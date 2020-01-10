@@ -7,26 +7,35 @@
 
 import Foundation
 
-public class Request {
+public class Transport {
+    
+}
+
+public class Request<T> {
+    
+    typealias Result = T
     
     // MARK:- Types
     
     enum RequestType {
-        case data, download, upload(Data)
+        case data(ResponseDecoder), download, upload(Data, ResponseDecoder)
         
-        func task(for request: URLRequest, on session: URLSession, completion: @escaping (Response)->Void) -> URLSessionTask {
+        func task(for request: URLRequest, on session: URLSession, completion: @escaping (Response<Result>)->Void) -> URLSessionTask {
             switch self {
-            case .data:
+            case .data(let decoder):
                 return session.dataTask(with: request) { (data, response, error) in
-                    completion(Response(urlResponse: response, url: nil, data: data, error: error))
+                    let contents = data != nil ? decoder.decode(Result.self, from: data!) : nil
+                    let response = Response<Result>(urlResponse: response, url: nil, contents: contents, error: error)
+                    completion(response)
                 }
             case .download:
                 return session.downloadTask(with: request) { (url, response, error) in
-                    completion(Response(urlResponse: response, url: url, data: nil, error: error))
+                    completion(Response(urlResponse: response, url: url, contents: nil, error: error))
                 }
-            case .upload(let data):
+            case .upload(let data, let decoder):
+                let contents = data != nil ? decoder.decode(Result.self, from: data!) : nil
                 return session.uploadTask(with: request, from: data) { (data, response, error) in
-                    completion(Response(urlResponse: response, url: nil, data: data, error: error))
+                    completion(Response(urlResponse: response, url: nil, contents: contents, error: error))
                 }
             }
         }
@@ -38,32 +47,24 @@ public class Request {
     
     var urlRequest: URLRequest
     
-    var type: RequestType = .data
-    
-    var method: String? {
-        get {
-            urlRequest.httpMethod
-        }
-        set {
-            urlRequest.httpMethod = newValue
-        }
-    }
+    var type: RequestType
     
     // MARK:- Initialization
     
-    init(_ aRequest: URLRequest, session aSession: URLSession) {
+    init(_ aRequest: URLRequest, type aType: RequestType, session aSession: URLSession) {
+        type = aType
         urlSession = aSession
         urlRequest = aRequest
     }
     
-    convenience init(_ anUrl: URL, session aSession: URLSession) {
-        self.init(URLRequest(url: anUrl), session: aSession)
+    convenience init(_ anUrl: URL, type aType: RequestType, session aSession: URLSession) {
+        self.init(URLRequest(url: anUrl), type: aType, session: aSession)
     }
     
     // MARK:- Execution
     
     @discardableResult
-    func execute(completion: @escaping (Response)->Void) -> URLSessionTask {
+    func execute(completion: @escaping (Response<Result>)->Void) -> URLSessionTask {
         let task = type.task(for: urlRequest, on: urlSession, completion: completion)
         task.resume()
         return task

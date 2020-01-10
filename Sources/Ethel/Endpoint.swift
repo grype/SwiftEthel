@@ -27,8 +27,7 @@ extension Endpoint {
     }
     
     func execute<T>(_ block: ExecutionBlock? = nil) -> Promise<T> {
-        return client.execute(self, with: block).compactMap { $0.data as? T
-        }
+        return client.execute(self, with: block)
     }
 }
 

@@ -7,13 +7,13 @@
 
 import Foundation
 
-public struct Response {
+public struct Response<T> {
     /// Actual URLResponse
     var urlResponse: URLResponse?
     /// Optional URL where response data is stored
     var url: URL?
-    /// Optional Data from the response
-    var data: Data?
+    /// Optional contents of the response
+    var contents: T?
     /// Response error
     var error: Error?
 }

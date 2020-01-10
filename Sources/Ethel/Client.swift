@@ -21,7 +21,7 @@ public protocol Client {
     
     func createRequest() -> Request
     
-    func execute(_ endpoint: Endpoint, with anExecBlock: ExecutionBlock?) -> Promise<Response>
+    func execute<T>(_ endpoint: Endpoint, with anExecBlock: ExecutionBlock?) -> Promise<T>
     
 }
 
@@ -35,16 +35,16 @@ extension Client {
         
     }
     
-    public func execute(_ endpoint: Endpoint, with anExecBlock: ExecutionBlock? = nil) -> Promise<Response> {
+    public func execute<T>(_ endpoint: Endpoint, with anExecBlock: ExecutionBlock? = nil) -> Promise<T> {
         let request = createRequest()
         configure(on: request)
         endpoint.configure(on: request)
         if let execBlock = anExecBlock {
             execBlock(request)
         }
-        return Promise<Response> { seal in
+        return Promise<T> { seal in
             request.execute { (response) in
-                seal.resolve(response, response.error)
+                seal.resolve(response as? T, response.error)
             }
         }
     }

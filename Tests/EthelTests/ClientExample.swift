@@ -94,7 +94,7 @@ class GHPublicGistsEndpoint : GHPaginatedEndpoint {
     
     func list() -> Promise<[GHGist]> {
         return execute { http in
-            http.method = "GET"
+            http.urlRequest.httpMethod = "GET"
         }
     }
 }
