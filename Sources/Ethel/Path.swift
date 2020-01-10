@@ -26,8 +26,8 @@ public struct Path {
     
     init(_ string: String? = nil, isAbsolute absolute: Bool, delimiter aDelimeter: String = DefaultDelimiter) {
         isAbsolute = absolute
-        segments = string?.components(separatedBy: delimiter).filter { !$0.isEmpty } ?? [String]()
         delimiter = aDelimeter
+        segments = string?.components(separatedBy: delimiter).filter { !$0.isEmpty } ?? [String]()
     }
     
     init(_ string: String? = nil, delimiter aDelimeter: String = DefaultDelimiter) {

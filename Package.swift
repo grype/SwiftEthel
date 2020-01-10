@@ -31,6 +31,6 @@ let package = Package(
             dependencies: ["Beacon", "PromiseKit"]),
         .testTarget(
             name: "EthelTests",
-            dependencies: ["Ethel", "Nimble"]),
+            dependencies: ["Ethel", "PromiseKit"]),
     ]
 )

@@ -13,7 +13,7 @@ public protocol Endpoint {
     init(on aClient: Client)
     static var path: Path { get }
     var client: Client { get set }
-    func configure(on aRequest: Request)
+    func configure(on aTransport: Transport)
     func execute<T>(_ block: ExecutionBlock?) -> Promise<T>
 }
 
@@ -22,8 +22,8 @@ extension Endpoint {
         return type(of: self).path
     }
     
-    func configure(on aRequest: Request) {
-        aRequest.urlRequest.url?.resolve(path)
+    func configure(on aTransport: Transport) {
+        aTransport.request?.url?.resolve(path)
     }
     
     func execute<T>(_ block: ExecutionBlock? = nil) -> Promise<T> {

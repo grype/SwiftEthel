@@ -51,6 +51,8 @@ class GHClient : Client {
     
     var configuration: GHClientConfiguration
     
+    var dateFormatter = ISO8601DateFormatter()
+    
     var gists : GHGistsEndpoint {
         return self / GHGistsEndpoint.self
     }
@@ -66,6 +68,10 @@ class GHEndpoint : Endpoint {
     }
     
     var client: Client
+    
+    var dateFormatter: ISO8601DateFormatter {
+        return (client as! GHClient).dateFormatter
+    }
     
     required init(on aClient: Client) {
         client = aClient
@@ -92,9 +98,23 @@ class GHPublicGistsEndpoint : GHPaginatedEndpoint {
     
     var since: Date?
     
+    func configure(on aTransport: Transport) {
+        if let since = since {
+            aTransport.add(queryItem: URLQueryItem(name: "since", value: dateFormatter.string(from: since)))
+        }
+    }
+    
     func list() -> Promise<[GHGist]> {
+        let url = (client.baseUrl / path)!
+        let request = URLRequest(url: url)
+        
+        // TODO: try using publisher as a means of executing requests and mapping responses
+        // You'd call Client.execute() with a block, the client will call the block with configured DataTaskPublisher,
+        // the endpoint method will then do all the mapping and decoding?!
+        let result = client.session.dataTaskPublisher(for: request).map { $0.data }.decode(type: GHGist.self, decoder: JSONDecoder())
+        
         return execute { http in
-            http.urlRequest.httpMethod = "GET"
+            http.request?.httpMethod = "GET"
         }
     }
 }

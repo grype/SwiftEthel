@@ -9,7 +9,7 @@
 import Foundation
 import PromiseKit
 
-public typealias ExecutionBlock = (Request) -> Void
+public typealias ExecutionBlock = (Transport) -> Void
 
 public protocol Client {
     
@@ -17,9 +17,7 @@ public protocol Client {
     
     var session: URLSession { get }
     
-    func configure(on aBuilder: Request)
-    
-    func createRequest() -> Request
+    func configure(on aTransport: Transport)
     
     func execute<T>(_ endpoint: Endpoint, with anExecBlock: ExecutionBlock?) -> Promise<T>
     
@@ -27,24 +25,24 @@ public protocol Client {
 
 extension Client {
     
-    func createRequest() -> Request {
-        return Request(baseUrl, session: session)
+    public func createTransport() -> Transport {
+        return Transport(session)
     }
     
-    public func configure(on aBuilder: Request) {
-        
+    public func configure(on aTransport: Transport) {
+        aTransport.request = URLRequest(url: baseUrl)
     }
     
     public func execute<T>(_ endpoint: Endpoint, with anExecBlock: ExecutionBlock? = nil) -> Promise<T> {
-        let request = createRequest()
-        configure(on: request)
-        endpoint.configure(on: request)
+        let transport = createTransport()
+        configure(on: transport)
+        endpoint.configure(on: transport)
         if let execBlock = anExecBlock {
-            execBlock(request)
+            execBlock(transport)
         }
         return Promise<T> { seal in
-            request.execute { (response) in
-                seal.resolve(response as? T, response.error)
+            transport.execute { (transport) in
+                seal.resolve(transport.contents as? T, transport.responseError)
             }
         }
     }
