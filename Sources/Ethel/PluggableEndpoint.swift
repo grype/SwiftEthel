@@ -8,8 +8,15 @@
 
 import Foundation
 
-struct PluggableEndpoint : Endpoint {
+class PluggableEndpoint : Endpoint {
+    static var path: Path = Path()
     
-    private(set) var endpointPath: Path
+    var client: Client
+    
+    var path: Path?
+    
+    required init(on aClient: Client) {
+        client = aClient
+    }
     
 }

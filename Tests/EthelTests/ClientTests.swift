@@ -12,10 +12,6 @@ import Nimble
 
 class ClientTests: XCTestCase {
     
-    static var allTests = [
-        ("testInit", testInit),
-    ]
-    
     private var client: Client!
     private static var defaultUrl: URL = URL(string: "http://localhost:8080/")!
 

@@ -7,16 +7,31 @@
 //
 
 import Foundation
+import PromiseKit
 
 public protocol Endpoint {
-    var endpointPath: Path { get }
+    init(on aClient: Client)
+    static var path: Path { get }
     var client: Client { get set }
-    func configure(on aSession: URLSession)
-    init(_ aClient: Client)
+    func configure(on aRequest: Request)
+    func execute<T>(_ block: Client.ExecutionBlock?) -> Promise<T>
 }
 
 extension Endpoint {
-    init(_ aClient: Client) {
-        client = aClient
+    var path: Path {
+        return type(of: self).path
     }
+    
+    func configure(on aRequest: Request) {
+        aRequest.urlRequest.url?.resolve(path)
+    }
+    
+    func execute<T>(_ block: Client.ExecutionBlock? = nil) -> Promise<T> {
+        return client.execute(self, with: block).compactMap { $0.data as? T
+        }
+    }
+}
+
+public func /<T: Endpoint, U: Endpoint>(left: T, right: U.Type) -> U {
+    return right.init(on: left.client)
 }

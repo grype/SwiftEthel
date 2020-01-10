@@ -9,21 +9,14 @@
 import Foundation
 import PromiseKit
 
-struct RequestError : Error {
-    var request: URLRequest!
-    init(_ aRequest: URLRequest) {
-        request = aRequest
-    }
-}
-
-public class Client : Named {
+public class Client {
     
-    public typealias ExecutionBlock = (URLSession) -> Void
+    public typealias ExecutionBlock = (Request) -> Void
     
     public private(set) var baseUrl : URL!
     
     public lazy var session: URLSession = {
-        URLSession(configuration: URLSessionConfiguration.background(withIdentifier: typeName))
+        URLSession(configuration: URLSessionConfiguration.background(withIdentifier: String(describing: type(of: self))))
     }()
     
     // MARK:- Initializing
@@ -32,14 +25,34 @@ public class Client : Named {
         baseUrl = aBaseUrl
     }
     
+    // MARK:- Configuring
+    
+    public func configure(on aBuilder: Request) {
+        
+    }
+    
     // MARK:- Executing
     
-    public func execute(_ endpoint: Endpoint, with anExecBlock: ExecutionBlock? = nil) -> Promise<URLSession> {
-        endpoint.configure(on: session)
+    func createRequest() -> Request {
+        return Request(baseUrl, session: session)
+    }
+    
+    public func execute(_ endpoint: Endpoint, with anExecBlock: ExecutionBlock? = nil) -> Promise<Response> {
+        let request = createRequest()
+        configure(on: request)
+        endpoint.configure(on: request)
+        if let execBlock = anExecBlock {
+            execBlock(request)
+        }
+        return Promise<Response> { seal in
+            request.execute { (response) in
+                seal.resolve(response, response.error)
+            }
+        }
     }
     
 }
 
-func /(left: Client, right: Endpoint.Type) -> Endpoint {
-    return right.init(left)
+func /<T: Endpoint>(left: Client, right: T.Type) -> T {
+    return right.init(on: left)
 }
