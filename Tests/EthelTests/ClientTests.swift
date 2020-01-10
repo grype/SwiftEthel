@@ -7,16 +7,20 @@
 //
 
 import XCTest
-import Ethel
 import Nimble
+@testable import Ethel
+
+class TestClient : Client {
+    var baseUrl = URL(string: "http://localhost:8080/")!
+    var session = URLSession(configuration: URLSessionConfiguration.background(withIdentifier: "TestClient"))
+}
 
 class ClientTests: XCTestCase {
     
     private var client: Client!
-    private static var defaultUrl: URL = URL(string: "http://localhost:8080/")!
 
     override func setUp() {
-        client = Client(ClientTests.defaultUrl)
+        client = TestClient()
     }
 
     override func tearDown() {
@@ -24,7 +28,6 @@ class ClientTests: XCTestCase {
     }
 
     func testInit() {
-        expect(self.client.baseUrl).to(equal(ClientTests.defaultUrl))
     }
 
 //    func testPerformanceExample() {

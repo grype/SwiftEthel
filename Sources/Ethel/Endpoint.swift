@@ -14,7 +14,7 @@ public protocol Endpoint {
     static var path: Path { get }
     var client: Client { get set }
     func configure(on aRequest: Request)
-    func execute<T>(_ block: Client.ExecutionBlock?) -> Promise<T>
+    func execute<T>(_ block: ExecutionBlock?) -> Promise<T>
 }
 
 extension Endpoint {
@@ -26,7 +26,7 @@ extension Endpoint {
         aRequest.urlRequest.url?.resolve(path)
     }
     
-    func execute<T>(_ block: Client.ExecutionBlock? = nil) -> Promise<T> {
+    func execute<T>(_ block: ExecutionBlock? = nil) -> Promise<T> {
         return client.execute(self, with: block).compactMap { $0.data as? T
         }
     }

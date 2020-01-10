@@ -41,6 +41,11 @@ struct GHClientConfiguration {
 // MARK:- Client
 
 class GHClient : Client {
+    var baseUrl: URL {
+        return configuration.url
+    }
+    
+    var session: URLSession = URLSession(configuration: URLSessionConfiguration.background(withIdentifier: "GHClient"))
     
     static var `default` = GHClient(configuration: GHClientConfiguration.default)
     
@@ -52,7 +57,6 @@ class GHClient : Client {
     
     init(configuration aConfig: GHClientConfiguration) {
         configuration = aConfig
-        super.init(aConfig.url)
     }
 }
 

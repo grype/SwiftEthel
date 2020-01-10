@@ -9,32 +9,30 @@
 import Foundation
 import PromiseKit
 
-public class Client {
+public typealias ExecutionBlock = (Request) -> Void
+
+public protocol Client {
     
-    public typealias ExecutionBlock = (Request) -> Void
+    var baseUrl: URL { get }
     
-    public private(set) var baseUrl : URL!
+    var session: URLSession { get }
     
-    public lazy var session: URLSession = {
-        URLSession(configuration: URLSessionConfiguration.background(withIdentifier: String(describing: type(of: self))))
-    }()
+    func configure(on aBuilder: Request)
     
-    // MARK:- Initializing
+    func createRequest() -> Request
     
-    public init(_ aBaseUrl: URL) {
-        baseUrl = aBaseUrl
-    }
+    func execute(_ endpoint: Endpoint, with anExecBlock: ExecutionBlock?) -> Promise<Response>
     
-    // MARK:- Configuring
-    
-    public func configure(on aBuilder: Request) {
-        
-    }
-    
-    // MARK:- Executing
+}
+
+extension Client {
     
     func createRequest() -> Request {
         return Request(baseUrl, session: session)
+    }
+    
+    public func configure(on aBuilder: Request) {
+        
     }
     
     public func execute(_ endpoint: Endpoint, with anExecBlock: ExecutionBlock? = nil) -> Promise<Response> {
@@ -50,7 +48,6 @@ public class Client {
             }
         }
     }
-    
 }
 
 func /<T: Endpoint>(left: Client, right: T.Type) -> T {
