@@ -2,12 +2,30 @@
   "object": {
     "pins": [
       {
+        "package": "CwlCatchException",
+        "repositoryURL": "https://github.com/mattgallagher/CwlCatchException.git",
+        "state": {
+          "branch": null,
+          "revision": "7cd2f8cacc4d22f21bc0b2309c3b18acf7957b66",
+          "version": "1.2.0"
+        }
+      },
+      {
+        "package": "CwlPreconditionTesting",
+        "repositoryURL": "https://github.com/mattgallagher/CwlPreconditionTesting.git",
+        "state": {
+          "branch": null,
+          "revision": "c228db5d2ad1b01ebc84435e823e6cca4e3db98b",
+          "version": "1.2.0"
+        }
+      },
+      {
         "package": "Nimble",
         "repositoryURL": "https://github.com/Quick/Nimble.git",
         "state": {
           "branch": null,
-          "revision": "f8657642dfdec9973efc79cc68bcef43a653a2bc",
-          "version": "8.0.2"
+          "revision": "b02b00b30b6353632aa4a5fb6124f8147f7140c0",
+          "version": "8.0.5"
         }
       },
       {
@@ -15,17 +33,17 @@
         "repositoryURL": "https://github.com/mxcl/PromiseKit",
         "state": {
           "branch": null,
-          "revision": "2fdb8c64a85e2081388532dbc61eb348a0793b1c",
-          "version": "6.10.0"
+          "revision": "80963d4317bcdc03891e0fbaa744f20511d1bc08",
+          "version": "6.12.0"
         }
       },
       {
         "package": "Beacon",
         "repositoryURL": "https://github.com/grype/SwiftBeacon",
         "state": {
-          "branch": null,
-          "revision": "eee727684b9b92448933fb7ae864689bda9d133b",
-          "version": "1.0.0"
+          "branch": "master",
+          "revision": "3cf823763c04bc5b7c15455ead4628e5cc8ccd8f",
+          "version": null
         }
       }
     ]
