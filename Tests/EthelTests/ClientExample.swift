@@ -41,11 +41,7 @@ struct GHClientConfiguration {
 // MARK:- Client
 
 class GHClient : Client {
-    var baseUrl: URL {
-        return configuration.url
-    }
-    
-    var session: URLSession = URLSession(configuration: URLSessionConfiguration.background(withIdentifier: "GHClient"))
+    override var baseUrl: URL? { return configuration.url }
     
     static var `default` = GHClient(configuration: GHClientConfiguration.default)
     
@@ -53,13 +49,17 @@ class GHClient : Client {
     
     var dateFormatter = ISO8601DateFormatter()
     
+    init(configuration aConfig: GHClientConfiguration) {
+        configuration = aConfig
+        super.init(url: aConfig.url, sessionConfiguration: URLSessionConfiguration.background(withIdentifier: "GHClient"))
+    }
+    
+    // MARK:- Endpoints
+    
     var gists : GHGistsEndpoint {
         return self / GHGistsEndpoint.self
     }
     
-    init(configuration aConfig: GHClientConfiguration) {
-        configuration = aConfig
-    }
 }
 
 class GHEndpoint : Endpoint {
@@ -105,16 +105,12 @@ class GHPublicGistsEndpoint : GHPaginatedEndpoint {
     }
     
     func list() -> Promise<[GHGist]> {
-        let url = (client.baseUrl / path)!
-        let request = URLRequest(url: url)
-        
-        // TODO: try using publisher as a means of executing requests and mapping responses
-        // You'd call Client.execute() with a block, the client will call the block with configured DataTaskPublisher,
-        // the endpoint method will then do all the mapping and decoding?!
-        let result = client.session.dataTaskPublisher(for: request).map { $0.data }.decode(type: GHGist.self, decoder: JSONDecoder())
-        
-        return execute { http in
-            http.request?.httpMethod = "GET"
+        return execute { transport in
+            transport.request?.httpMethod = "GET"
+            transport.contentReader = { (data) -> [GHGist] in
+                let result = try? JSONDecoder().decode([GHGist].self, from: data)
+                return result ?? [GHGist]()
+            }
         }
     }
 }
@@ -128,9 +124,12 @@ class GHClientTests: XCTestCase {
     func testListPublicGists() {
         let publicGists = client.gists.public
         publicGists.since = Date().addingTimeInterval(-86400)
+        let expect = expectation(description: "Listing public gists")
         let _ = publicGists.list().done { (gists) in
             print(String(describing: gists))
+            expect.fulfill()
         }
+        wait(for: [expect], timeout: 10)
     }
     
 //    func testIteratePublicGists() {

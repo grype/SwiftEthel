@@ -11,26 +11,29 @@ import PromiseKit
 
 public typealias ExecutionBlock = (Transport) -> Void
 
-public protocol Client {
+public class Client : NSObject, URLSessionDataDelegate {
     
-    var baseUrl: URL { get }
+    private(set) var baseUrl: URL?
     
-    var session: URLSession { get }
+    var session: URLSession!
     
-    func configure(on aTransport: Transport)
+    private var tasks = [URLSessionTask : Transport]()
     
-    func execute<T>(_ endpoint: Endpoint, with anExecBlock: ExecutionBlock?) -> Promise<T>
-    
-}
-
-extension Client {
+    init(url anUrl: URL? = nil, sessionConfiguration: URLSessionConfiguration? = nil) {
+        super.init()
+        let sessionConfig = sessionConfiguration ?? URLSessionConfiguration.default
+        baseUrl = anUrl
+        session = URLSession(configuration: sessionConfig, delegate: self, delegateQueue: nil)
+    }
     
     public func createTransport() -> Transport {
         return Transport(session)
     }
     
     public func configure(on aTransport: Transport) {
-        aTransport.request = URLRequest(url: baseUrl)
+        if let baseUrl = baseUrl {
+            aTransport.request = URLRequest(url: baseUrl)
+        }
     }
     
     public func execute<T>(_ endpoint: Endpoint, with anExecBlock: ExecutionBlock? = nil) -> Promise<T> {
@@ -41,10 +44,31 @@ extension Client {
             execBlock(transport)
         }
         return Promise<T> { seal in
-            transport.execute { (transport) in
+            let task = transport.execute { (transport, task) in
                 seal.resolve(transport.contents as? T, transport.responseError)
+                if let task = task {
+                    self.tasks.removeValue(forKey: task)
+                }
             }
+            self.tasks[task] = transport
         }
+    }
+    
+    public func urlSession(_ session: URLSession, didBecomeInvalidWithError error: Error?) {
+        self.tasks.forEach { (task, transport) in
+            transport.urlSession(session, didBecomeInvalidWithError: error)
+        }
+    }
+    
+    public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+        self.tasks.forEach { (task, transport) in
+            transport.urlSession(session, task: task, didCompleteWithError: error)
+        }
+    }
+    
+    public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
+        guard let transport = self.tasks[dataTask] else { return }
+        transport.urlSession(session, dataTask: dataTask, didReceive: data)
     }
 }
 

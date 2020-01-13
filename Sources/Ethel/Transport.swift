@@ -7,13 +7,15 @@
 
 import Foundation
 
-public class Transport {
+public class Transport : NSObject {
     
     // MARK:- Types
     
     enum RequestType {
         case data, download, upload
     }
+    
+    typealias Completion = (Transport, URLSessionTask?)->Void
     
     // MARK:- Properties
     
@@ -35,28 +37,26 @@ public class Transport {
     
     private(set) var responseError: Error?
     
+    private var completion: Completion!
+    
     // MARK:- Initialization
     
     init(_ aSession: URLSession) {
         session = aSession
+        super.init()
     }
     
     // MARK:- Execution
     
-    @discardableResult
-    func execute(completion: @escaping (Transport)->Void) -> URLSessionTask {
+    func execute(completion aCompletionBlock: @escaping Completion) -> URLSessionTask {
         guard let request = request else {
             fatalError("Transport has no configured request")
         }
         
         var task: URLSessionTask!
         
-        task = session.dataTask(with: request) { (data, response, error) in
-            self.response = response
-            self.responseData = data
-            self.responseError = error
-            self.hasResponse = true
-        }
+        task = session.dataTask(with: request)
+        completion = aCompletionBlock
         task.resume()
         return task
     }
@@ -133,6 +133,36 @@ public class Transport {
                 return contentReader(responseData)
             }
             return responseData
+        }
+    }
+}
+
+extension Transport : URLSessionDelegate {
+    public func urlSession(_ session: URLSession, didBecomeInvalidWithError error: Error?) {
+        responseError = error
+        hasResponse = true
+        completion(self, nil)
+    }
+}
+
+extension Transport : URLSessionTaskDelegate {
+    public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+        responseError = error
+        response = task.response
+        hasResponse = true
+        completion(self, task)
+    }
+}
+
+extension Transport : URLSessionDataDelegate {
+    public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
+        guard var responseData = responseData else {
+            self.responseData = data
+            return
+        }
+        var i = data.enumerated().makeIterator()
+        while let next = i.next() {
+            responseData.append(next.element)
         }
     }
 }

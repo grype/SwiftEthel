@@ -11,8 +11,6 @@ import XCTest
 @testable import Ethel
 
 class TestClient : Client {
-    var baseUrl = URL(string: "http://localhost:8080/")!
-    var session = URLSession(configuration: URLSessionConfiguration.background(withIdentifier: "TestClient"))
 }
 
 class ClientTests: XCTestCase {
@@ -20,7 +18,7 @@ class ClientTests: XCTestCase {
     private var client: Client!
 
     override func setUp() {
-        client = TestClient()
+        client = TestClient(url: URL(string: "http://localhost:8080/"), sessionConfiguration: URLSessionConfiguration.default)
     }
 
     override func tearDown() {
