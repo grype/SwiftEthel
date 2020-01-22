@@ -11,17 +11,34 @@ import PromiseKit
 
 // MARK:- Models
 
-class GHGist : Codable, CustomStringConvertible {
+struct GHGist : Codable, CustomStringConvertible {
     var url: URL
     var isPublic: Bool
     var created: Date
     var updated: Date?
     var gistDescription: String?
     
+    enum CodingKeys: String, CodingKey {
+        case url
+        case isPublic = "public"
+        case gistDescription = "description"
+        case created = "created_at"
+        case updated = "updated_at"
+    }
+    
     init(url aUrl: URL, public aPublic: Bool, created aCreatedDate: Date = Date()) {
         url = aUrl
         isPublic = aPublic
         created = aCreatedDate
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        url = try container.decode(URL.self, forKey: .url)
+        isPublic = try container.decode(Bool.self, forKey: .isPublic)
+        created = ISO8601DateFormatter().date(from: try container.decode(String.self, forKey: .created))!
+        updated = ISO8601DateFormatter().date(from: try container.decode(String.self, forKey: .updated))
+        gistDescription = try container.decode(String.self, forKey: .gistDescription)
     }
     
     var description: String {
@@ -54,13 +71,15 @@ class GHClient : Client {
         super.init(url: aConfig.url, sessionConfiguration: URLSessionConfiguration.background(withIdentifier: "GHClient"))
     }
     
-    // MARK:- Endpoints
+    // MARK: Endpoints
     
     var gists : GHGistsEndpoint {
         return self / GHGistsEndpoint.self
     }
     
 }
+
+// MARK:- Endpoints
 
 class GHEndpoint : Endpoint {
     class var path: Path {
@@ -81,8 +100,6 @@ class GHEndpoint : Endpoint {
 class GHPaginatedEndpoint : GHEndpoint {
     
 }
-
-// MARK:- Endpoints
 
 class GHGistsEndpoint : GHEndpoint {
     
@@ -108,7 +125,13 @@ class GHPublicGistsEndpoint : GHPaginatedEndpoint {
         return execute { transport in
             transport.request?.httpMethod = "GET"
             transport.contentReader = { (data) -> [GHGist] in
-                let result = try? JSONDecoder().decode([GHGist].self, from: data)
+                var result: [GHGist]?
+                do {
+                    result = try JSONDecoder().decode([GHGist].self, from: data)
+                }
+                catch {
+                    print("Error decoding JSON data: \(error)")
+                }
                 return result ?? [GHGist]()
             }
         }
