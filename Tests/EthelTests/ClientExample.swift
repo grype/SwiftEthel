@@ -108,6 +108,12 @@ class GHGistsEndpoint : GHEndpoint {
     var `public` : GHPublicGistsEndpoint {
         return self / GHPublicGistsEndpoint.self
     }
+    
+    func `public`(since: Date? = nil) -> Promise<[GHGist]> {
+        let ep = self.public
+        ep.since = since
+        return ep.list()
+    }
 }
 
 class GHPublicGistsEndpoint : GHPaginatedEndpoint {
@@ -137,6 +143,15 @@ class GHClientTests: XCTestCase {
         publicGists.since = Date().addingTimeInterval(-86400)
         let expect = expectation(description: "Listing public gists")
         let _ = publicGists.list().done { (gists) in
+            print(String(describing: gists))
+            expect.fulfill()
+        }
+        wait(for: [expect], timeout: 10)
+    }
+    
+    func testListPublicGistsShortcut() {
+        let expect = expectation(description: "Listing public gists")
+        let _ = client.gists.public(since: Date().addingTimeInterval(-86400)).done { (gists) in
             print(String(describing: gists))
             expect.fulfill()
         }
