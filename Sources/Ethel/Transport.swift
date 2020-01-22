@@ -156,13 +156,10 @@ extension Transport : URLSessionTaskDelegate {
 
 extension Transport : URLSessionDataDelegate {
     public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
-        guard var responseData = responseData else {
+        guard let _ = responseData else {
             self.responseData = data
             return
         }
-        var i = data.enumerated().makeIterator()
-        while let next = i.next() {
-            responseData.append(next.element)
-        }
+        self.responseData?.append(data)
     }
 }
