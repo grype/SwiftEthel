@@ -122,19 +122,7 @@ class GHPublicGistsEndpoint : GHPaginatedEndpoint {
     }
     
     func list() -> Promise<[GHGist]> {
-        return execute { transport in
-            transport.request?.httpMethod = "GET"
-            transport.contentReader = { (data) -> [GHGist] in
-                var result: [GHGist]?
-                do {
-                    result = try JSONDecoder().decode([GHGist].self, from: data)
-                }
-                catch {
-                    print("Error decoding JSON data: \(error)")
-                }
-                return result ?? [GHGist]()
-            }
-        }
+        return getJSON()
     }
 }
 
