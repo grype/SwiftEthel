@@ -15,7 +15,7 @@ public class Client : NSObject, URLSessionDataDelegate {
     
     private(set) var baseUrl: URL?
     
-    var session: URLSession!
+    private(set) var session: URLSession!
     
     private var tasks = [URLSessionTask : Transport]()
     
