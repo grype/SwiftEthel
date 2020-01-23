@@ -66,31 +66,36 @@ public func /<T: Endpoint, U: Endpoint>(left: T, right: U.Type) -> U {
 
 // MARK:- JSON Extensions
 extension Endpoint {
-    public func getJSON<T: Decodable>(decoder: JSONDecoder = JSONDecoder(), block: ExecutionBlock? = nil) -> Promise<T> {
-        return client.getJSON(self, decoder: decoder, with: block)
+    
+    var jsonDecoder: JSONDecoder {
+        return JSONDecoder()
     }
     
-    public func deleteJSON<T: Decodable>(decoder: JSONDecoder = JSONDecoder(), block: ExecutionBlock? = nil) -> Promise<T> {
-        return client.deleteJSON(self, decoder: decoder, with: block)
+    public func getJSON<T: Decodable>(decoder: JSONDecoder? = nil, block: ExecutionBlock? = nil) -> Promise<T> {
+        return client.getJSON(self, decoder: decoder ?? jsonDecoder, with: block)
     }
     
-    public func putJSON<T: Decodable>(decoder: JSONDecoder = JSONDecoder(), block: ExecutionBlock? = nil) -> Promise<T> {
-        return client.putJSON(self, decoder: decoder, with: block)
+    public func deleteJSON<T: Decodable>(decoder: JSONDecoder? = nil, block: ExecutionBlock? = nil) -> Promise<T> {
+        return client.deleteJSON(self, decoder: decoder ?? jsonDecoder, with: block)
     }
     
-    public func postJSON<T: Decodable>(decoder: JSONDecoder = JSONDecoder(), block: ExecutionBlock? = nil) -> Promise<T> {
-        return client.postJSON(self, decoder: decoder, with: block)
+    public func putJSON<T: Decodable>(decoder: JSONDecoder? = nil, block: ExecutionBlock? = nil) -> Promise<T> {
+        return client.putJSON(self, decoder: decoder ?? jsonDecoder, with: block)
     }
     
-    public func patchJSON<T: Decodable>(decoder: JSONDecoder = JSONDecoder(), block: ExecutionBlock? = nil) -> Promise<T> {
-        return client.patchJSON(self, decoder: decoder, with: block)
+    public func postJSON<T: Decodable>(decoder: JSONDecoder? = nil, block: ExecutionBlock? = nil) -> Promise<T> {
+        return client.postJSON(self, decoder: decoder ?? jsonDecoder, with: block)
     }
     
-    public func optionsJSON<T: Decodable>(decoder: JSONDecoder = JSONDecoder(), block: ExecutionBlock? = nil) -> Promise<T> {
-        return client.optionsJSON(self, decoder: decoder, with: block)
+    public func patchJSON<T: Decodable>(decoder: JSONDecoder? = nil, block: ExecutionBlock? = nil) -> Promise<T> {
+        return client.patchJSON(self, decoder: decoder ?? jsonDecoder, with: block)
     }
     
-    public func headJSON<T: Decodable>(decoder: JSONDecoder = JSONDecoder(), block: ExecutionBlock? = nil) -> Promise<T> {
-        return client.headJSON(self, decoder: decoder, with: block)
+    public func optionsJSON<T: Decodable>(decoder: JSONDecoder? = nil, block: ExecutionBlock? = nil) -> Promise<T> {
+        return client.optionsJSON(self, decoder: decoder ?? jsonDecoder, with: block)
+    }
+    
+    public func headJSON<T: Decodable>(decoder: JSONDecoder? = nil, block: ExecutionBlock? = nil) -> Promise<T> {
+        return client.headJSON(self, decoder: decoder ?? jsonDecoder, with: block)
     }
 }
