@@ -8,6 +8,7 @@
 
 import Foundation
 import PromiseKit
+import Beacon
 
 public typealias ExecutionBlock = (Transport) -> Void
 
@@ -19,6 +20,8 @@ public class Client : NSObject, URLSessionDataDelegate {
     
     private var tasks = [URLSessionTask : Transport]()
     
+    var loggers = [SignalLogger]()
+    
     // MARK: Init
     
     init(url anUrl: URL? = nil, sessionConfiguration: URLSessionConfiguration? = nil) {
@@ -26,6 +29,7 @@ public class Client : NSObject, URLSessionDataDelegate {
         let sessionConfig = sessionConfiguration ?? URLSessionConfiguration.default
         baseUrl = anUrl
         session = URLSession(configuration: sessionConfig, delegate: self, delegateQueue: nil)
+        loggers.append(ConsoleLogger(name: "Ethel.Client"))
     }
     
     // MARK: Configuring
@@ -37,6 +41,19 @@ public class Client : NSObject, URLSessionDataDelegate {
     public func configure(on aTransport: Transport) {
         if let baseUrl = baseUrl {
             aTransport.request = URLRequest(url: baseUrl)
+        }
+    }
+    
+    public var loggingEnabled = false {
+        didSet {
+            loggers.forEach { (logger) in
+                if loggingEnabled {
+                    logger.start()
+                }
+                else {
+                    logger.stop()
+                }
+            }
         }
     }
     
