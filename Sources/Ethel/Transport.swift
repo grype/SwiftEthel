@@ -6,8 +6,9 @@
 //
 
 import Foundation
+import Beacon
 
-public class Transport : NSObject {
+public class Transport : NSObject{
     
     // MARK:- Types
     
@@ -39,6 +40,8 @@ public class Transport : NSObject {
     
     private var completion: Completion!
     
+    private(set) var currentTask: URLSessionTask?
+    
     // MARK:- Initialization
     
     init(_ aSession: URLSession) {
@@ -58,6 +61,8 @@ public class Transport : NSObject {
         task = session.dataTask(with: request)
         completion = aCompletionBlock
         task.resume()
+        currentTask = task
+        emit(self)
         return task
     }
     
@@ -70,6 +75,12 @@ public class Transport : NSObject {
         get {
             return hasResponse ? response?.url : request?.url
         }
+    }
+    
+    // MARK:- Testing
+    
+    var isExecuting: Bool {
+        return currentTask != nil
     }
     
     // MARK:- Query
@@ -135,12 +146,24 @@ public class Transport : NSObject {
             return responseData
         }
     }
+    
+    override public var description: String {
+        return """
+        \(super.description)
+            Executing: \(String(describing: isExecuting))
+            Request: \((request != nil) ? String(describing: request!) : "<nil>")
+            Response: \((response != nil) ? String(describing: response!) : "<nil>")
+            Current Task: \((currentTask != nil) ? String(describing: currentTask!) : "<nil>" )
+        """
+    }
 }
 
 extension Transport : URLSessionDelegate {
     public func urlSession(_ session: URLSession, didBecomeInvalidWithError error: Error?) {
         responseError = error
         hasResponse = true
+        currentTask = nil
+        emit(self)
         completion(self, nil)
     }
 }
@@ -150,6 +173,8 @@ extension Transport : URLSessionTaskDelegate {
         responseError = error
         response = task.response
         hasResponse = true
+        currentTask = nil
+        emit(self)
         completion(self, task)
     }
 }
@@ -161,5 +186,45 @@ extension Transport : URLSessionDataDelegate {
             return
         }
         self.responseData?.append(data)
+    }
+}
+
+extension Transport : NSCopying {
+    public func copy(with zone: NSZone? = nil) -> Any {
+        let transport = Transport(session)
+        transport.type = type
+        transport.request = request
+        transport.response = response
+        transport.currentTask = currentTask
+        transport.contents = contents
+        transport.contentReader = contentReader
+        transport.contentWriter = contentWriter
+        transport.hasResponse = hasResponse
+        transport.responseData = responseData
+        transport.responseError = responseError
+        return transport
+    }
+}
+
+class TransportSignal : Signal {
+    var transport: Transport
+    
+    override class var signalName: String {
+        return "🚛 \(super.signalName)"
+    }
+    
+    init(_ aTransport: Transport) {
+        transport = aTransport
+        super.init()
+    }
+    
+    override var description: String {
+        return "\(super.description) \(transport.description)"
+    }
+}
+
+extension Transport : Signaling {
+    public var beaconSignal: Signal {
+        return TransportSignal(self)
     }
 }
