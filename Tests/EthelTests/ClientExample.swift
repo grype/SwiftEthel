@@ -12,37 +12,33 @@ import PromiseKit
 // MARK:- Models
 
 struct GHGist : Codable, CustomStringConvertible {
-    var url: URL
-    var isPublic: Bool
-    var created: Date
+    var id: String?
+    var url: URL?
+    var isPublic: Bool?
+    var created: Date?
     var updated: Date?
     var gistDescription: String?
     
     enum CodingKeys: String, CodingKey {
-        case url
+        case id, url
         case isPublic = "public"
         case gistDescription = "description"
         case created = "created_at"
         case updated = "updated_at"
     }
     
-    init(url aUrl: URL, public aPublic: Bool, created aCreatedDate: Date = Date()) {
-        url = aUrl
-        isPublic = aPublic
-        created = aCreatedDate
-    }
-    
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(String.self, forKey: .id)
         url = try container.decode(URL.self, forKey: .url)
         isPublic = try container.decode(Bool.self, forKey: .isPublic)
-        created = ISO8601DateFormatter().date(from: try container.decode(String.self, forKey: .created))!
+        created = ISO8601DateFormatter().date(from: try container.decode(String.self, forKey: .created))
         updated = ISO8601DateFormatter().date(from: try container.decode(String.self, forKey: .updated))
         gistDescription = try container.decode(String.self, forKey: .gistDescription)
     }
     
     var description: String {
-        return "GHGist <\(url)>"
+        return "GHGist <\(id!)>"
     }
 }
 
@@ -114,6 +110,12 @@ class GHGistsEndpoint : GHEndpoint {
         ep.since = since
         return ep.list()
     }
+    
+    func gist(withId id: String) -> Promise<GHGist> {
+        return getJSON(decoder: nil) { (transport) in
+            transport.request?.url?.appendPathComponent(id)
+        }
+    }
 }
 
 class GHPublicGistsEndpoint : GHPaginatedEndpoint {
@@ -138,6 +140,11 @@ class GHClientTests: XCTestCase {
     
     var client = GHClient.default
     
+    override func setUp() {
+        super.setUp()
+        client.loggingEnabled = true
+    }
+    
     func testListPublicGists() {
         let publicGists = client.gists.public
         publicGists.since = Date().addingTimeInterval(-86400)
@@ -153,6 +160,19 @@ class GHClientTests: XCTestCase {
         let expect = expectation(description: "Listing public gists")
         let _ = client.gists.public(since: Date().addingTimeInterval(-86400)).done { (gists) in
             print(String(describing: gists))
+            expect.fulfill()
+        }
+        wait(for: [expect], timeout: 10)
+    }
+    
+    func testGistById() {
+        let expect = expectation(description: "Getting gist by id")
+        let _ = firstly {
+            self.client.gists.public()
+        }.then { (gists) -> Promise<GHGist> in
+            self.client.gists.gist(withId: gists[0].id!)
+        }.done { (gist) in
+            print(String(describing: gist))
             expect.fulfill()
         }
         wait(for: [expect], timeout: 10)
