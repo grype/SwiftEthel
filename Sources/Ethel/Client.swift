@@ -141,7 +141,7 @@ func /<T: Endpoint>(left: Client, right: T.Type) -> T {
 // MARK:- JSON Extensions
 
 extension Client {
-    private func executeJSON<T: Decodable>(method: String, endpoint: Endpoint, decoder: JSONDecoder = JSONDecoder(), with anExecBlock: ExecutionBlock? = nil) -> Promise<T> {
+    private func executeJSON<T: Decodable>(method: String, endpoint: Endpoint, decoder: JSONDecoder = JSONDecoder(), with block: ExecutionBlock? = nil) -> Promise<T> {
         return execute(endpoint) { (transport) in
             transport.request?.httpMethod = method
             transport.contentReader = { (data) -> T? in
@@ -154,6 +154,7 @@ extension Client {
                 }
                 return result
             }
+            block?(transport)
         }
     }
     
