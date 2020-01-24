@@ -8,9 +8,11 @@
 import Foundation
 import Beacon
 
+// MARK:- Transport
+
 public class Transport : NSObject{
     
-    // MARK:- Types
+    // MARK: Types
     
     enum RequestType {
         case data, download, upload
@@ -18,7 +20,7 @@ public class Transport : NSObject{
     
     typealias Completion = (Transport, URLSessionTask?)->Void
     
-    // MARK:- Properties
+    // MARK: Properties
     
     var session: URLSession
     
@@ -42,14 +44,14 @@ public class Transport : NSObject{
     
     private(set) var currentTask: URLSessionTask?
     
-    // MARK:- Initialization
+    // MARK: Initialization
     
     init(_ aSession: URLSession) {
         session = aSession
         super.init()
     }
     
-    // MARK:- Execution
+    // MARK: Execution
     
     func execute(completion aCompletionBlock: @escaping Completion) -> URLSessionTask {
         guard let request = request else {
@@ -66,7 +68,7 @@ public class Transport : NSObject{
         return task
     }
     
-    // MARK:- URL
+    // MARK: URL
     
     var url: URL? {
         set {
@@ -77,13 +79,13 @@ public class Transport : NSObject{
         }
     }
     
-    // MARK:- Testing
+    // MARK: Testing
     
     var isExecuting: Bool {
         return currentTask != nil
     }
     
-    // MARK:- Query
+    // MARK: Query
     
     func add(queryItem: URLQueryItem) {
         addAll(queryItems: [queryItem])
@@ -124,7 +126,7 @@ public class Transport : NSObject{
         request?.url = components.url
     }
     
-    // MARK:- Contents
+    // MARK: Contents
     
     var contents: Any? {
         set {
@@ -147,6 +149,8 @@ public class Transport : NSObject{
         }
     }
     
+    // MARK: CustomStringConvertible
+    
     override public var description: String {
         return """
         \(super.description)
@@ -158,6 +162,8 @@ public class Transport : NSObject{
     }
 }
 
+// MARK:- URLSessionDelegate
+
 extension Transport : URLSessionDelegate {
     public func urlSession(_ session: URLSession, didBecomeInvalidWithError error: Error?) {
         responseError = error
@@ -167,6 +173,8 @@ extension Transport : URLSessionDelegate {
         completion(self, nil)
     }
 }
+
+// MARK:- URLSessionTaskDelegate
 
 extension Transport : URLSessionTaskDelegate {
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
@@ -179,6 +187,8 @@ extension Transport : URLSessionTaskDelegate {
     }
 }
 
+// MARK:- URLSessionDataDelegate
+
 extension Transport : URLSessionDataDelegate {
     public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
         guard let _ = responseData else {
@@ -188,6 +198,8 @@ extension Transport : URLSessionDataDelegate {
         self.responseData?.append(data)
     }
 }
+
+// MARK:- NSCopying
 
 extension Transport : NSCopying {
     public func copy(with zone: NSZone? = nil) -> Any {
@@ -205,6 +217,8 @@ extension Transport : NSCopying {
         return transport
     }
 }
+
+// MARK:- Beacon
 
 class TransportSignal : Signal {
     var transport: Transport
