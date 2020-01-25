@@ -93,10 +93,6 @@ class GHEndpoint : Endpoint {
     }
 }
 
-class GHPaginatedEndpoint : GHEndpoint {
-    
-}
-
 class GHGistsEndpoint : GHEndpoint {
     
     override class var path: Path { GHEndpoint.path / "gists" }
@@ -118,7 +114,59 @@ class GHGistsEndpoint : GHEndpoint {
     }
 }
 
-class GHPublicGistsEndpoint : GHPaginatedEndpoint {
+struct GHIterator<U: SequenceEndpoint> : EndpointIterator {
+    
+    typealias Element = U.Element
+    
+    var endpoint: U
+    
+    var hasMore: Bool = true
+    
+    var page: Int = 1
+    
+    var pageSize: Int = 5
+    
+    private var currentOffset: Int = 0
+    
+    private var elements: [Element]?
+    
+    init(_ anEndpoint: U) {
+        endpoint = anEndpoint
+    }
+    
+    private var needsFetch: Bool {
+        guard hasMore else { return false }
+        return elements == nil || currentOffset >= elements!.count
+    }
+    
+    mutating func next() -> Element? {
+        guard hasMore else { return nil }
+        if needsFetch {
+            fetch()
+        }
+        
+        guard let elements = elements, elements.count > currentOffset else {
+            return nil
+        }
+        let result = elements[currentOffset]
+        currentOffset += 1
+        return result
+    }
+    
+    private mutating func fetch() {
+        currentOffset = 0
+        do {
+            elements = try endpoint.next(with: self as! U.Iterator).wait()
+            hasMore = (elements?.count ?? 0) == pageSize
+            page += 1
+        } catch {
+            print("Error: \(error)")
+        }
+    }
+}
+
+class GHPublicGistsEndpoint : GHEndpoint {
+    
     override class var path : Path { GHGistsEndpoint.path / "public" }
     
     var since: Date?
@@ -132,6 +180,24 @@ class GHPublicGistsEndpoint : GHPaginatedEndpoint {
     func list() -> Promise<[GHGist]> {
         return getJSON()
     }
+}
+
+extension GHPublicGistsEndpoint : SequenceEndpoint {
+    
+    typealias Iterator = GHIterator<GHPublicGistsEndpoint>
+    typealias Element = GHGist
+    
+    func makeIterator() -> Iterator {
+        return GHIterator(self)
+    }
+    
+    func next(with iterator: Iterator) -> Promise<[GHGist]> {
+        return getJSON() { (transport) in
+            transport.add(queryItem: URLQueryItem(name: "page", value: "\(iterator.page)"))
+            transport.add(queryItem: URLQueryItem(name: "per_page", value: "\(iterator.pageSize)"))
+        }
+    }
+  
 }
 
 // MARK:- Examples
@@ -178,6 +244,38 @@ class GHClientTests: XCTestCase {
         wait(for: [expect], timeout: 10)
     }
     
+//    func testRanging() {
+//        firstly {
+//            client.gists.public[0..<10]
+//        }.done { (gists) in
+//            print(String(describing: gists))
+//        }
+//    }
+    
+    func testForEach() {
+        let expect = expectation(description: "forEach")
+        let limit = 15
+        var all = [GHGist]()
+        DispatchQueue.global(qos: .background).async {
+            self.client.gists.public.forEach(limit: limit) { (gist) in
+                all.append(gist)
+            }
+            expect.fulfill()
+        }
+        wait(for: [expect], timeout: 10)
+        assert(all.count == limit, "Expected \(limit) gists, but found \(all.count)!")
+    }
+    
+//    func testFilter() {
+//        firstly {
+//            client.gists.public.filter { (gist) in
+//                return Bool.random()
+//            }
+//        }.done { (gists) in
+//            print(String(describing: gists))
+//        }
+//    }
+    
 //    func testIteratePublicGists() {
 //        let iterator = client.gists.public.iterator
 //        while iterator.hasMore {
@@ -186,7 +284,7 @@ class GHClientTests: XCTestCase {
 //            }
 //        }
 //    }
-//
+
 //    func testRangingPublicGists() {
 //        client.gists.public.iterator.first(10).then {
 //            let gists = $0
