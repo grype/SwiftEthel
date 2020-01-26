@@ -27,6 +27,9 @@ protocol SequenceEndpoint : Sequence {
     
     func sorted(limit: Int, by block: (Element, Element) throws -> Bool) rethrows -> [Element]
     func sorted(until: (Element) -> Bool, by block: (Element, Element) throws -> Bool) rethrows -> [Element]
+    
+    func compactMap<ElementOfResult>(limit: Int, transform: (Element) throws -> ElementOfResult?) rethrows -> [ElementOfResult]
+    func compactMap<ElementOfResult>(until: (Element) -> Bool, transform: (Element) throws -> ElementOfResult?) rethrows -> [ElementOfResult]
 }
 
 extension SequenceEndpoint {
@@ -97,6 +100,22 @@ extension SequenceEndpoint {
             result.append(each)
         }
         return try result.sorted(by: block)
+    }
+    
+    func compactMap<ElementOfResult>(limit: Int, transform: (Element) throws -> ElementOfResult?) rethrows -> [ElementOfResult] {
+        var count = 0
+        return try compactMap(until: { (each) -> Bool in
+            count += 1
+            return count >= limit
+        }, transform: transform)
+    }
+    
+    func compactMap<ElementOfResult>(until: (Element) -> Bool, transform: (Element) throws -> ElementOfResult?) rethrows -> [ElementOfResult] {
+        var result = [Element]()
+        forEach(until: until) { (each) in
+            result.append(each)
+        }
+        return try result.compactMap(transform)
     }
         
 }

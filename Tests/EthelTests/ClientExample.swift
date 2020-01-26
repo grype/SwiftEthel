@@ -152,6 +152,22 @@ class GHClientTests: XCTestCase {
         }), "Result is not sorted")
     }
     
+    func testCompactMap() {
+        let expect = expectation(description: "Compact map")
+        var result = [String]()
+        queue.async {
+            let mapped = self.client.gists.public.compactMap(limit: 10) { (gist) -> String? in
+                return gist.gistDescription
+            }
+            result.append(contentsOf: mapped)
+            expect.fulfill()
+        }
+        wait(for: [expect], timeout: Timeouts.long.rawValue)
+        assert(!result.isEmpty, "Expected non-empty result")
+        let descriptions = result.compactMap { return $0 }
+        assert(descriptions.count == result.count, "Unexpected results from compactMap")
+    }
+    
     // MARK:- Subscripting
     
     func testSubscript() {
