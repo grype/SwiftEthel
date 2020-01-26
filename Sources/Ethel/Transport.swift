@@ -30,9 +30,9 @@ public class Transport : NSObject{
     
     var type: RequestType = .data
     
-    var contentWriter: ((Any)->Data?)?
+    var contentWriter: ((Any) throws -> Data?)?
     
-    var contentReader: ((Data)->Any?)?
+    var contentReader: ((Data) throws -> Any?)?
     
     private(set) var hasResponse = false
     
@@ -130,23 +130,31 @@ public class Transport : NSObject{
     
     var contents: Any? {
         set {
-            guard var request = request else {
-                fatalError("Transport has no configured request")
-            }
-            if let newValue = newValue, let contentWriter = contentWriter {
-                request.httpBody = contentWriter(newValue)
-            }
-            else {
-                request.httpBody = newValue as? Data
-            }
+            try? setRequestContents(newValue)
         }
         get {
-            guard hasResponse, let responseData = responseData else { return nil }
-            if let contentReader = contentReader {
-                return contentReader(responseData)
-            }
-            return responseData
+            return try? getResponseContents()
         }
+    }
+    
+    public func setRequestContents(_ contents: Any?) throws {
+        guard var request = request else {
+            fatalError("Transport has no configured request")
+        }
+        if let contents = contents, let contentWriter = contentWriter {
+            request.httpBody = try contentWriter(contents)
+        }
+        else {
+            request.httpBody = contents as? Data
+        }
+    }
+    
+    public func getResponseContents() throws -> Any? {
+        guard hasResponse, let responseData = responseData else { return nil }
+        if let contentReader = contentReader {
+            return try contentReader(responseData)
+        }
+        return responseData
     }
     
     // MARK: CustomStringConvertible

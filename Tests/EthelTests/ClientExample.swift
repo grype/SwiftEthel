@@ -231,11 +231,16 @@ class GHClientTests: XCTestCase {
         let publicGists = client.gists.public
         publicGists.since = Date().addingTimeInterval(-86400)
         let expect = expectation(description: "Listing public gists")
+        var result = [GHGist]()
         let _ = publicGists.list().done { (gists) in
-            print(String(describing: gists))
+            result.append(contentsOf: gists)
+            expect.fulfill()
+        }.catch { (error) in
+            print("Error: \(error)")
             expect.fulfill()
         }
         wait(for: [expect], timeout: Timeouts.short.rawValue)
+        assert(!result.isEmpty, "Expected to find at least one public gist")
     }
     
     func testGistById() {
@@ -247,17 +252,12 @@ class GHClientTests: XCTestCase {
         }.done { (gist) in
             print(String(describing: gist))
             expect.fulfill()
+        }.catch { (error) in
+            print("Error: \(error)")
+            expect.fulfill()
         }
         wait(for: [expect], timeout: Timeouts.short.rawValue)
     }
-    
-//    func testRanging() {
-//        firstly {
-//            client.gists.public[0..<10]
-//        }.done { (gists) in
-//            print(String(describing: gists))
-//        }
-//    }
     
     func testForEach() {
         let expect = expectation(description: "forEach")
@@ -320,6 +320,14 @@ class GHClientTests: XCTestCase {
 //            }
 //        }
 //    }
+    
+//    func testRanging() {
+//        firstly {
+//            client.gists.public[0..<10]
+//        }.done { (gists) in
+//            print(String(describing: gists))
+//        }
+//    }
 
 //    func testRangingPublicGists() {
 //        client.gists.public.iterator.first(10).then {
@@ -329,7 +337,7 @@ class GHClientTests: XCTestCase {
 //            let gists = $0
 //        }
 //    }
-//
+
 //    func testPaginatingPublicGists() {
 //        client.gists.public.iterator.from(0, to: 100, by: 20).then {
 //

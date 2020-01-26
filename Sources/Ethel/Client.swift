@@ -74,7 +74,14 @@ public class Client : NSObject, URLSessionDataDelegate {
         
         return Promise<T> { seal in
             let task = transport.execute { (transport, task) in
-                seal.resolve(transport.contents as? T, transport.responseError)
+                var contents: T?
+                do {
+                    contents = try transport.getResponseContents() as? T
+                    seal.resolve(contents, transport.responseError)
+                }
+                catch {
+                    seal.reject(error)
+                }
                 if let task = task {
                     self.tasks.removeValue(forKey: task)
                 }
@@ -144,53 +151,4 @@ public class Client : NSObject, URLSessionDataDelegate {
 
 func /<T: Endpoint>(left: Client, right: T.Type) -> T {
     return right.init(on: left)
-}
-
-// MARK:- JSON Extensions
-
-extension Client {
-    public func executeJSON<T: Decodable>(method: String, endpoint: Endpoint, decoder: JSONDecoder = JSONDecoder(), with block: TransportBlock? = nil) -> Promise<T> {
-        return execute(endpoint) { (transport) in
-            transport.request?.httpMethod = method
-            transport.contentReader = { (data) -> T? in
-                var result: T?
-                do {
-                    result = try JSONDecoder().decode(T.self, from: data)
-                }
-                catch {
-                    print("Error decoding JSON data: \(error)")
-                }
-                return result
-            }
-            block?(transport)
-        }
-    }
-    
-    public func getJSON<T: Decodable>(_ endpoint: Endpoint, decoder: JSONDecoder = JSONDecoder(), with block: TransportBlock? = nil) -> Promise<T> {
-        return executeJSON(method: "GET", endpoint: endpoint, decoder: decoder, with: block)
-    }
-    
-    public func putJSON<T: Decodable>(_ endpoint: Endpoint, decoder: JSONDecoder = JSONDecoder(), with block: TransportBlock? = nil) -> Promise<T> {
-        return executeJSON(method: "PUT", endpoint: endpoint, decoder: decoder, with: block)
-    }
-    
-    public func postJSON<T: Decodable>(_ endpoint: Endpoint, decoder: JSONDecoder = JSONDecoder(), with block: TransportBlock? = nil) -> Promise<T> {
-        return executeJSON(method: "POST", endpoint: endpoint, decoder: decoder, with: block)
-    }
-    
-    public func patchJSON<T: Decodable>(_ endpoint: Endpoint, decoder: JSONDecoder = JSONDecoder(), with block: TransportBlock? = nil) -> Promise<T> {
-        return executeJSON(method: "PATCH", endpoint: endpoint, decoder: decoder, with: block)
-    }
-    
-    public func optionsJSON<T: Decodable>(_ endpoint: Endpoint, decoder: JSONDecoder = JSONDecoder(), with block: TransportBlock? = nil) -> Promise<T> {
-        return executeJSON(method: "OPTIONS", endpoint: endpoint, decoder: decoder, with: block)
-    }
-    
-    public func headJSON<T: Decodable>(_ endpoint: Endpoint, decoder: JSONDecoder = JSONDecoder(), with block: TransportBlock? = nil) -> Promise<T> {
-        return executeJSON(method: "HEAD", endpoint: endpoint, decoder: decoder, with: block)
-    }
-    
-    public func deleteJSON<T: Decodable>(_ endpoint: Endpoint, decoder: JSONDecoder = JSONDecoder(), with block: TransportBlock? = nil) -> Promise<T> {
-        return executeJSON(method: "DELETE", endpoint: endpoint, decoder: decoder, with: block)
-    }
 }
