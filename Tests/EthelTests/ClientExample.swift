@@ -134,6 +134,24 @@ class GHClientTests: XCTestCase {
         assert(first!.id != second!.id)
     }
     
+    func testSort() {
+        let expect = expectation(description: "Sorting")
+        var result = [GHGist]()
+        queue.async {
+            let sorted = self.client.gists.public.sorted(limit: 10) { (a, b) -> Bool in
+                a.created! > b.created!
+            }
+            result.append(contentsOf: sorted)
+            expect.fulfill()
+        }
+        wait(for: [expect], timeout: Timeouts.short.rawValue)
+        assert(!result.isEmpty, "Expected non-empty result")
+        let resultTimes = result.map { $0.created! }
+        assert(resultTimes == resultTimes.sorted(by: { (a, b) -> Bool in
+            a > b
+        }), "Result is not sorted")
+    }
+    
     // MARK:- Subscripting
     
     func testSubscript() {

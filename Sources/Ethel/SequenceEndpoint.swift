@@ -20,10 +20,13 @@ protocol SequenceEndpoint : Sequence {
     func next(with: Iterator) -> Promise<[Element]>
     
     func forEach(limit: Int, body: (Element) throws -> Void) rethrows
-    func forEach(until: (Element)->Bool, body: (Element) throws -> Void) rethrows
+    func forEach(until: (Element) -> Bool, body: (Element) throws -> Void) rethrows
     
     func filter(limit: Int, isIncluded: (Element) throws -> Bool) rethrows -> [Element]
-    func filter(until: (Element)->Bool, isIncluded: (Element) throws -> Bool) rethrows -> [Element]
+    func filter(until: (Element) -> Bool, isIncluded: (Element) throws -> Bool) rethrows -> [Element]
+    
+    func sorted(limit: Int, by block: (Element, Element) throws -> Bool) rethrows -> [Element]
+    func sorted(until: (Element) -> Bool, by block: (Element, Element) throws -> Bool) rethrows -> [Element]
 }
 
 extension SequenceEndpoint {
@@ -36,7 +39,7 @@ extension SequenceEndpoint {
         }, body: body)
     }
     
-    func forEach(until: (Element)->Bool, body: (Element) throws -> Void) rethrows {
+    func forEach(until: (Element) -> Bool, body: (Element) throws -> Void) rethrows {
         do {
             try forEach { (each) in
                 try body(each)
@@ -60,7 +63,7 @@ extension SequenceEndpoint {
         }, isIncluded: isIncluded)
     }
     
-    func filter(until: (Element)->Bool, isIncluded: (Element) throws -> Bool) rethrows -> [Element] {
+    func filter(until: (Element) -> Bool, isIncluded: (Element) throws -> Bool) rethrows -> [Element] {
         var results = [Element]()
         do {
             let _ = try filter { (each) -> Bool in
@@ -78,6 +81,22 @@ extension SequenceEndpoint {
             throw error
         }
         return results
+    }
+    
+    func sorted(limit: Int, by block: (Element, Element) throws -> Bool) rethrows -> [Element] {
+        var count = 0
+        return try sorted(until: { (each) -> Bool in
+            count += 1
+            return count >= limit
+        }, by: block)
+    }
+    
+    func sorted(until: (Element) -> Bool, by block: (Element, Element) throws -> Bool) rethrows -> [Element] {
+        var result = [Element]()
+        forEach(until: until) { (each) in
+            result.append(each)
+        }
+        return try result.sorted(by: block)
     }
         
 }
