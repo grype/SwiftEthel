@@ -31,13 +31,13 @@ struct GHGist : Codable, CustomStringConvertible {
     
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        id = try container.decode(String.self, forKey: .id)
-        url = try container.decode(URL.self, forKey: .url)
-        isPublic = try container.decode(Bool.self, forKey: .isPublic)
+        id = try? container.decode(String.self, forKey: .id)
+        url = try? container.decode(URL.self, forKey: .url)
+        isPublic = try? container.decode(Bool.self, forKey: .isPublic)
         created = ISO8601DateFormatter().date(from: try container.decode(String.self, forKey: .created))
         updated = ISO8601DateFormatter().date(from: try container.decode(String.self, forKey: .updated))
-        gistDescription = try container.decode(String.self, forKey: .gistDescription)
-        files = try container.decode([String:GHGistFile].self, forKey: .files)
+        gistDescription = try? container.decode(String.self, forKey: .gistDescription)
+        files = try? container.decode([String:GHGistFile].self, forKey: .files)
     }
     
     var description: String {
