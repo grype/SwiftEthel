@@ -214,10 +214,17 @@ extension GHPublicGistsEndpoint : SequenceEndpoint {
 class GHClientTests: XCTestCase {
     
     var client = GHClient.default
+    var queue: DispatchQueue!
+    
+    enum Timeouts : Double {
+        case short = 3
+        case long = 10
+    }
     
     override func setUp() {
         super.setUp()
         client.loggingEnabled = true
+        queue = DispatchQueue.global(qos: .background)
     }
     
     func testListPublicGists() {
@@ -228,7 +235,7 @@ class GHClientTests: XCTestCase {
             print(String(describing: gists))
             expect.fulfill()
         }
-        wait(for: [expect], timeout: 10)
+        wait(for: [expect], timeout: Timeouts.short.rawValue)
     }
     
     func testGistById() {
@@ -241,7 +248,7 @@ class GHClientTests: XCTestCase {
             print(String(describing: gist))
             expect.fulfill()
         }
-        wait(for: [expect], timeout: 10)
+        wait(for: [expect], timeout: Timeouts.short.rawValue)
     }
     
 //    func testRanging() {
@@ -256,13 +263,13 @@ class GHClientTests: XCTestCase {
         let expect = expectation(description: "forEach")
         let limit = 15
         var all = [GHGist]()
-        DispatchQueue.global(qos: .background).async {
+        queue.async {
             self.client.gists.public.forEach(limit: limit) { (gist) in
                 all.append(gist)
             }
             expect.fulfill()
         }
-        wait(for: [expect], timeout: 10)
+        wait(for: [expect], timeout: Timeouts.long.rawValue)
         assert(all.count == limit, "Expected \(limit) gists, but found \(all.count)!")
     }
     
@@ -271,15 +278,38 @@ class GHClientTests: XCTestCase {
         let limit = 5
         var all = [GHGist]()
         
-        DispatchQueue.global(qos: .background).async {
+        queue.async {
             let found = self.client.gists.public.filter(limit: limit) { (gist) -> Bool in
                 return Bool.random()
             }
             all.append(contentsOf: found)
             expect.fulfill()
         }
-        wait(for: [expect], timeout: 10)
+        wait(for: [expect], timeout: Timeouts.long.rawValue)
         assert(all.count == limit, "Expected \(limit) gists, but found \(all.count)!")
+    }
+    
+    func testFirst() {
+        var found: GHGist?
+        let language = "python"
+        let expect = expectation(description: "first")
+        queue.async {
+            found = self.client.gists.public.first { (gist) -> Bool in
+                gist.files?.contains(where: { (each) -> Bool in
+                    each.value.language?.lowercased() == language
+                }) ?? false
+            }
+            if found != nil {
+                expect.fulfill()
+            }
+        }
+        wait(for: [expect], timeout: Timeouts.short.rawValue)
+        assert(found != nil, "Expected a result")
+        assert(found!.files != nil, "Expected result to contain at least one file")
+        assert(found!.files!.contains(where: { (each) -> Bool in
+            each.value.language?.lowercased() == language
+        }), "Expected at least one file w/o a language")
+        print(String(describing: found?.files))
     }
     
 //    func testIteratePublicGists() {
