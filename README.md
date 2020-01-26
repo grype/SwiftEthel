@@ -276,7 +276,7 @@ DispatchQueue.global(qos: .background).async {
 This also make it possible to fetch data using subscripts:
 
 ```swift
-extension {
+extension GHPublicGistsEndpoint {
   subscript(index: Int) -> GHGist? {
     var iterator = makeIterator()
     iterator.pageSize = 1
