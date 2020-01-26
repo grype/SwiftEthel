@@ -18,6 +18,7 @@ struct GHGist : Codable, CustomStringConvertible {
     var created: Date?
     var updated: Date?
     var gistDescription: String?
+    var files: [String : GHGistFile]?
     
     enum CodingKeys: String, CodingKey {
         case id, url
@@ -25,6 +26,7 @@ struct GHGist : Codable, CustomStringConvertible {
         case gistDescription = "description"
         case created = "created_at"
         case updated = "updated_at"
+        case files
     }
     
     init(from decoder: Decoder) throws {
@@ -35,10 +37,23 @@ struct GHGist : Codable, CustomStringConvertible {
         created = ISO8601DateFormatter().date(from: try container.decode(String.self, forKey: .created))
         updated = ISO8601DateFormatter().date(from: try container.decode(String.self, forKey: .updated))
         gistDescription = try container.decode(String.self, forKey: .gistDescription)
+        files = try container.decode([String:GHGistFile].self, forKey: .files)
     }
     
     var description: String {
         return "GHGist <\(id!)>"
+    }
+}
+
+struct GHGistFile : Codable {
+    var filename: String?
+    var gistType: String?
+    var language: String?
+    var url: URL?
+    var gistSize: Int = 0
+    
+    enum CodingKeys : String, CodingKey {
+        case filename, gistType = "type", language, url = "raw_url", gistSize = "size"
     }
 }
 
@@ -99,12 +114,6 @@ class GHGistsEndpoint : GHEndpoint {
     
     var `public` : GHPublicGistsEndpoint {
         return self / GHPublicGistsEndpoint.self
-    }
-    
-    func `public`(since: Date? = nil) -> Promise<[GHGist]> {
-        let ep = self.public
-        ep.since = since
-        return ep.list()
     }
     
     func gist(withId id: String) -> Promise<GHGist> {
@@ -222,19 +231,10 @@ class GHClientTests: XCTestCase {
         wait(for: [expect], timeout: 10)
     }
     
-    func testListPublicGistsShortcut() {
-        let expect = expectation(description: "Listing public gists")
-        let _ = client.gists.public(since: Date().addingTimeInterval(-86400)).done { (gists) in
-            print(String(describing: gists))
-            expect.fulfill()
-        }
-        wait(for: [expect], timeout: 10)
-    }
-    
     func testGistById() {
         let expect = expectation(description: "Getting gist by id")
         let _ = firstly {
-            self.client.gists.public()
+            self.client.gists.public.list()
         }.then { (gists) -> Promise<GHGist> in
             self.client.gists.gist(withId: gists[0].id!)
         }.done { (gist) in
@@ -266,15 +266,21 @@ class GHClientTests: XCTestCase {
         assert(all.count == limit, "Expected \(limit) gists, but found \(all.count)!")
     }
     
-//    func testFilter() {
-//        firstly {
-//            client.gists.public.filter { (gist) in
-//                return Bool.random()
-//            }
-//        }.done { (gists) in
-//            print(String(describing: gists))
-//        }
-//    }
+    func testFilter() {
+        let expect = expectation(description: "filter")
+        let limit = 5
+        var all = [GHGist]()
+        
+        DispatchQueue.global(qos: .background).async {
+            let found = self.client.gists.public.filter(limit: limit) { (gist) -> Bool in
+                return Bool.random()
+            }
+            all.append(contentsOf: found)
+            expect.fulfill()
+        }
+        wait(for: [expect], timeout: 10)
+        assert(all.count == limit, "Expected \(limit) gists, but found \(all.count)!")
+    }
     
 //    func testIteratePublicGists() {
 //        let iterator = client.gists.public.iterator

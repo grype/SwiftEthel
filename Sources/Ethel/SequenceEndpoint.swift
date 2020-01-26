@@ -21,9 +21,13 @@ protocol SequenceEndpoint : Sequence {
     
     func forEach(limit: Int, body: (Element) throws -> Void) rethrows
     func forEach(until: (Element)->Bool, body: (Element) throws -> Void) rethrows
+    
+    func filter(limit: Int, isIncluded: (Element) throws -> Bool) rethrows -> [Element]
+    func filter(until: (Element)->Bool, isIncluded: (Element) throws -> Bool) rethrows -> [Element]
 }
 
 extension SequenceEndpoint {
+    
     func forEach(limit: Int, body: (Element) throws -> Void) rethrows {
         var count = 0
         try forEach(until: { (each) -> Bool in
@@ -48,4 +52,32 @@ extension SequenceEndpoint {
         }
     }
     
+    func filter(limit: Int, isIncluded: (Element) throws -> Bool) rethrows -> [Element] {
+        var count = 0
+        return try filter(until: { (each) -> Bool in
+            count += 1
+            return count >= limit
+        }, isIncluded: isIncluded)
+    }
+    
+    func filter(until: (Element)->Bool, isIncluded: (Element) throws -> Bool) rethrows -> [Element] {
+        var results = [Element]()
+        do {
+            let _ = try filter { (each) -> Bool in
+                guard try isIncluded(each) else { return false }
+                results.append(each)
+                if until(each) {
+                    throw(LimitError())
+                }
+                return true
+            }
+        } catch {
+            if let _ = error as? LimitError {
+                return results
+            }
+            throw error
+        }
+        return results
+    }
+        
 }
