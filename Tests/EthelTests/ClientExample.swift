@@ -140,7 +140,7 @@ class GHClientTests: XCTestCase {
         var gist: GHGist?
         var first = [GHGist]()
         let index = 3
-        let expect = expectation(description: "Subscripting")
+        let expect = expectation(description: "Subscript by index")
         queue.async {
             gist = self.client.gists.public[index]
             if let found = try? self.client.gists.public.list().wait() {
@@ -154,12 +154,24 @@ class GHClientTests: XCTestCase {
         assert(gist!.id == first[index].id)
     }
         
-//    func testRanging() {
-//        firstly {
-//            client.gists.public[0..<10]
-//        }.done { (gists) in
-//            print(String(describing: gists))
-//        }
-//    }
+    func testRanging() {
+        var result = [GHGist]()
+        var first = [GHGist]()
+        let range = 2..<5
+        let expect = expectation(description: "Subscript by range")
+        queue.async {
+            result = self.client.gists.public[range]
+            if let found = try? self.client.gists.public.list().wait() {
+                first.append(contentsOf: found)
+            }
+            expect.fulfill()
+        }
+        wait(for: [expect], timeout: Timeouts.short.rawValue)
+        assert(result.count == range.count, "Unexpected number of results")
+        
+        let resultIds = result.map { $0.id! }
+        let firstIds = first[range].map { $0.id! }
+        assert(firstIds == resultIds)
+    }
     
 }
