@@ -25,6 +25,8 @@ class GHClientTests: XCTestCase {
         queue = DispatchQueue.global(qos: .background)
     }
     
+    // MARK:- Basic endpoint execution
+    
     func testListPublicGists() {
         let publicGists = client.gists.public
         publicGists.since = Date().addingTimeInterval(-86400)
@@ -41,6 +43,8 @@ class GHClientTests: XCTestCase {
         assert(!result.isEmpty, "Expected to find at least one public gist")
     }
     
+    // MARK:- Per-method URL modifications
+    
     func testGistById() {
         let expect = expectation(description: "Getting gist by id")
         let _ = firstly {
@@ -56,6 +60,8 @@ class GHClientTests: XCTestCase {
         }
         wait(for: [expect], timeout: Timeouts.short.rawValue)
     }
+    
+    // MARK:- Enumeration
     
     func testForEach() {
         let expect = expectation(description: "forEach")
@@ -126,6 +132,26 @@ class GHClientTests: XCTestCase {
         assert(first != nil, "Expected there to be at least one public gist")
         assert(second != nil, "Expected there to be at least another public gist")
         assert(first!.id != second!.id)
+    }
+    
+    // MARK:- Subscripting
+    
+    func testSubscript() {
+        var gist: GHGist?
+        var first = [GHGist]()
+        let index = 3
+        let expect = expectation(description: "Subscripting")
+        queue.async {
+            gist = self.client.gists.public[index]
+            if let found = try? self.client.gists.public.list().wait() {
+                first.append(contentsOf: found)
+            }
+            expect.fulfill()
+        }
+        wait(for: [expect], timeout: Timeouts.short.rawValue)
+        assert(gist != nil, "Expected to find a gist")
+        assert(!first.isEmpty, "Expected a listing of public gists")
+        assert(gist!.id == first[index].id)
     }
         
 //    func testRanging() {

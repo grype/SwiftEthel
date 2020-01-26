@@ -24,6 +24,13 @@ class GHPublicGistsEndpoint : GHEndpoint {
     func list() -> Promise<[GHGist]> {
         return getJSON()
     }
+    
+    subscript(index: Int) -> GHGist? {
+        var iterator = makeIterator()
+        iterator.pageSize = 1
+        iterator.page = index + 1
+        return iterator.next()
+    }
 }
 
 extension GHPublicGistsEndpoint : SequenceEndpoint {
