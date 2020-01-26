@@ -312,15 +312,24 @@ class GHClientTests: XCTestCase {
         print(String(describing: found?.files))
     }
     
-//    func testIteratePublicGists() {
-//        let iterator = client.gists.public.iterator
-//        while iterator.hasMore {
-//            iterator.next {
-//                let gist = $0
-//            }
-//        }
-//    }
-    
+    func testIterator() {
+        var iterator = client.gists.public.makeIterator()
+        var first: GHGist?
+        var second: GHGist?
+        
+        let expect = expectation(description: "Iterator next")
+        assert(iterator.hasMore, "New iterator should indicate there's more results")
+        queue.async {
+            first = iterator.next()
+            second = iterator.next()
+            expect.fulfill()
+        }
+        wait(for: [expect], timeout: Timeouts.short.rawValue)
+        assert(first != nil, "Expected there to be at least one public gist")
+        assert(second != nil, "Expected there to be at least another public gist")
+        assert(first!.id != second!.id)
+    }
+        
 //    func testRanging() {
 //        firstly {
 //            client.gists.public[0..<10]
