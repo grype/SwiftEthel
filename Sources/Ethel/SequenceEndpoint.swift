@@ -188,4 +188,12 @@ extension SequenceEndpoint {
         return result
     }
     
+    func prefix(_ maxLength: Int) -> [Element] {
+        var result = [Element]()
+        forEach(limit: maxLength) { (each) in
+            result.append(each)
+        }
+        return result
+    }
+    
 }

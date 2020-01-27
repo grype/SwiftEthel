@@ -188,6 +188,19 @@ class GHClientTests: XCTestCase {
         assert(result == check, "Expected result of reduce to equal the check value")
     }
     
+    func testPrefixMaxLength() {
+        var result: [GHGist]?
+        let limit = 3
+        let expect = expectation(description: "Prefix with max length")
+        queue.async {
+            result = self.client.gists.public.prefix(limit)
+            expect.fulfill()
+        }
+        wait(for: [expect], timeout: Timeouts.short.rawValue)
+        assert(result != nil, "Expected some results")
+        assert(result!.count == limit, "Unexpected number of results via prefix(maxLength)")
+    }
+    
     // MARK:- Subscripting
     
     func testSubscript() {
