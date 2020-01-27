@@ -9,4 +9,5 @@ import Foundation
 @testable import Ethel
 
 class TestClient : Client {
+    
 }
