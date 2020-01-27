@@ -180,8 +180,9 @@ class GHClientTests: XCTestCase {
             check = self.client.gists.public[0..<limit].reduce(into: "", { (run, gist) in
                 run?.append(gist.id!)
             })
+            expect.fulfill()
         }
-        wait(for: [expect], timeout: Timeouts.long.rawValue)
+        wait(for: [expect], timeout: Timeouts.short.rawValue)
         assert(result != nil, "Expected a non-nil result of reduce")
         assert(check != nil, "Expected a non-nil check value")
         assert(result == check, "Expected result of reduce to equal the check value")
