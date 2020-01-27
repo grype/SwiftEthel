@@ -9,7 +9,7 @@ import XCTest
 import PromiseKit
 @testable import Ethel
 
-class GHClientTests: XCTestCase {
+class Examples: XCTestCase {
     
     var client = GHClient.default
     var queue: DispatchQueue!
