@@ -8,15 +8,42 @@
 
 import Foundation
 
-class PluggableEndpoint : Endpoint {
-    static var path: Path = Path()
+public class PluggableEndpoint : Endpoint {
+    public static var path: Path = Path()
     
-    var client: Client
+    public var client: Client
     
-    var path: Path?
+    public var path: Path
     
-    required init(on aClient: Client) {
+    required public init(on aClient: Client) {
         client = aClient
+        path = Path()
     }
     
+}
+
+public func /<T: Endpoint>(left: T, right: String) -> PluggableEndpoint {
+    let endpoint = PluggableEndpoint(on: left.client)
+    let oldPath = left.path
+    let newPath = oldPath / right
+    endpoint.path = newPath
+    return endpoint
+}
+
+public func /<T: Endpoint>(left: T, right: Path) -> PluggableEndpoint {
+    let endpoint = PluggableEndpoint(on: left.client)
+    endpoint.path = left.path / right
+    return endpoint
+}
+
+public func/<T: Client>(left: T, right: String) -> PluggableEndpoint {
+    let endpoint = PluggableEndpoint(on: left)
+    endpoint.path = Path() / right
+    return endpoint
+}
+
+public func/<T: Client>(left: T, right: Path) -> PluggableEndpoint {
+    let endpoint = PluggableEndpoint(on: left)
+    endpoint.path = Path() / right
+    return endpoint
 }

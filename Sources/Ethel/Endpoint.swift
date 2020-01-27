@@ -14,6 +14,7 @@ import PromiseKit
 public protocol Endpoint {
     init(on aClient: Client)
     static var path: Path { get }
+    var path: Path { get }
     var client: Client { get set }
     func configure(on aTransport: Transport)
     func execute<T>(_ block: TransportBlock?) -> Promise<T>

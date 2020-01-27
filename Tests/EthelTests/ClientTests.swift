@@ -10,9 +10,6 @@ import XCTest
 //import Nimble
 @testable import Ethel
 
-class TestClient : Client {
-}
-
 class ClientTests: XCTestCase {
     
     private var client: Client!
