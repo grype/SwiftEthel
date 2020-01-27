@@ -36,14 +36,14 @@ class GHPublicGistsEndpoint : GHEndpoint {
         var iterator = makeIterator()
         iterator.page = Int(floor(Double(range.lowerBound / iterator.pageSize))) + 1
         var result = [GHGist]()
-        while iterator.hasMore, result.count < range.upperBound - range.lowerBound {
+        while iterator.hasMore, result.count < range.count {
             guard let found = try? next(with: iterator).wait() else { break }
 
             let startOffset = (iterator.page - 1) * iterator.pageSize
             let endOffset = startOffset + iterator.pageSize - 1
 
             let low = Swift.max(range.lowerBound - startOffset, 0)
-            let high = iterator.pageSize - Swift.max(endOffset - range.upperBound, 0)
+            let high = iterator.pageSize - Swift.max(endOffset - (range.lowerBound + range.count - 1), 0)
 
             result.append(contentsOf: found[low..<high])
             iterator.page += 1
