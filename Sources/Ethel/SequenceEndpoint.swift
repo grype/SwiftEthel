@@ -168,4 +168,24 @@ extension SequenceEndpoint {
         return result
     }
     
+    func reduce<Result>(until: (Element) -> Bool, into initialResult: __owned Result, _ updateAccumulatingResult: (inout Result, Element) throws -> ()) rethrows -> Result {
+        var result = initialResult
+        do {
+            result = try reduce(into: initialResult, { (run, element) in
+                try updateAccumulatingResult(&run, element)
+                result = run
+                if until(element) {
+                    throw(LimitError())
+                }
+            })
+        }
+        catch {
+            if let _ = error as? LimitError {
+                return result
+            }
+            throw error
+        }
+        return result
+    }
+    
 }
