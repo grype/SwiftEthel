@@ -190,7 +190,7 @@ class GHClientTests: XCTestCase {
     
     func testPrefixMaxLength() {
         var result: [GHGist]?
-        let limit = 3
+        let limit = Int(client.gists.public.makeIterator().pageSize / 2)
         let expect = expectation(description: "Prefix with max length")
         queue.async {
             result = self.client.gists.public.prefix(limit)
@@ -199,6 +199,36 @@ class GHClientTests: XCTestCase {
         wait(for: [expect], timeout: Timeouts.short.rawValue)
         assert(result != nil, "Expected some results")
         assert(result!.count == limit, "Unexpected number of results via prefix(maxLength)")
+    }
+    
+    func testPrefixMaxLengthMulitpleRequests() {
+        var result: [GHGist]?
+        let limit = Int(Double(client.gists.public.makeIterator().pageSize) * 2.5)
+        let expect = expectation(description: "Prefix with max length")
+        queue.async {
+            result = self.client.gists.public.prefix(limit)
+            expect.fulfill()
+        }
+        wait(for: [expect], timeout: Timeouts.short.rawValue)
+        assert(result != nil, "Expected some results")
+        assert(result!.count == limit, "Unexpected number of results via prefix(maxLength)")
+    }
+    
+    func testPrefixWhile() {
+        var results: [GHGist]?
+        let expect = expectation(description: "Prefix while")
+        var count = 0
+        let limit = Int(Double(client.gists.public.makeIterator().pageSize) * 2.5)
+        queue.async {
+            results = self.client.gists.public.prefix { (gist) -> Bool in
+                count += 1
+                return count <= limit
+            }
+            expect.fulfill()
+        }
+        wait(for: [expect], timeout: Timeouts.short.rawValue)
+        assert(results != nil, "Expected some results")
+        assert(results!.count == limit, "Expected \(limit) results, but got \(results!.count)")
     }
     
     // MARK:- Subscripting
