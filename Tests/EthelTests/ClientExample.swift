@@ -168,6 +168,25 @@ class GHClientTests: XCTestCase {
         assert(descriptions.count == result.count, "Unexpected results from compactMap")
     }
     
+    func testReduce() {
+        var result: String?
+        var check: String?
+        let limit = 3
+        let expect = expectation(description: "Reduce")
+        queue.async {
+            result = self.client.gists.public.reduce(limit: limit, initialResult: "", { (run, gist) -> String in
+                return run.appending(gist.id!)
+            })
+            check = self.client.gists.public[0..<limit].reduce(into: "", { (run, gist) in
+                run?.append(gist.id!)
+            })
+        }
+        wait(for: [expect], timeout: Timeouts.long.rawValue)
+        assert(result != nil, "Expected a non-nil result of reduce")
+        assert(check != nil, "Expected a non-nil check value")
+        assert(result == check, "Expected result of reduce to equal the check value")
+    }
+    
     // MARK:- Subscripting
     
     func testSubscript() {

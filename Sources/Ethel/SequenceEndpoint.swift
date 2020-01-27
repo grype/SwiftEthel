@@ -30,6 +30,12 @@ protocol SequenceEndpoint : Sequence {
     
     func compactMap<ElementOfResult>(limit: Int, transform: (Element) throws -> ElementOfResult?) rethrows -> [ElementOfResult]
     func compactMap<ElementOfResult>(until: (Element) -> Bool, transform: (Element) throws -> ElementOfResult?) rethrows -> [ElementOfResult]
+    
+    func flatMap<SegmentOfResult>(limit: Int, transform: (Element) throws -> SegmentOfResult) rethrows -> [SegmentOfResult.Element] where SegmentOfResult : Sequence
+    func flatMap<SegmentOfResult>(until: (Element) -> Bool, transform: (Element) throws -> SegmentOfResult) rethrows -> [SegmentOfResult.Element] where SegmentOfResult : Sequence
+    
+    func reduce<Result>(limit: Int, initialResult: Result, _ nextPartialResult: (Result, Element) throws -> Result) rethrows -> Result
+    func reduce<Result>(until: (Element) -> Bool, initialResult: Result, _ nextPartialResult: (Result, Element) throws -> Result) rethrows -> Result
 }
 
 extension SequenceEndpoint {
@@ -117,5 +123,49 @@ extension SequenceEndpoint {
         }
         return try result.compactMap(transform)
     }
-        
+    
+    func flatMap<SegmentOfResult>(limit: Int, transform: (Element) throws -> SegmentOfResult) rethrows -> [SegmentOfResult.Element] where SegmentOfResult : Sequence {
+        var count = 0
+        return try flatMap(until: { (each) -> Bool in
+            count += 1
+            return count >= limit
+        }, transform: transform)
+    }
+    
+    func flatMap<SegmentOfResult>(until: (Element) -> Bool, transform: (Element) throws -> SegmentOfResult) rethrows -> [SegmentOfResult.Element] where SegmentOfResult : Sequence {
+        var result = [Element]()
+        forEach(until: until) { (each) in
+            result.append(each)
+        }
+        return try result.flatMap(transform)
+    }
+    
+    func reduce<Result>(limit: Int, initialResult: Result, _ nextPartialResult: (Result, Element) throws -> Result) rethrows -> Result {
+        var count = 0
+        return try reduce(until: { (each) -> Bool in
+            count += 1
+            return count >= limit
+        }, initialResult: initialResult, nextPartialResult)
+    }
+    
+    func reduce<Result>(until: (Element) -> Bool, initialResult: Result, _ nextPartialResult: (Result, Element) throws -> Result) rethrows -> Result {
+        var result: Result = initialResult
+        do {
+            result = try reduce(initialResult) { (aResult, element) -> Result in
+                result = try nextPartialResult(aResult, element)
+                if until(element) {
+                    throw(LimitError())
+                }
+                return result
+            }
+        }
+        catch {
+            if let _ = error as? LimitError {
+                return result
+            }
+            throw error
+        }
+        return result
+    }
+    
 }
