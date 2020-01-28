@@ -43,7 +43,8 @@
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
          <TestableReference
-            skipped = "NO">
+            skipped = "NO"
+            parallelizable = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "EthelTests"
@@ -54,9 +55,6 @@
             <SkippedTests>
                <Test
                   Identifier = "Examples">
-               </Test>
-               <Test
-                  Identifier = "GHClientTests">
                </Test>
             </SkippedTests>
          </TestableReference>
