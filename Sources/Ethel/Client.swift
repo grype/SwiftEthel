@@ -24,11 +24,11 @@ open class Client : NSObject, URLSessionDataDelegate {
     
     private var tasks = [URLSessionTask : Transport]()
     
-    var loggers = [SignalLogger]()
+    public var loggers = [SignalLogger]()
     
     // MARK: Init
     
-    init(url anUrl: URL? = nil, sessionConfiguration: URLSessionConfiguration? = nil) {
+    public init(url anUrl: URL? = nil, sessionConfiguration: URLSessionConfiguration? = nil) {
         super.init()
         let sessionConfig = sessionConfiguration ?? URLSessionConfiguration.default
         baseUrl = anUrl
@@ -149,6 +149,6 @@ open class Client : NSObject, URLSessionDataDelegate {
 
 // MARK:- Extensions
 
-func /<T: Endpoint>(left: Client, right: T.Type) -> T {
+public func /<T: Endpoint>(left: Client, right: T.Type) -> T {
     return right.init(on: left)
 }

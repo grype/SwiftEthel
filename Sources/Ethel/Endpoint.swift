@@ -23,7 +23,7 @@ public protocol Endpoint {
 // MARK:- Extensions
 
 extension Endpoint {
-    var path: Path {
+    public var path: Path {
         return type(of: self).path
     }
     

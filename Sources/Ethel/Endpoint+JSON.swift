@@ -10,7 +10,7 @@ import PromiseKit
 
 extension Endpoint {
     
-    var jsonDecoder: JSONDecoder {
+    public var jsonDecoder: JSONDecoder {
         return JSONDecoder()
     }
     

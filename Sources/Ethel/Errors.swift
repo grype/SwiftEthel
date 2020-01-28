@@ -7,9 +7,9 @@
 
 import Foundation
 
-struct RequestError : Error {
-    var request: URLRequest!
-    init(_ aRequest: URLRequest) {
+public struct RequestError : Error {
+    public var request: URLRequest!
+    public init(_ aRequest: URLRequest) {
         request = aRequest
     }
 }

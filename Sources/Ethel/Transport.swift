@@ -14,25 +14,25 @@ open class Transport : NSObject{
     
     // MARK: Types
     
-    enum RequestType {
+    public enum RequestType {
         case data, download, upload
     }
     
-    typealias Completion = (Transport, URLSessionTask?)->Void
+    public typealias Completion = (Transport, URLSessionTask?)->Void
     
     // MARK: Properties
     
-    var session: URLSession
+    public var session: URLSession
     
-    var request: URLRequest?
+    public var request: URLRequest?
     
-    var response: URLResponse?
+    public var response: URLResponse?
     
-    var type: RequestType = .data
+    public var type: RequestType = .data
     
-    var contentWriter: ((Any) throws -> Data?)?
+    public var contentWriter: ((Any) throws -> Data?)?
     
-    var contentReader: ((Data) throws -> Any?)?
+    public var contentReader: ((Data) throws -> Any?)?
     
     private(set) var hasResponse = false
     
@@ -46,14 +46,14 @@ open class Transport : NSObject{
     
     // MARK: Initialization
     
-    init(_ aSession: URLSession) {
+    public init(_ aSession: URLSession) {
         session = aSession
         super.init()
     }
     
     // MARK: Execution
     
-    func execute(completion aCompletionBlock: @escaping Completion) -> URLSessionTask {
+    public func execute(completion aCompletionBlock: @escaping Completion) -> URLSessionTask {
         guard let request = request else {
             fatalError("Transport has no configured request")
         }
@@ -70,7 +70,7 @@ open class Transport : NSObject{
     
     // MARK: URL
     
-    var url: URL? {
+    public var url: URL? {
         set {
             request?.url = newValue
         }
@@ -81,21 +81,21 @@ open class Transport : NSObject{
     
     // MARK: Testing
     
-    var isExecuting: Bool {
+    public var isExecuting: Bool {
         return currentTask != nil
     }
     
     // MARK: Query
     
-    func add(queryItem: URLQueryItem) {
+    public func add(queryItem: URLQueryItem) {
         addAll(queryItems: [queryItem])
     }
     
-    func remove(queryItem: URLQueryItem) {
+    public func remove(queryItem: URLQueryItem) {
         removeAll(queryItems: [queryItem])
     }
     
-    func addAll(queryItems: [URLQueryItem]) {
+    public func addAll(queryItems: [URLQueryItem]) {
         guard let url = request?.url else {
             fatalError("No request configured with URL")
         }
@@ -104,7 +104,7 @@ open class Transport : NSObject{
         request?.url = components.url
     }
     
-    func removeAll(queryItems itemsToRemove: [URLQueryItem]) {
+    public func removeAll(queryItems itemsToRemove: [URLQueryItem]) {
         guard let url = request?.url else {
             fatalError("No request configured with URL")
         }
@@ -116,7 +116,7 @@ open class Transport : NSObject{
         request?.url = components.url
     }
     
-    func removeAllQueryItems() {
+    public func removeAllQueryItems() {
         guard let url = request?.url else {
             fatalError("No request configured with URL")
         }
@@ -128,7 +128,7 @@ open class Transport : NSObject{
     
     // MARK: Contents
     
-    var contents: Any? {
+    public var contents: Any? {
         set {
             try? setRequestContents(newValue)
         }
@@ -223,30 +223,5 @@ extension Transport : NSCopying {
         transport.responseData = responseData
         transport.responseError = responseError
         return transport
-    }
-}
-
-// MARK:- Beacon
-
-class TransportSignal : Signal {
-    var transport: Transport
-    
-    override class var signalName: String {
-        return "🚛 \(super.signalName)"
-    }
-    
-    init(_ aTransport: Transport) {
-        transport = aTransport
-        super.init()
-    }
-    
-    override var description: String {
-        return "\(super.description) \(transport.description)"
-    }
-}
-
-extension Transport : Signaling {
-    public var beaconSignal: Signal {
-        return TransportSignal(self)
     }
 }

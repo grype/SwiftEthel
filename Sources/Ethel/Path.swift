@@ -10,7 +10,7 @@ import Foundation
 
 public struct Path {
     
-    static let DefaultDelimiter = "/"
+    public static let DefaultDelimiter = "/"
     
     /// Whether path is absolute as opposed to relative.
     /// An absolute path will have a root.
@@ -24,13 +24,13 @@ public struct Path {
     
     // MARK:- Initializing
     
-    init(_ string: String? = nil, isAbsolute absolute: Bool, delimiter aDelimeter: String = DefaultDelimiter) {
+    public init(_ string: String? = nil, isAbsolute absolute: Bool, delimiter aDelimeter: String = DefaultDelimiter) {
         isAbsolute = absolute
         delimiter = aDelimeter
         segments = string?.components(separatedBy: delimiter).filter { !$0.isEmpty } ?? [String]()
     }
     
-    init(_ string: String? = nil, delimiter aDelimeter: String = DefaultDelimiter) {
+    public init(_ string: String? = nil, delimiter aDelimeter: String = DefaultDelimiter) {
         self.init(string, isAbsolute: string == nil || string!.hasPrefix(aDelimeter), delimiter: aDelimeter)
     }
     
@@ -43,25 +43,25 @@ public struct Path {
     // MARK:- Testing
     
     /// Whether the path is a root path and has no additional segments.
-    var isRoot: Bool {
+    public var isRoot: Bool {
         return isAbsolute && isEmpty
     }
     
     /// An empty path has no segments. An absolute path that's empty is a root path.
-    var isEmpty: Bool {
+    public var isEmpty: Bool {
         return segments.count == 0
     }
     
     // MARK:- Resolving
     
     /// Resolves a path by appending string argument
-    func path(resolving str: String) -> Path {
+    public func path(resolving str: String) -> Path {
         let relativePath = Path(str, delimiter: delimiter)
         return path(resolving: relativePath)
     }
     
     /// Resolves a path by appending another path
-    func path(resolving path: Path) -> Path {
+    public func path(resolving path: Path) -> Path {
         if path.isAbsolute {
             return Path(path.segments, isAbsolute: path.isAbsolute, delimiter: delimiter)
         }
@@ -76,7 +76,7 @@ public struct Path {
     // MARK:- Converting
     
     /// Returns string representation of the path
-    var pathString: String {
+    public var pathString: String {
         var result = segments.joined(separator: String(delimiter))
         if isAbsolute {
             result = delimiter + result
@@ -85,7 +85,7 @@ public struct Path {
     }
     
     /// Returns relative path
-    var relativePath: Path {
+    public var relativePath: Path {
         return Path(segments, isAbsolute: false, delimiter: delimiter)
     }
 }
@@ -93,15 +93,15 @@ public struct Path {
 // MARK:- Extensions (Path)
 
 extension Path {
-    static func /(left: Path, right: String) -> Path {
+    public static func /(left: Path, right: String) -> Path {
         return left.path(resolving: right)
     }
     
-    static func /(left: Path, right: Path) -> Path {
+    public static func /(left: Path, right: Path) -> Path {
         return left.path(resolving: right)
     }
     
-    static func /(left: Path.Type, right: String) -> Path {
+    public static func /(left: Path.Type, right: String) -> Path {
         return Path(right, isAbsolute: true, delimiter: Path.DefaultDelimiter)
     }
 }
@@ -122,38 +122,38 @@ extension Path: Equatable {
 
 extension String {
     /// Converts String to Path
-    var pathValue: Path { return Path(self) }
+    public var pathValue: Path { return Path(self) }
 }
 
 extension URL {
     /// Converts URL to Path
-    var pathValue: Path { return Path(path) }
+    public var pathValue: Path { return Path(path) }
     
     /// Strips path components from URL and returns a new URL that points to the root
-    var rootURL: URL? {
+    public var rootURL: URL? {
         return URL(string: "/", relativeTo: self)
     }
     
-    static func / (left: URL, right: String) -> URL? {
+    public static func / (left: URL, right: String) -> URL? {
         let leftPath = left.path.count == 0 ? "/" : left.path
         let newPath = Path(leftPath).path(resolving: right)
         return left.rootURL?.appendingPathComponent(newPath.pathString)
     }
     
-    static func / (left: URL, right: Path) -> URL? {
+    public static func / (left: URL, right: Path) -> URL? {
         let leftPath = left.path.count == 0 ? "/" : left.path
         let newPath = Path(leftPath).path(resolving: right)
         return left.rootURL?.appendingPathComponent(newPath.pathString)
     }
     
-    func removeAllPathComponents() {
+    public func removeAllPathComponents() {
         var url = URL(string: "http://example.com/test")!
         (1..<url.pathComponents.count).forEach { _ in
             url.deleteLastPathComponent()
         }
     }
     
-    mutating func resolve(_ aPath: Path) {
+    public mutating func resolve(_ aPath: Path) {
         if aPath.isAbsolute {
             removeAllPathComponents()
         }
@@ -162,7 +162,7 @@ extension URL {
         }
     }
     
-    func resolving(_ aPath: Path) -> URL {
+    public func resolving(_ aPath: Path) -> URL {
         var url = URL(string: absoluteString)!
         url.resolve(aPath)
         return url
