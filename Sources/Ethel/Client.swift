@@ -16,7 +16,7 @@ public typealias TransportBlock = (Transport) -> Void
 
 // MARK:- Client
 
-public class Client : NSObject, URLSessionDataDelegate {
+open class Client : NSObject, URLSessionDataDelegate {
     
     private(set) var baseUrl: URL?
     

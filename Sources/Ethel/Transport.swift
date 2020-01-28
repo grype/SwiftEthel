@@ -10,7 +10,7 @@ import Beacon
 
 // MARK:- Transport
 
-public class Transport : NSObject{
+open class Transport : NSObject{
     
     // MARK: Types
     

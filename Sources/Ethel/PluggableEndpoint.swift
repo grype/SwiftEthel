@@ -8,7 +8,7 @@
 
 import Foundation
 
-public class PluggableEndpoint : Endpoint {
+open class PluggableEndpoint : Endpoint {
     public static var path: Path = Path()
     
     public var client: Client
