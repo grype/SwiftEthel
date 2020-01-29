@@ -24,7 +24,7 @@ open class Client : NSObject, URLSessionDataDelegate {
     
     private var tasks = [URLSessionTask : Transport]()
     
-    public var loggers = [SignalLogger]()
+    open var loggers = [SignalLogger]()
     
     // MARK: Init
     
@@ -38,17 +38,17 @@ open class Client : NSObject, URLSessionDataDelegate {
     
     // MARK: Configuring
     
-    public func createTransport() -> Transport {
+    open func createTransport() -> Transport {
         return Transport(session)
     }
     
-    public func configure(on aTransport: Transport) {
+    open func configure(on aTransport: Transport) {
         if let baseUrl = baseUrl {
             aTransport.request = URLRequest(url: baseUrl)
         }
     }
     
-    public var loggingEnabled = false {
+    open var loggingEnabled = false {
         didSet {
             loggers.forEach { (logger) in
                 if loggingEnabled {
@@ -63,7 +63,7 @@ open class Client : NSObject, URLSessionDataDelegate {
     
     // MARK: Executing
     
-    public func execute<T>(_ endpoint: Endpoint, with block: TransportBlock? = nil) -> Promise<T> {
+    open func execute<T>(_ endpoint: Endpoint, with block: TransportBlock? = nil) -> Promise<T> {
         let transport = createTransport()
         configure(on: transport)
         endpoint.configure(on: transport)
@@ -90,44 +90,44 @@ open class Client : NSObject, URLSessionDataDelegate {
         }
     }
     
-    public func execute<T>(method: String, endpoint: Endpoint, with block: TransportBlock? = nil) -> Promise<T> {
+    open func execute<T>(method: String, endpoint: Endpoint, with block: TransportBlock? = nil) -> Promise<T> {
         return execute(endpoint) { (transport) in
             transport.request?.httpMethod = method
             block?(transport)
         }
     }
     
-    public func get<T>(_ endpoint: Endpoint, with block: TransportBlock? = nil) -> Promise<T> {
+    open func get<T>(_ endpoint: Endpoint, with block: TransportBlock? = nil) -> Promise<T> {
         return execute(method: "GET", endpoint: endpoint, with: block)
     }
     
-    public func delete<T>(_ endpoint: Endpoint, with block: TransportBlock? = nil) -> Promise<T> {
+    open func delete<T>(_ endpoint: Endpoint, with block: TransportBlock? = nil) -> Promise<T> {
         return execute(method: "DELETE", endpoint: endpoint, with: block)
     }
     
-    public func put<T>(_ endpoint: Endpoint, with block: TransportBlock? = nil) -> Promise<T> {
+    open func put<T>(_ endpoint: Endpoint, with block: TransportBlock? = nil) -> Promise<T> {
         return execute(method: "PUT", endpoint: endpoint, with: block)
     }
     
-    public func post<T>(_ endpoint: Endpoint, with block: TransportBlock? = nil) -> Promise<T> {
+    open func post<T>(_ endpoint: Endpoint, with block: TransportBlock? = nil) -> Promise<T> {
         return execute(method: "POST", endpoint: endpoint, with: block)
     }
     
-    public func patch<T>(_ endpoint: Endpoint, with block: TransportBlock? = nil) -> Promise<T> {
+    open func patch<T>(_ endpoint: Endpoint, with block: TransportBlock? = nil) -> Promise<T> {
         return execute(method: "PATCH", endpoint: endpoint, with: block)
     }
     
-    public func head<T>(_ endpoint: Endpoint, with block: TransportBlock? = nil) -> Promise<T> {
+    open func head<T>(_ endpoint: Endpoint, with block: TransportBlock? = nil) -> Promise<T> {
         return execute(method: "HEAD", endpoint: endpoint, with: block)
     }
     
-    public func options<T>(_ endpoint: Endpoint, with block: TransportBlock? = nil) -> Promise<T> {
+    open func options<T>(_ endpoint: Endpoint, with block: TransportBlock? = nil) -> Promise<T> {
         return execute(method: "OPTIONS", endpoint: endpoint, with: block)
     }
     
     // MARK: URLSessionDelegate
     
-    public func urlSession(_ session: URLSession, didBecomeInvalidWithError error: Error?) {
+    open func urlSession(_ session: URLSession, didBecomeInvalidWithError error: Error?) {
         self.tasks.forEach { (task, transport) in
             transport.urlSession(session, didBecomeInvalidWithError: error)
         }
@@ -135,13 +135,13 @@ open class Client : NSObject, URLSessionDataDelegate {
     
     // MARK: URLSessionTaskDelegate
     
-    public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+    open func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         self.tasks.forEach { (task, transport) in
             transport.urlSession(session, task: task, didCompleteWithError: error)
         }
     }
     
-    public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
+    open func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
         guard let transport = self.tasks[dataTask] else { return }
         transport.urlSession(session, dataTask: dataTask, didReceive: data)
     }
