@@ -18,12 +18,11 @@ public struct ResponseError: Error {
     var code: Int
     
     public var localizedDescription: String {
-        let str = ResponseError.description(for: code) ?? "Unknown Error"
-        return "\(code) \(str)"
+        return "\(code) \(ResponseError.description(for: code))"
     }
     
-    public static func description(for code: Int) -> String? {
-        return HTTPStatusCodes[code]
+    public static func description(for code: Int) -> String {
+        return HTTPStatusCodes[code] ?? "Unknown Error"
     }
 }
 
