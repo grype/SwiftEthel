@@ -61,6 +61,33 @@ open class Client : NSObject, URLSessionDataDelegate {
         }
     }
     
+    // MARK: Resolving
+    
+    open func resolve<T>(_ resolver: Resolver<T>, transport: Transport) {
+        var contents: T?
+        do {
+            contents = try transport.getResponseContents() as? T
+            var error: Error?
+            if let response = transport.response {
+                error = validate(response: response)
+            }
+            resolver.resolve(contents, error ?? transport.responseError)
+        }
+        catch {
+            resolver.reject(error)
+        }
+    }
+    
+    /// Returns an error if response is considered erroneous, that is
+    /// the Promise should be rejected
+    open func validate(response: URLResponse) -> Error? {
+        guard let response = response as? HTTPURLResponse else { return nil }
+        if response.statusCode >= 200 && response.statusCode < 300 {
+            return nil
+        }
+        return ResponseError(code: response.statusCode)
+    }
+    
     // MARK: Executing
     
     open func execute<T>(_ endpoint: Endpoint, with block: TransportBlock? = nil) -> Promise<T> {
@@ -74,14 +101,7 @@ open class Client : NSObject, URLSessionDataDelegate {
         
         return Promise<T> { seal in
             let task = transport.execute { (transport, task) in
-                var contents: T?
-                do {
-                    contents = try transport.getResponseContents() as? T
-                    seal.resolve(contents, transport.responseError)
-                }
-                catch {
-                    seal.reject(error)
-                }
+                self.resolve(seal, transport: transport)
                 if let task = task {
                     self.tasks.removeValue(forKey: task)
                 }

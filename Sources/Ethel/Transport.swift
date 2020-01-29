@@ -24,9 +24,13 @@ open class Transport : NSObject{
     
     public var session: URLSession
     
-    public var request: URLRequest?
+    public var request: URLRequest? {
+        didSet { request?.transport = self }
+    }
     
-    public var response: URLResponse?
+    public var response: URLResponse? {
+        didSet { response?.transport = self }
+    }
     
     public var type: RequestType = .data
     
@@ -223,5 +227,33 @@ extension Transport : NSCopying {
         transport.responseData = responseData
         transport.responseError = responseError
         return transport
+    }
+}
+
+
+extension URLRequest {
+    private struct AssociatedKeys {
+        static var transport = "Ethel.Transport"
+    }
+    
+    public var transport: Transport? {
+        get { return objc_getAssociatedObject(self, &AssociatedKeys.transport) as? Transport }
+        set {
+            objc_setAssociatedObject(self, &AssociatedKeys.transport, newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+        }
+    }
+}
+
+
+extension URLResponse {
+    private struct AssociatedKeys {
+        static var transport = "Ethel.Transport"
+    }
+    
+    public var transport: Transport? {
+        get { return objc_getAssociatedObject(self, &AssociatedKeys.transport) as? Transport }
+        set {
+            objc_setAssociatedObject(self, &AssociatedKeys.transport, newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+        }
     }
 }
