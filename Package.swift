@@ -21,7 +21,6 @@ let package = Package(
         // Dependencies declare other packages that this package depends on.
         .package(url: "https://github.com/grype/SwiftBeacon", .branch("master")),
         .package(url: "https://github.com/mxcl/PromiseKit", from: "6.12.0"),
-        .package(url: "https://github.com/Quick/Nimble.git", .upToNextMajor(from: "8.0.1")),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
