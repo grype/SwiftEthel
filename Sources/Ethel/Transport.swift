@@ -164,11 +164,29 @@ open class Transport : NSObject{
     // MARK: CustomStringConvertible
     
     override public var description: String {
+        var requestDescription = "<nil>"
+        if let request = request {
+            if let method = request.httpMethod {
+                requestDescription = "[\(method)]"
+            }
+            else {
+                requestDescription = "[<nil>]"
+            }
+            requestDescription = "\(requestDescription) \(String(describing: request))"
+        }
+        
+        var responseDescription = "<nil>"
+        if let response = response as? HTTPURLResponse {
+            responseDescription = "[\(response.statusCode)] \(String(describing: response))"
+        }
+        else if let response = response {
+            responseDescription = String(describing: response)
+        }
         return """
         \(super.description)
             Executing: \(String(describing: isExecuting))
-            Request: \((request != nil) ? String(describing: request!) : "<nil>")
-            Response: \((response != nil) ? String(describing: response!) : "<nil>")
+            Request: \(requestDescription)
+            Response: \(responseDescription)
             Current Task: \((currentTask != nil) ? String(describing: currentTask!) : "<nil>" )
         """
     }
