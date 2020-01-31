@@ -132,7 +132,7 @@ open class Transport : NSObject{
     
     // MARK: Contents
     
-    public var contents: Any? {
+    open var contents: Any? {
         set {
             try? setRequestContents(newValue)
         }
@@ -141,19 +141,16 @@ open class Transport : NSObject{
         }
     }
     
-    public func setRequestContents(_ contents: Any?) throws {
-        guard var request = request else {
-            fatalError("Transport has no configured request")
-        }
+    open func setRequestContents(_ contents: Any?) throws {
         if let contents = contents, let contentWriter = contentWriter {
-            request.httpBody = try contentWriter(contents)
+            request?.httpBody = try contentWriter(contents)
         }
         else {
-            request.httpBody = contents as? Data
+            request?.httpBody = contents as? Data
         }
     }
     
-    public func getResponseContents() throws -> Any? {
+    open func getResponseContents() throws -> Any? {
         guard hasResponse, let responseData = responseData else { return nil }
         if let contentReader = contentReader {
             return try contentReader(responseData)
