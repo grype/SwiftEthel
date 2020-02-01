@@ -146,10 +146,9 @@ extension URL {
         return left.rootURL?.appendingPathComponent(newPath.pathString)
     }
     
-    public func removeAllPathComponents() {
-        var url = URL(string: "http://example.com/test")!
-        (1..<url.pathComponents.count).forEach { _ in
-            url.deleteLastPathComponent()
+    public mutating func removeAllPathComponents() {
+        while pathComponents.count > 1 {
+            deleteLastPathComponent()
         }
     }
     
