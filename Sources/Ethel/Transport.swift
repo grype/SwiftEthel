@@ -38,15 +38,15 @@ open class Transport : NSObject{
     
     public var contentReader: ((Data) throws -> Any?)?
     
-    private(set) var hasResponse = false
+    public private(set) var hasResponse = false
     
-    private(set) var responseData: Data?
+    public private(set) var responseData: Data?
     
-    private(set) var responseError: Error?
+    public private(set) var responseError: Error?
     
     private var completion: Completion!
     
-    private(set) var currentTask: URLSessionTask?
+    public private(set) var currentTask: URLSessionTask?
     
     // MARK: Initialization
     
