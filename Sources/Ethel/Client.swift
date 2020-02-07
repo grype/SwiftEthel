@@ -27,9 +27,8 @@ open class Client : NSObject, URLSessionDataDelegate {
     open var loggers = [SignalLogger]()
     
     /// Instance of `Beacon` used by the framework to emit signals
-    open var beacon: Beacon {
-        get { return Beacon.shared }
-        set { Beacon.shared = newValue }
+    open var beacon = Beacon.shared {
+        didSet { restartLoggers() }
     }
     
     // MARK: Init
@@ -58,13 +57,18 @@ open class Client : NSObject, URLSessionDataDelegate {
         didSet {
             loggers.forEach { (logger) in
                 if loggingEnabled {
-                    logger.start()
+                    logger.start(on: [beacon])
                 }
                 else {
                     logger.stop()
                 }
             }
         }
+    }
+    
+    private func restartLoggers() {
+        loggingEnabled = false
+        loggingEnabled = true
     }
     
     // MARK: Resolving
