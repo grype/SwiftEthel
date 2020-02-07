@@ -26,6 +26,12 @@ open class Client : NSObject, URLSessionDataDelegate {
     
     open var loggers = [SignalLogger]()
     
+    /// Instance of `Beacon` used by the framework to emit signals
+    open var beacon: Beacon {
+        get { return Beacon.shared }
+        set { Beacon.shared = newValue }
+    }
+    
     // MARK: Init
     
     public init(url anUrl: URL? = nil, sessionConfiguration: URLSessionConfiguration? = nil) {
