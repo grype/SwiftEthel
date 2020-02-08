@@ -13,16 +13,8 @@ open class TransportSignal : WrapperSignal {
         return value as! Transport
     }
     
-    public override class var signalName: String {
-        return "🚛 \(super.signalName)"
-    }
-    
-    public init(_ aTransport: Transport) {
-        super.init(aTransport)
-    }
-    
-    public override var description: String {
-        return "\(super.description) \(transport.description)"
+    open override var signalName: String {
+        return "🚛"
     }
 }
 
