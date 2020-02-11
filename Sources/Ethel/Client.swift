@@ -16,9 +16,41 @@ public typealias TransportBlock = (Transport) -> Void
 
 // MARK:- Client
 
+/**
+ I am a base class for defining a client for web APIs.
+ 
+ I typically need to be subclassed as I provide very limitted functionality.
+ I maintain a reference to the base url of the API, which includes the longest
+ common path for all of my endpoints.
+ 
+ Instantiate me with a base URL and an `URLSessoinConfiguration`, which I use
+ for configuring `URLSession` that I use for making requests.
+ 
+ My sole purpose is to capture common behavior that is shared by all endpoints, or
+ by groups of endpoints - i.e., I could provide methods for configuring authenticated
+ requests vs un-authenticated.
+ 
+ The rest of the behavior should be defined in the individual `Endpoint`s. I can create
+ endpoints using `/` operator, much like other endpoints can. For example, the following
+ two statements are equivalent:
+ 
+ ```
+ MyEndpoint(client: client)
+ client / MyEndpoint.self
+ ```
+ 
+ When creating endpoint instances this way, the final path of the endpoint is resolved using
+ both the client's `baseUrl` and the endpoints's `path`
+ 
+ Subclassing notes:
+ 
+ Override `configureTransport` if you need to configure the request. This is done
+ via an intermediate `Transport` object that gets passed into the function as the sole
+ argument.
+ */
 open class Client : NSObject, URLSessionDataDelegate {
     
-    private(set) var baseUrl: URL?
+    private(set) var baseUrl: URL!
     
     private(set) var session: URLSession!
     
@@ -28,10 +60,14 @@ open class Client : NSObject, URLSessionDataDelegate {
     
     // MARK: Init
     
-    public init(url anUrl: URL? = nil, sessionConfiguration: URLSessionConfiguration? = nil) {
+    public convenience init(_ urlString: String, sessionConfiguration: URLSessionConfiguration? = nil) {
+        self.init(URL(string: urlString)!, sessionConfiguration: sessionConfiguration)
+    }
+    
+    public init(_ anUrl: URL, sessionConfiguration: URLSessionConfiguration? = nil) {
         super.init()
-        let sessionConfig = sessionConfiguration ?? URLSessionConfiguration.default
         baseUrl = anUrl
+        let sessionConfig = sessionConfiguration ?? URLSessionConfiguration.default
         session = URLSession(configuration: sessionConfig, delegate: self, delegateQueue: nil)
         loggers.append(ConsoleLogger(name: "Ethel.Client"))
     }
@@ -43,9 +79,7 @@ open class Client : NSObject, URLSessionDataDelegate {
     }
     
     open func configure(on aTransport: Transport) {
-        if let baseUrl = baseUrl {
-            aTransport.request = URLRequest(url: baseUrl)
-        }
+        aTransport.request = URLRequest(url: baseUrl)
     }
     
     open var loggingEnabled = false {

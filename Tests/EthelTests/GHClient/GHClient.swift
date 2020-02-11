@@ -31,7 +31,7 @@ class GHClient : Client {
     
     init(configuration aConfig: GHClientConfiguration) {
         configuration = aConfig
-        super.init(url: aConfig.url, sessionConfiguration: URLSessionConfiguration.background(withIdentifier: "GHClient"))
+        super.init(aConfig.url, sessionConfiguration: URLSessionConfiguration.background(withIdentifier: "GHClient"))
     }
     
     // MARK: Endpoints

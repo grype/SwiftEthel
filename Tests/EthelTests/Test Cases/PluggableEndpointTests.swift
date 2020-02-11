@@ -17,7 +17,7 @@ class PluggableEndpointTests : XCTestCase {
     
     override func setUp() {
         super.setUp()
-        client = TestClient(url: baseURL, sessionConfiguration: URLSessionConfiguration.default)
+        client = TestClient(baseURL, sessionConfiguration: URLSessionConfiguration.default)
     }
     
     func testEndpointFromClient() {
