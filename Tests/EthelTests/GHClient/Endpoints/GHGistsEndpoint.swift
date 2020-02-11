@@ -11,7 +11,9 @@ import PromiseKit
 
 class GHGistsEndpoint : GHEndpoint {
     
-    override class var path: Path { GHEndpoint.path / "gists" }
+    override var path: Path {
+        return Path("/gists")
+    }
     
     var `public` : GHPublicGistsEndpoint {
         return self / GHPublicGistsEndpoint.self

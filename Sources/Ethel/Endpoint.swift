@@ -11,55 +11,50 @@ import PromiseKit
 
 // MARK:- Endpoint
 
-public protocol Endpoint {
-    init(on aClient: Client)
-    static var path: Path { get }
-    var path: Path { get }
-    var client: Client { get set }
-    func configure(on aTransport: Transport)
-    func execute<T>(_ block: TransportBlock?) -> Promise<T>
-}
-
-// MARK:- Extensions
-
-extension Endpoint {
-    public var path: Path {
-        return type(of: self).path
+open class Endpoint {
+    open var client: Client
+    
+    open var path: Path {
+        return Path()
     }
     
-    public func configure(on aTransport: Transport) {
+    required public init(on aClient: Client) {
+        client = aClient
+    }
+    
+    open func configure(on aTransport: Transport) {
         aTransport.request?.url?.resolve(path)
     }
     
-    public func execute<T>(_ block: TransportBlock? = nil) -> Promise<T> {
+    open func execute<T>(_ block: TransportBlock? = nil) -> Promise<T> {
         return client.execute(self, with: block)
     }
     
-    public func get<T>(_ block: TransportBlock? = nil) -> Promise<T> {
+    open func get<T>(_ block: TransportBlock? = nil) -> Promise<T> {
         return client.get(self, with: block)
     }
     
-    public func delete<T>(_ block: TransportBlock? = nil) -> Promise<T> {
+    open func delete<T>(_ block: TransportBlock? = nil) -> Promise<T> {
         return client.delete(self, with: block)
     }
     
-    public func post<T>(_ block: TransportBlock? = nil) -> Promise<T> {
+    open func post<T>(_ block: TransportBlock? = nil) -> Promise<T> {
         return client.post(self, with: block)
     }
     
-    public func patch<T>(_ block: TransportBlock? = nil) -> Promise<T> {
+    open func patch<T>(_ block: TransportBlock? = nil) -> Promise<T> {
         return client.patch(self, with: block)
     }
     
-    public func put<T>(_ block: TransportBlock? = nil) -> Promise<T> {
+    open func put<T>(_ block: TransportBlock? = nil) -> Promise<T> {
         return client.put(self, with: block)
     }
     
-    public func head<T>(_ block: TransportBlock? = nil) -> Promise<T> {
+    open func head<T>(_ block: TransportBlock? = nil) -> Promise<T> {
         return client.head(self, with: block)
     }
     
-    public func options<T>(_ block: TransportBlock? = nil) -> Promise<T> {
+    open func options<T>(_ block: TransportBlock? = nil) -> Promise<T> {
         return client.options(self, with: block)
     }
 }

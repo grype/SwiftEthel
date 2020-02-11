@@ -95,12 +95,11 @@ class Examples: XCTestCase {
     
     func testFirst() {
         var found: GHGist?
-        let language = "python"
         let expect = expectation(description: "first")
         queue.async {
             found = self.client.gists.public.first { (gist) -> Bool in
                 gist.files?.contains(where: { (each) -> Bool in
-                    each.value.language?.lowercased() == language
+                    each.value.language != nil
                 }) ?? false
             }
             if found != nil {
@@ -111,27 +110,9 @@ class Examples: XCTestCase {
         assert(found != nil, "Expected a result")
         assert(found!.files != nil, "Expected result to contain at least one file")
         assert(found!.files!.contains(where: { (each) -> Bool in
-            each.value.language?.lowercased() == language
+            each.value.language != nil
         }), "Expected at least one file w/o a language")
         print(String(describing: found?.files))
-    }
-    
-    func testIterator() {
-        var iterator = client.gists.public.makeIterator()
-        var first: GHGist?
-        var second: GHGist?
-        
-        let expect = expectation(description: "Iterator next")
-        assert(iterator.hasMore, "New iterator should indicate there's more results")
-        queue.async {
-            first = iterator.next()
-            second = iterator.next()
-            expect.fulfill()
-        }
-        wait(for: [expect], timeout: Timeouts.short.rawValue)
-        assert(first != nil, "Expected there to be at least one public gist")
-        assert(second != nil, "Expected there to be at least another public gist")
-        assert(first!.id != second!.id)
     }
     
     func testSort() {
@@ -190,7 +171,7 @@ class Examples: XCTestCase {
     
     func testPrefixMaxLength() {
         var result: [GHGist]?
-        let limit = Int(client.gists.public.makeIterator().pageSize / 2)
+        let limit = Int((client.gists.public.makeCursor() as! GHPageCursor).pageSize / 2)
         let expect = expectation(description: "Prefix with max length")
         queue.async {
             result = self.client.gists.public.prefix(limit)
@@ -203,7 +184,7 @@ class Examples: XCTestCase {
     
     func testPrefixMaxLengthMulitpleRequests() {
         var result: [GHGist]?
-        let limit = Int(Double(client.gists.public.makeIterator().pageSize) * 2.5)
+        let limit = Int(Double((client.gists.public.makeCursor() as! GHPageCursor).pageSize) * 2.5)
         let expect = expectation(description: "Prefix with max length")
         queue.async {
             result = self.client.gists.public.prefix(limit)
@@ -218,7 +199,7 @@ class Examples: XCTestCase {
         var results: [GHGist]?
         let expect = expectation(description: "Prefix while")
         var count = 0
-        let limit = Int(Double(client.gists.public.makeIterator().pageSize) * 2.5)
+        let limit = Int(Double((client.gists.public.makeCursor() as! GHPageCursor).pageSize) * 2.5)
         queue.async {
             results = self.client.gists.public.prefix { (gist) -> Bool in
                 count += 1

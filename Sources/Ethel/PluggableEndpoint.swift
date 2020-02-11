@@ -9,15 +9,21 @@
 import Foundation
 
 open class PluggableEndpoint : Endpoint {
-    public static var path: Path = Path()
     
-    public var client: Client
+    open override var path: Path {
+        get {
+            return pluggablePath
+        }
+        set {
+            pluggablePath = newValue
+        }
+    }
     
-    public var path: Path
+    open var pluggablePath: Path
     
-    required public init(on aClient: Client) {
-        client = aClient
-        path = Path()
+    public required init(on aClient: Client) {
+        pluggablePath = Path()
+        super.init(on: aClient)
     }
     
 }
