@@ -171,7 +171,7 @@ class Examples: XCTestCase {
     
     func testPrefixMaxLength() {
         var result: [GHGist]?
-        let limit = Int((client.gists.public.makeCursor() as! GHPageCursor).pageSize / 2)
+        let limit = Int(client.gists.public.makeCursor().pageSize / 2)
         let expect = expectation(description: "Prefix with max length")
         queue.async {
             result = self.client.gists.public.prefix(limit)
@@ -184,7 +184,7 @@ class Examples: XCTestCase {
     
     func testPrefixMaxLengthMulitpleRequests() {
         var result: [GHGist]?
-        let limit = Int(Double((client.gists.public.makeCursor() as! GHPageCursor).pageSize) * 2.5)
+        let limit = Int(Double(client.gists.public.makeCursor().pageSize) * 2.5)
         let expect = expectation(description: "Prefix with max length")
         queue.async {
             result = self.client.gists.public.prefix(limit)
@@ -199,7 +199,7 @@ class Examples: XCTestCase {
         var results: [GHGist]?
         let expect = expectation(description: "Prefix while")
         var count = 0
-        let limit = Int(Double((client.gists.public.makeCursor() as! GHPageCursor).pageSize) * 2.5)
+        let limit = Int(Double(client.gists.public.makeCursor().pageSize) * 2.5)
         queue.async {
             results = self.client.gists.public.prefix { (gist) -> Bool in
                 count += 1

@@ -34,12 +34,12 @@ public protocol Cursor {
  I am used by `CursoredEndpoint`, which makes it easy to extend endpoints with
  enumerating behavior.
  */
-public class CursoredIterator<U: SequenceEndpoint> : EndpointIterator {
+public class CursoredIterator<U: SequenceEndpoint, V: Cursor> : EndpointIterator {
     public typealias Element = U.Element
     
     open var endpoint: U
     
-    open var cursor: Cursor
+    open var cursor: V
     
     open var hasMore: Bool { cursor.hasMore }
     
@@ -49,7 +49,7 @@ public class CursoredIterator<U: SequenceEndpoint> : EndpointIterator {
     
     // MARK: Init
     
-    init(endpoint anEndpoint: U, cursor aCursor: Cursor) {
+    init(endpoint anEndpoint: U, cursor aCursor: V) {
         endpoint = anEndpoint
         cursor = aCursor
     }
@@ -96,17 +96,18 @@ public class CursoredIterator<U: SequenceEndpoint> : EndpointIterator {
  hiding the iterator machinery and using a simple `Cursor` object.
  */
 public protocol CursoredEndpoint : SequenceEndpoint {
-    func makeCursor() -> Cursor
-    func next(with: Cursor) -> Promise<[Element]>
+    associatedtype EndpointCursor: Cursor
+    func makeCursor() -> EndpointCursor
+    func next(with: EndpointCursor) -> Promise<[Element]>
 }
 
 extension CursoredEndpoint {
-    public func makeIterator() -> CursoredIterator<Self> {
+    public func makeIterator() -> CursoredIterator<Self, EndpointCursor> {
         return CursoredIterator(endpoint: self, cursor: makeCursor())
     }
     
     public func next(with anIterator: Iterator) -> Promise<[Element]> {
-        let cursoredIterator = anIterator as! CursoredIterator<Self>
+        let cursoredIterator = anIterator as! CursoredIterator<Self,EndpointCursor>
         return next(with: cursoredIterator.cursor)
     }
     

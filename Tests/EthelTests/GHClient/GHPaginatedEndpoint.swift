@@ -10,6 +10,7 @@ import Ethel
 import PromiseKit
 
 class GHPaginatedEndpoint<T: Decodable> : GHEndpoint {
+
     typealias Element = T
     
     var page: Int = 1
@@ -23,7 +24,7 @@ class GHPaginatedEndpoint<T: Decodable> : GHEndpoint {
     }
     
     subscript(index: Int) -> Element? {
-        let cursor = self.makeCursor() as! GHPageCursor
+        let cursor = self.makeCursor()
         cursor.page = index + 1
         cursor.pageSize = 1
         guard let results = try? next(with: cursor).wait(), !results.isEmpty else {
@@ -33,7 +34,7 @@ class GHPaginatedEndpoint<T: Decodable> : GHEndpoint {
     }
     
     subscript(range: Range<Int>) -> [Element] {
-        let cursor = makeCursor() as! GHPageCursor
+        let cursor = makeCursor()
         cursor.page = Int(floor(Double(range.lowerBound / cursor.pageSize))) + 1
         var result = [Element]()
         while cursor.hasMore, result.count < range.count {
@@ -55,21 +56,22 @@ class GHPaginatedEndpoint<T: Decodable> : GHEndpoint {
 
 extension GHPaginatedEndpoint : CursoredEndpoint {
     
-    func makeCursor() -> Cursor {
+    typealias EndpointCursor = GHPageCursor
+    
+    func makeCursor() -> GHPageCursor {
         let cursor = GHPageCursor()
         cursor.page = page
         cursor.pageSize = pageSize
         return cursor
     }
     
-    func next(with aCursor: Cursor) -> Promise<[Element]> {
-        let cursor = aCursor as! GHPageCursor
-        page = cursor.page
-        pageSize = cursor.pageSize
+    func next(with aCursor: GHPageCursor) -> Promise<[T]> {
+        page = aCursor.page
+        pageSize = aCursor.pageSize
         return getJSON().get { (gists) in
-            cursor.page += 1
-            cursor.hasMore = gists.count >= self.pageSize
+            aCursor.page += 1
+            aCursor.hasMore = gists.count >= self.pageSize
         }
     }
-  
+    
 }
