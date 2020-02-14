@@ -163,18 +163,19 @@ open class Transport : NSObject{
     override public var description: String {
         var requestDescription = "<nil>"
         if let request = request {
-            if let method = request.httpMethod {
-                requestDescription = "[\(method)]"
-            }
-            else {
-                requestDescription = "[<nil>]"
-            }
-            requestDescription = "\(requestDescription) \(String(describing: request))"
+            let method = request.httpMethod ?? "<nil>"
+            let type = request.allHTTPHeaderFields?["Content-Type"] ?? ""
+            let length = request.httpBody?.count ?? 0
+            let url = request.url?.absoluteString ?? "<nil>"
+            requestDescription = "[\(method)] [\(type)] (\(length)) \(url)"
         }
         
         var responseDescription = "<nil>"
         if let response = response as? HTTPURLResponse {
-            responseDescription = "[\(response.statusCode)] \(String(describing: response))"
+            let length = response.expectedContentLength
+            let type = response.mimeType ?? ""
+            let url = response.url?.absoluteString ?? "<nil>"
+            responseDescription = "[\(response.statusCode)] [\(type)] (\(length)) \(url)"
         }
         else if let response = response {
             responseDescription = String(describing: response)
