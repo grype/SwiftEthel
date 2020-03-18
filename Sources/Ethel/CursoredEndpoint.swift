@@ -64,14 +64,12 @@ public class CursoredIterator<U: SequenceEndpoint, V: Cursor> : EndpointIterator
     // MARK: Enumerating
     
     open func next() -> Element? {
-        guard hasMore else { return nil }
-        
         if needsFetch {
             fetch()
             currentOffset = 0
         }
         
-        guard let elements = elements, !elements.isEmpty else { return nil }
+        guard let elements = elements, !elements.isEmpty, currentOffset < elements.count else { return nil }
         
         let result = elements[currentOffset]
         currentOffset += 1
