@@ -20,19 +20,20 @@ public typealias TransportBlock = (Transport) -> Void
  I am a base class for defining a client for web APIs.
  
  I typically need to be subclassed as I provide very limitted functionality.
- I maintain a reference to the base url of the API, which includes the longest
+ I maintain a reference to the base url of the API, which is the longest
  common path for all of my endpoints.
  
- Instantiate me with a base URL and an `URLSessoinConfiguration`, which I use
- for configuring `URLSession` that I use for making requests.
+ Instantiate me with a base URL and an `URLSessionConfiguration`, which I use
+ for configuring `URLSession` when making requests.
  
  My sole purpose is to capture common behavior that is shared by all endpoints, or
  by groups of endpoints - i.e., I could provide methods for configuring authenticated
  requests vs un-authenticated.
  
  The rest of the behavior should be defined in the individual `Endpoint`s. I can create
- endpoints using `/` operator, much like other endpoints can. For example, the following
- two statements are equivalent:
+ endpoints using `/` operator, much like an endpoints can. For example, the following
+ two statements are equivalent - they both result in an instance of MyEndpoint configured
+ with a client:
  
  ```
  MyEndpoint(client: client)
@@ -85,12 +86,7 @@ open class Client : NSObject, URLSessionDataDelegate {
     open var loggingEnabled = false {
         didSet {
             loggers.forEach { (logger) in
-                if loggingEnabled {
-                    logger.start()
-                }
-                else {
-                    logger.stop()
-                }
+                loggingEnabled ? logger.start() : logger.stop()
             }
         }
     }

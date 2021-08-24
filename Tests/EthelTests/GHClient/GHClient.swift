@@ -21,7 +21,8 @@ struct GHClientConfiguration {
 // MARK:- Client
 
 class GHClient : Client {
-    override var baseUrl: URL? { return configuration.url }
+    
+    override var baseUrl: URL? { configuration.url }
     
     static var `default` = GHClient(configuration: GHClientConfiguration.default)
     
