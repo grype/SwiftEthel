@@ -2,12 +2,75 @@
   "object": {
     "pins": [
       {
+        "package": "AnyCodable",
+        "repositoryURL": "https://github.com/Flight-School/AnyCodable",
+        "state": {
+          "branch": null,
+          "revision": "69261f239f0fffaf51495dadc4f8483fbfe97025",
+          "version": "0.6.1"
+        }
+      },
+      {
+        "package": "Cuckoo",
+        "repositoryURL": "https://github.com/Brightify/Cuckoo",
+        "state": {
+          "branch": null,
+          "revision": "39e05cdf563f90be1652483ce7731d5be45c7153",
+          "version": "1.5.1"
+        }
+      },
+      {
+        "package": "CwlCatchException",
+        "repositoryURL": "https://github.com/mattgallagher/CwlCatchException.git",
+        "state": {
+          "branch": null,
+          "revision": "682841464136f8c66e04afe5dbd01ab51a3a56f2",
+          "version": "2.1.0"
+        }
+      },
+      {
+        "package": "CwlPreconditionTesting",
+        "repositoryURL": "https://github.com/mattgallagher/CwlPreconditionTesting.git",
+        "state": {
+          "branch": null,
+          "revision": "0630439888c94657a235ffcd5977d6047ef3c87b",
+          "version": "2.0.1"
+        }
+      },
+      {
+        "package": "Nimble",
+        "repositoryURL": "https://github.com/Quick/Nimble",
+        "state": {
+          "branch": null,
+          "revision": "af1730dde4e6c0d45bf01b99f8a41713ce536790",
+          "version": "9.2.0"
+        }
+      },
+      {
         "package": "PromiseKit",
         "repositoryURL": "https://github.com/mxcl/PromiseKit",
         "state": {
           "branch": null,
-          "revision": "80963d4317bcdc03891e0fbaa744f20511d1bc08",
-          "version": "6.12.0"
+          "revision": "d2f7ba14bcdc45e18f4f60ad9df883fb9055f081",
+          "version": "6.15.3"
+        }
+      },
+      {
+        "package": "RWLock",
+        "repositoryURL": "https://github.com/grype/RWLock-Swift",
+        "state": {
+          "branch": null,
+          "revision": "fc7781a5b696c9e26942d8175b7d2363cd2d3680",
+          "version": "1.0.0"
+        }
+      },
+      {
+        "package": "SwiftAnnouncements",
+        "repositoryURL": "https://github.com/grype/SwiftAnnouncements",
+        "state": {
+          "branch": null,
+          "revision": "30446e4babfcf0021d4664ab3df2cdf52f2dd300",
+          "version": "1.0.2"
         }
       },
       {
@@ -15,7 +78,7 @@
         "repositoryURL": "https://github.com/grype/SwiftBeacon",
         "state": {
           "branch": "master",
-          "revision": "3cf823763c04bc5b7c15455ead4628e5cc8ccd8f",
+          "revision": "4f3a2cb9bcef5f765445daf9d9fa39fb66c101b9",
           "version": null
         }
       }
