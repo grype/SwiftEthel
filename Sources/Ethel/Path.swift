@@ -8,21 +8,25 @@
 
 import Foundation
 
-public struct Path {
+public struct Path : ExpressibleByStringInterpolation {
     
     public static let DefaultDelimiter = "/"
     
     /// Whether path is absolute as opposed to relative.
     /// An absolute path will have a root.
-    private(set) var isAbsolute: Bool!
+    private(set) var isAbsolute: Bool = true
     
     /// Path delimiter string. Defaults to `Path.DefaultDelimiter`.
-    private(set) var delimiter: String!
+    private(set) var delimiter: String = DefaultDelimiter
     
     /// Path segments starting with the root.
     private(set) var segments: [String]!
     
     // MARK:- Initializing
+    
+    public init(stringLiteral value: String) {
+        self.init(value)
+    }
     
     public init(_ string: String? = nil, isAbsolute absolute: Bool, delimiter aDelimeter: String = DefaultDelimiter) {
         isAbsolute = absolute
