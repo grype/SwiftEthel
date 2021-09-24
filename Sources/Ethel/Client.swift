@@ -94,6 +94,7 @@ open class Client : NSObject, URLSessionDataDelegate {
                 loggingEnabled ? logger.start() : logger.stop()
             }
         }
+    }
     
     private func restartLoggers() {
         loggingEnabled = false
