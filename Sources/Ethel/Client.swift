@@ -59,6 +59,11 @@ open class Client : NSObject, URLSessionDataDelegate {
     
     open var loggers = [SignalLogger]()
     
+    /// Instance of `Beacon` used by the framework to emit signals
+    open var beacon = Beacon.shared {
+        didSet { restartLoggers() }
+    }
+    
     // MARK: Init
     
     public convenience init(_ urlString: String, sessionConfiguration: URLSessionConfiguration? = nil) {
@@ -89,6 +94,10 @@ open class Client : NSObject, URLSessionDataDelegate {
                 loggingEnabled ? logger.start() : logger.stop()
             }
         }
+    
+    private func restartLoggers() {
+        loggingEnabled = false
+        loggingEnabled = true
     }
     
     // MARK: Resolving

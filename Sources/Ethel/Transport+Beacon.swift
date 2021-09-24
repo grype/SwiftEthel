@@ -16,6 +16,14 @@ open class TransportSignal : WrapperSignal {
     open override var signalName: String {
         return "🚛"
     }
+    
+    public init(_ aTransport: Transport) {
+        super.init(aTransport)
+    }
+    
+    public override var description: String {
+        return "\(super.description) \(transport.description)"
+    }
 }
 
 extension Transport : Signaling {
