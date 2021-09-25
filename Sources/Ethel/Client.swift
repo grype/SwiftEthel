@@ -75,8 +75,16 @@ open class Client : NSObject, URLSessionDataDelegate {
     public init(_ anUrl: URL, sessionConfiguration: URLSessionConfiguration? = nil) {
         super.init()
         baseUrl = anUrl
+        initializeURLSession(sessionConfiguration)
+        initializeLogging()
+    }
+    
+    fileprivate func initializeURLSession(_ sessionConfiguration: URLSessionConfiguration?) {
         let sessionConfig = sessionConfiguration ?? URLSessionConfiguration.default
         session = URLSession(configuration: sessionConfig, delegate: self, delegateQueue: nil)
+    }
+    
+    fileprivate func initializeLogging() {
         loggers.append(ConsoleLogger(name: "Ethel.Client"))
     }
     
