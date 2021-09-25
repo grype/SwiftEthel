@@ -8,6 +8,7 @@
 import Foundation
 import XCTest
 @testable import Ethel
+import Nimble
 
 class PathTests : XCTestCase {
     
@@ -20,17 +21,27 @@ class PathTests : XCTestCase {
     
     func testRemoveAllPathComponents() {
         url.removeAllPathComponents()
-        assert(url == URL(string: "https://example.com/")!, "Unexpected URL after removing all path components")
+        expect(self.url).to(equal(URL(string: "https://example.com/")!))
+    }
+    
+    func testAbsoluteStringLiteral() {
+        let path: Path = "/foo/bar"
+        expect(path.isAbsolute).to(beTrue())
+    }
+    
+    func testRelativeStringLiteral() {
+        let path: Path = "foo/bar"
+        expect(path.isAbsolute).to(beFalse())
     }
     
     func testURLResolveAbsolutePath() {
-        url.resolve(Path("/absolute"))
-        assert(url == URL(string: "https://example.com/absolute")!, "Unexpected URL resolve of absolute path")
+        url.resolve("/absolute")
+        expect(self.url).to(equal(URL(string: "https://example.com/absolute")!))
     }
     
     func testURLResolveRelativePath() {
-        url.resolve(Path("relative"))
-        assert(url == URL(string: "https://example.com/some/path/relative"), "Unexpected URL resolve of relative path")
+        url.resolve("relative")
+        expect(self.url).to(equal(URL(string: "https://example.com/some/path/relative")))
     }
     
 }

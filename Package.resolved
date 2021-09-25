@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/Flight-School/AnyCodable",
         "state": {
           "branch": null,
-          "revision": "69261f239f0fffaf51495dadc4f8483fbfe97025",
-          "version": "0.6.1"
+          "revision": "b1a7a8a6186f2fcb28f7bda67cfc545de48b3c80",
+          "version": "0.6.2"
         }
       },
       {
@@ -39,11 +39,11 @@
       },
       {
         "package": "Nimble",
-        "repositoryURL": "https://github.com/Quick/Nimble",
+        "repositoryURL": "https://github.com/quick/nimble",
         "state": {
           "branch": null,
-          "revision": "af1730dde4e6c0d45bf01b99f8a41713ce536790",
-          "version": "9.2.0"
+          "revision": "c93f16c25af5770f0d3e6af27c9634640946b068",
+          "version": "9.2.1"
         }
       },
       {
@@ -51,8 +51,8 @@
         "repositoryURL": "https://github.com/mxcl/PromiseKit",
         "state": {
           "branch": null,
-          "revision": "d2f7ba14bcdc45e18f4f60ad9df883fb9055f081",
-          "version": "6.15.3"
+          "revision": "2ff97931d2721ecae9f94d8cbf4cf853a7d79180",
+          "version": "6.16.0"
         }
       },
       {
@@ -69,16 +69,16 @@
         "repositoryURL": "https://github.com/grype/SwiftAnnouncements",
         "state": {
           "branch": null,
-          "revision": "30446e4babfcf0021d4664ab3df2cdf52f2dd300",
-          "version": "1.0.2"
+          "revision": "f570ce8b03954f23b35deaef9b7d84df55e29ed3",
+          "version": "1.0.3"
         }
       },
       {
         "package": "Beacon",
         "repositoryURL": "https://github.com/grype/SwiftBeacon",
         "state": {
-          "branch": "master",
-          "revision": "4f3a2cb9bcef5f765445daf9d9fa39fb66c101b9",
+          "branch": "filtering-by-type",
+          "revision": "6161751162245c4aa0db8bfd41369ffb8f4c0f9b",
           "version": null
         }
       }
