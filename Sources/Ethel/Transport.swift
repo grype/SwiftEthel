@@ -8,11 +8,9 @@
 import Foundation
 import Beacon
 
-// MARK:- Transport
-
 open class Transport : NSObject{
     
-    // MARK: Types
+    // MARK: - Types
     
     public enum RequestType {
         case data, download, upload
@@ -20,7 +18,7 @@ open class Transport : NSObject{
     
     public typealias Completion = (Transport, URLSessionTask?)->Void
     
-    // MARK: Properties
+    // MARK: - Properties
     
     public var session: URLSession
     
@@ -48,14 +46,14 @@ open class Transport : NSObject{
     
     public private(set) var currentTask: URLSessionTask?
     
-    // MARK: Initialization
+    // MARK: - Initializating
     
     public init(_ aSession: URLSession) {
         session = aSession
         super.init()
     }
     
-    // MARK: Execution
+    // MARK: - Executing
     
     public func execute(completion aCompletionBlock: @escaping Completion) -> URLSessionTask {
         guard let request = request else {
@@ -68,11 +66,11 @@ open class Transport : NSObject{
         completion = aCompletionBlock
         task.resume()
         currentTask = task
-        emit(self)
+        emit(self, on: Beacon.ethel)
         return task
     }
     
-    // MARK: URL
+    // MARK: - URL
     
     public var url: URL? {
         set {
@@ -83,13 +81,13 @@ open class Transport : NSObject{
         }
     }
     
-    // MARK: Testing
+    // MARK: - Testing
     
     public var isExecuting: Bool {
         return currentTask != nil
     }
     
-    // MARK: Query
+    // MARK: - Querying
     
     public func add(queryItem: URLQueryItem) {
         addAll(queryItems: [queryItem])
@@ -130,7 +128,7 @@ open class Transport : NSObject{
         request?.url = components.url
     }
     
-    // MARK: Contents
+    // MARK: - Contents
     
     open var contents: Any? {
         set {
@@ -158,7 +156,7 @@ open class Transport : NSObject{
         return responseData
     }
     
-    // MARK: CustomStringConvertible
+    // MARK: - CustomStringConvertible
     
     override public var description: String {
         var requestDescription = "<nil>"
@@ -190,19 +188,19 @@ open class Transport : NSObject{
     }
 }
 
-// MARK:- URLSessionDelegate
+// MARK: - URLSessionDelegate
 
 extension Transport : URLSessionDelegate {
     public func urlSession(_ session: URLSession, didBecomeInvalidWithError error: Error?) {
         responseError = error
         hasResponse = true
         currentTask = nil
-        emit(self)
+        emit(self, on: Beacon.ethel)
         completion(self, nil)
     }
 }
 
-// MARK:- URLSessionTaskDelegate
+// MARK: - URLSessionTaskDelegate
 
 extension Transport : URLSessionTaskDelegate {
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
@@ -210,12 +208,12 @@ extension Transport : URLSessionTaskDelegate {
         response = task.response
         hasResponse = true
         currentTask = nil
-        emit(self)
+        emit(self, on: Beacon.ethel)
         completion(self, task)
     }
 }
 
-// MARK:- URLSessionDataDelegate
+// MARK: - URLSessionDataDelegate
 
 extension Transport : URLSessionDataDelegate {
     public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
@@ -227,7 +225,7 @@ extension Transport : URLSessionDataDelegate {
     }
 }
 
-// MARK:- NSCopying
+// MARK: - NSCopying
 
 extension Transport : NSCopying {
     public func copy(with zone: NSZone? = nil) -> Any {
@@ -246,6 +244,7 @@ extension Transport : NSCopying {
     }
 }
 
+// MARK: - URLRequest
 
 extension URLRequest {
     private struct AssociatedKeys {
@@ -260,6 +259,7 @@ extension URLRequest {
     }
 }
 
+// MARK: - URLResponse
 
 extension URLResponse {
     private struct AssociatedKeys {

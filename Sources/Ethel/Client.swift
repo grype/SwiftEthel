@@ -8,7 +8,6 @@
 
 import Foundation
 import PromiseKit
-import Beacon
 
 // MARK:- Types
 
@@ -56,10 +55,6 @@ open class Client : NSObject, URLSessionDataDelegate {
     private(set) var session: URLSession!
     
     private var tasks = [URLSessionTask : Transport]()
-    
-    /// Instance of `Beacon` used by the framework to emit signals.
-    /// The default uses the shared Beacon.
-    open var beacon = Beacon.shared
     
     // MARK: Init
     

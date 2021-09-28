@@ -81,7 +81,7 @@ public class CursoredIterator<U: SequenceEndpoint, V: Cursor> : EndpointIterator
             elements = try endpoint.next(with: self as! U.Iterator).wait()
         } catch {
             elements = nil
-            emit(error: error)
+            emit(error: error, on: Beacon.ethel)
         }
     }
 }
