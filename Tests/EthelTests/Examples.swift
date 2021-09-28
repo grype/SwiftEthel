@@ -21,7 +21,6 @@ class Examples: XCTestCase {
     
     override func setUp() {
         super.setUp()
-        client.loggingEnabled = true
         queue = DispatchQueue.global(qos: .background)
     }
     

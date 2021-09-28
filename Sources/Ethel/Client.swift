@@ -57,14 +57,9 @@ open class Client : NSObject, URLSessionDataDelegate {
     
     private var tasks = [URLSessionTask : Transport]()
     
-    open var loggers = [SignalLogger]()
-    
     /// Instance of `Beacon` used by the framework to emit signals.
     /// The default uses the shared Beacon.
-    open var beacon = Beacon.shared {
-        willSet { loggingEnabled = false }
-        didSet { loggingEnabled = false }
-    }
+    open var beacon = Beacon.shared
     
     // MARK: Init
     
@@ -76,16 +71,11 @@ open class Client : NSObject, URLSessionDataDelegate {
         super.init()
         baseUrl = anUrl
         initializeURLSession(sessionConfiguration)
-        initializeLogging()
     }
     
     fileprivate func initializeURLSession(_ sessionConfiguration: URLSessionConfiguration?) {
         let sessionConfig = sessionConfiguration ?? URLSessionConfiguration.default
         session = URLSession(configuration: sessionConfig, delegate: self, delegateQueue: nil)
-    }
-    
-    fileprivate func initializeLogging() {
-        loggers.append(ConsoleLogger(name: "Ethel.Client"))
     }
     
     // MARK: Configuring
@@ -98,13 +88,6 @@ open class Client : NSObject, URLSessionDataDelegate {
         aTransport.request = URLRequest(url: baseUrl)
     }
     
-    open var loggingEnabled = false {
-        didSet {
-            loggers.forEach { (logger) in
-                loggingEnabled ? logger.start() : logger.stop()
-            }
-        }
-    }
     
     // MARK: Resolving
     
