@@ -10,7 +10,5 @@ import Foundation
 import PromiseKit
 
 class GHEndpoint: Endpoint {
-    var dateFormatter: ISO8601DateFormatter {
-        return (client as! GHClient).dateFormatter
-    }
+    var dateFormatter = ISO8601DateFormatter()
 }

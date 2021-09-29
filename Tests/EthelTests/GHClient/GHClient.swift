@@ -15,7 +15,7 @@ struct GHClientConfiguration {
     var url: URL
     var authToken: String?
     
-    static var `default` = GHClientConfiguration(url: URL(string: "https://api.github.com/")!, authToken: nil)
+    static var `default` = GHClientConfiguration(url: URL(string: "https://api.github.com/")!)
 }
 
 // MARK: - Client
@@ -23,11 +23,9 @@ struct GHClientConfiguration {
 class GHClient: Client {
     override var baseUrl: URL? { configuration.url }
     
-    static var `default` = GHClient(configuration: GHClientConfiguration.default)
+    static var `default` = GHClient(configuration: .default)
     
     var configuration: GHClientConfiguration
-    
-    var dateFormatter = ISO8601DateFormatter()
     
     init(configuration aConfig: GHClientConfiguration) {
         configuration = aConfig
