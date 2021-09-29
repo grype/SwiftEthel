@@ -85,7 +85,7 @@ public struct Path : ExpressibleByStringInterpolation {
     }
 }
 
-// MARK: - Extensions (Path)
+// MARK: - Extensions
 
 public extension Path {
     static func / (left: Path, right: String) -> Path {
@@ -101,11 +101,15 @@ public extension Path {
     }
 }
 
+// MARK: - CustomStringConvertible
+
 extension Path: CustomStringConvertible {
     public var description: String {
         return String(format: "Path %@%@", isAbsolute ? delimiter : "", segments.joined(separator: delimiter))
     }
 }
+
+// MARK: - Equatable
 
 extension Path: Equatable {
     public static func == (lhs: Path, rhs: Path) -> Bool {
@@ -113,51 +117,3 @@ extension Path: Equatable {
     }
 }
 
-// MARK: - Extensions (Foundation)
-
-public extension String {
-    /// Converts String to Path
-    var pathValue: Path { Path(self) }
-}
-
-public extension URL {
-    /// Converts URL to Path
-    var pathValue: Path { Path(path) }
-    
-    /// Strips path components from URL and returns a new URL that points to the root
-    var rootURL: URL? { resolving("/") }
-    
-    static func / (left: URL, right: String) -> URL? {
-        let leftPath = left.path.isEmpty ? "/" : left.path
-        let newPath = Path(leftPath).path(resolving: right)
-        return left.rootURL?.appendingPathComponent(newPath.pathString)
-    }
-    
-    static func / (left: URL, right: Path) -> URL? {
-        let leftPath = left.path.isEmpty ? "/" : left.path
-        let newPath = Path(leftPath).path(resolving: right)
-        return left.rootURL?.appendingPathComponent(newPath.pathString)
-    }
-    
-    mutating func removeAllPathComponents() {
-        while pathComponents.count > 1 {
-            deleteLastPathComponent()
-        }
-    }
-    
-    mutating func resolve(_ aPath: Path) {
-        if aPath.isAbsolute {
-            removeAllPathComponents()
-        }
-        aPath.segments.forEach { aSegment in
-            appendPathComponent(aSegment)
-        }
-    }
-    
-    func resolving(_ aPath: Path) -> URL {
-        var url = URL(string: absoluteString)!
-        url.resolve(aPath)
-        return url
-    }
-    
-}

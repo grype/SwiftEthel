@@ -1,12 +1,12 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Pavel Skaldin on 9/28/21.
 //
 
-import Foundation
 import Beacon
+import Foundation
 
 var EthelBeacon = Beacon.shared
 
