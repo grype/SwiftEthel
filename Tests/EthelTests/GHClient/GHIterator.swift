@@ -1,15 +1,14 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Pavel Skaldin on 1/25/20.
 //
 
-import Foundation
 @testable import Ethel
+import Foundation
 
-struct GHIterator<U: SequenceEndpoint> : EndpointIterator {
-    
+struct GHIterator<U: SequenceEndpoint>: EndpointIterator {
     typealias Element = U.Element
     
     var endpoint: U

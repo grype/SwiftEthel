@@ -1,17 +1,16 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Pavel Skaldin on 1/27/20.
 //
 
-import Foundation
-import XCTest
-import PromiseKit
 @testable import Ethel
+import Foundation
+import PromiseKit
+import XCTest
 
-class PluggableEndpointTests : XCTestCase {
-    
+class PluggableEndpointTests: XCTestCase {
     var client: TestClient!
     let baseURL = URL(string: "https://example.com")!
     
@@ -35,7 +34,7 @@ class PluggableEndpointTests : XCTestCase {
     func testGet() {
         let endpoint = client / "hello"
         var transport: Transport!
-        let promise: Promise<Any> = endpoint.get { (http) in
+        let promise: Promise<Any> = endpoint.get { http in
             transport = http
         }
         assert(promise.isPending, "Expecting a pending promise")

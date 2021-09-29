@@ -1,13 +1,13 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Pavel Skaldin on 1/9/20.
 //
 
 import Foundation
 
-public struct RequestError : Error {
+public struct RequestError: Error {
     public var request: URLRequest!
     public init(_ aRequest: URLRequest) {
         request = aRequest
@@ -16,17 +16,17 @@ public struct RequestError : Error {
 
 public struct ResponseError: Error {
     var code: Int
-    
+
     public var localizedDescription: String {
         return "\(code) \(ResponseError.description(for: code))"
     }
-    
+
     public static func description(for code: Int) -> String {
         return HTTPStatusCodes[code] ?? "Unknown Error"
     }
 }
 
-private var HTTPStatusCodes: [Int : String] = [
+private var HTTPStatusCodes: [Int: String] = [
     100: "Continue",
     101: "Switching Protocols",
     102: "Processing",

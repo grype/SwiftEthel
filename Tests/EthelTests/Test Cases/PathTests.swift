@@ -1,17 +1,16 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Pavel Skaldin on 2/1/20.
 //
 
-import Foundation
-import XCTest
 @testable import Ethel
+import Foundation
 import Nimble
+import XCTest
 
-class PathTests : XCTestCase {
-    
+class PathTests: XCTestCase {
     var url: URL!
     
     override func setUp() {
@@ -43,5 +42,4 @@ class PathTests : XCTestCase {
         url.resolve("relative")
         expect(self.url).to(equal(URL(string: "https://example.com/some/path/relative")))
     }
-    
 }

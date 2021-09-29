@@ -18,7 +18,7 @@ open class Endpoint {
         return Path()
     }
     
-    required public init(on aClient: Client) {
+    public required init(on aClient: Client) {
         client = aClient
     }
     
@@ -59,6 +59,6 @@ open class Endpoint {
     }
 }
 
-public func /<T: Endpoint, U: Endpoint>(left: T, right: U.Type) -> U {
+public func / <T: Endpoint, U: Endpoint>(left: T, right: U.Type) -> U {
     return right.init(on: left.client)
 }

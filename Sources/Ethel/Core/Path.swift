@@ -8,8 +8,7 @@
 
 import Foundation
 
-public struct Path : ExpressibleByStringInterpolation {
-    
+public struct Path: ExpressibleByStringInterpolation {
     public static let DefaultDelimiter = "/"
     
     /// Whether path is absolute as opposed to relative.
@@ -116,4 +115,3 @@ extension Path: Equatable {
         return lhs.isAbsolute == rhs.isAbsolute && lhs.segments == rhs.segments
     }
 }
-

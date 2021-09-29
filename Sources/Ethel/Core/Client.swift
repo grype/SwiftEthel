@@ -48,13 +48,12 @@ public typealias TransportBlock = (Transport) -> Void
  via an intermediate `Transport` object that gets passed into the function as the sole
  argument.
  */
-open class Client : NSObject, URLSessionDataDelegate {
-    
+open class Client: NSObject, URLSessionDataDelegate {
     private(set) var baseUrl: URL!
     
     private(set) var session: URLSession!
     
-    private var tasks = [URLSessionTask : Transport]()
+    private var tasks = [URLSessionTask: Transport]()
     
     // MARK: Init
     
@@ -83,7 +82,6 @@ open class Client : NSObject, URLSessionDataDelegate {
         aTransport.request = URLRequest(url: baseUrl)
     }
     
-    
     // MARK: Resolving
     
     open func resolve<T>(_ resolver: Resolver<T>, transport: Transport) {
@@ -105,7 +103,7 @@ open class Client : NSObject, URLSessionDataDelegate {
     /// the Promise should be rejected
     open func validate(response: URLResponse) -> Error? {
         guard let response = response as? HTTPURLResponse else { return nil }
-        if response.statusCode >= 200 && response.statusCode < 300 {
+        if response.statusCode >= 200, response.statusCode < 300 {
             return nil
         }
         return ResponseError(code: response.statusCode)
@@ -123,7 +121,7 @@ open class Client : NSObject, URLSessionDataDelegate {
         }
         
         return Promise<T> { seal in
-            let task = transport.execute { (transport, task) in
+            let task = transport.execute { transport, task in
                 self.resolve(seal, transport: transport)
                 if let task = task {
                     self.tasks.removeValue(forKey: task)
@@ -134,7 +132,7 @@ open class Client : NSObject, URLSessionDataDelegate {
     }
     
     open func execute<T>(method: String, endpoint: Endpoint, with block: TransportBlock? = nil) -> Promise<T> {
-        return execute(endpoint) { (transport) in
+        return execute(endpoint) { transport in
             transport.request?.httpMethod = method
             block?(transport)
         }
@@ -171,7 +169,7 @@ open class Client : NSObject, URLSessionDataDelegate {
     // MARK: URLSessionDelegate
     
     open func urlSession(_ session: URLSession, didBecomeInvalidWithError error: Error?) {
-        self.tasks.forEach { (task, transport) in
+        tasks.forEach { _, transport in
             transport.urlSession(session, didBecomeInvalidWithError: error)
         }
     }
@@ -179,19 +177,19 @@ open class Client : NSObject, URLSessionDataDelegate {
     // MARK: URLSessionTaskDelegate
     
     open func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-        self.tasks.forEach { (task, transport) in
+        tasks.forEach { task, transport in
             transport.urlSession(session, task: task, didCompleteWithError: error)
         }
     }
     
     open func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
-        guard let transport = self.tasks[dataTask] else { return }
+        guard let transport = tasks[dataTask] else { return }
         transport.urlSession(session, dataTask: dataTask, didReceive: data)
     }
 }
 
 // MARK: - Extensions
 
-public func /<T: Endpoint>(left: Client, right: T.Type) -> T {
+public func / <T: Endpoint>(left: Client, right: T.Type) -> T {
     return right.init(on: left)
 }

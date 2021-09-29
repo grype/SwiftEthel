@@ -1,22 +1,21 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Pavel Skaldin on 1/9/20.
 //
 
-import Foundation
 import Beacon
+import Foundation
 
-open class Transport : NSObject{
-    
+open class Transport: NSObject {
     // MARK: - Types
     
     public enum RequestType {
         case data, download, upload
     }
     
-    public typealias Completion = (Transport, URLSessionTask?)->Void
+    public typealias Completion = (Transport, URLSessionTask?) -> Void
     
     // MARK: - Properties
     
@@ -111,7 +110,7 @@ open class Transport : NSObject{
             fatalError("No request configured with URL")
         }
         guard var components = URLComponents(url: url, resolvingAgainstBaseURL: true), var queryItems = components.queryItems else { return }
-        queryItems.removeAll { (anItem) -> Bool in
+        queryItems.removeAll { anItem -> Bool in
             itemsToRemove.contains(anItem)
         }
         components.queryItems = queryItems
@@ -183,14 +182,14 @@ open class Transport : NSObject{
             Executing: \(String(describing: isExecuting))
             Request: \(requestDescription)
             Response: \(responseDescription)
-            Current Task: \((currentTask != nil) ? String(describing: currentTask!) : "<nil>" )
+            Current Task: \((currentTask != nil) ? String(describing: currentTask!) : "<nil>")
         """
     }
 }
 
 // MARK: - URLSessionDelegate
 
-extension Transport : URLSessionDelegate {
+extension Transport: URLSessionDelegate {
     public func urlSession(_ session: URLSession, didBecomeInvalidWithError error: Error?) {
         responseError = error
         hasResponse = true
@@ -202,7 +201,7 @@ extension Transport : URLSessionDelegate {
 
 // MARK: - URLSessionTaskDelegate
 
-extension Transport : URLSessionTaskDelegate {
+extension Transport: URLSessionTaskDelegate {
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         responseError = error
         response = task.response
@@ -215,19 +214,19 @@ extension Transport : URLSessionTaskDelegate {
 
 // MARK: - URLSessionDataDelegate
 
-extension Transport : URLSessionDataDelegate {
+extension Transport: URLSessionDataDelegate {
     public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
         guard let _ = responseData else {
-            self.responseData = data
+            responseData = data
             return
         }
-        self.responseData?.append(data)
+        responseData?.append(data)
     }
 }
 
 // MARK: - NSCopying
 
-extension Transport : NSCopying {
+extension Transport: NSCopying {
     public func copy(with zone: NSZone? = nil) -> Any {
         let transport = Transport(session)
         transport.type = type
@@ -247,7 +246,7 @@ extension Transport : NSCopying {
 // MARK: - URLRequest
 
 extension URLRequest {
-    private struct AssociatedKeys {
+    private enum AssociatedKeys {
         static var transport = "Ethel.Transport"
     }
     
@@ -262,7 +261,7 @@ extension URLRequest {
 // MARK: - URLResponse
 
 extension URLResponse {
-    private struct AssociatedKeys {
+    private enum AssociatedKeys {
         static var transport = "Ethel.Transport"
     }
     

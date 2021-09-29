@@ -1,13 +1,13 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Pavel Skaldin on 2/10/20.
 //
 
+import Beacon
 import Foundation
 import PromiseKit
-import Beacon
 
 // MARK: - Cursor
 
@@ -21,7 +21,6 @@ public protocol Cursor {
     var hasMore: Bool { get }
 }
 
-
 // MARK: - CursoredIterator
 
 /**
@@ -34,7 +33,7 @@ public protocol Cursor {
  I am used by `CursoredEndpoint`, which makes it easy to extend endpoints with
  enumerating behavior.
  */
-public class CursoredIterator<U: SequenceEndpoint, V: Cursor> : EndpointIterator {
+public class CursoredIterator<U: SequenceEndpoint, V: Cursor>: EndpointIterator {
     public typealias Element = U.Element
     
     open var endpoint: U
@@ -86,27 +85,25 @@ public class CursoredIterator<U: SequenceEndpoint, V: Cursor> : EndpointIterator
     }
 }
 
-
 // MARK: - CursoredEndpoint
 
 /**
  I extend `SequenceEndpoint` to simplify the implementation,
  hiding the iterator machinery and using a simple `Cursor` object.
  */
-public protocol CursoredEndpoint : SequenceEndpoint {
+public protocol CursoredEndpoint: SequenceEndpoint {
     associatedtype EndpointCursor: Cursor
     func makeCursor() -> EndpointCursor
     func next(with: EndpointCursor) -> Promise<[Element]>
 }
 
-extension CursoredEndpoint {
-    public func makeIterator() -> CursoredIterator<Self, EndpointCursor> {
+public extension CursoredEndpoint {
+    func makeIterator() -> CursoredIterator<Self, EndpointCursor> {
         return CursoredIterator(endpoint: self, cursor: makeCursor())
     }
     
-    public func next(with anIterator: Iterator) -> Promise<[Element]> {
-        let cursoredIterator = anIterator as! CursoredIterator<Self,EndpointCursor>
+    func next(with anIterator: Iterator) -> Promise<[Element]> {
+        let cursoredIterator = anIterator as! CursoredIterator<Self, EndpointCursor>
         return next(with: cursoredIterator.cursor)
     }
-    
 }

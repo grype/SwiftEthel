@@ -1,20 +1,19 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Pavel Skaldin on 1/8/20.
 //
 
-import XCTest
-import PromiseKit
 @testable import Ethel
+import PromiseKit
+import XCTest
 
 class Examples: XCTestCase {
-    
     var client = GHClient.default
     var queue: DispatchQueue!
     
-    enum Timeouts : Double {
+    enum Timeouts: Double {
         case short = 3
         case long = 10
     }
@@ -31,10 +30,10 @@ class Examples: XCTestCase {
         publicGists.since = Date().addingTimeInterval(-86400)
         let expect = expectation(description: "Listing public gists")
         var result = [GHGist]()
-        let _ = publicGists.list().done { (gists) in
+        _ = publicGists.list().done { gists in
             result.append(contentsOf: gists)
             expect.fulfill()
-        }.catch { (error) in
+        }.catch { error in
             print("Error: \(error)")
             expect.fulfill()
         }
@@ -46,14 +45,14 @@ class Examples: XCTestCase {
     
     func testGistById() {
         let expect = expectation(description: "Getting gist by id")
-        let _ = firstly {
+        _ = firstly {
             self.client.gists.public.list()
-        }.then { (gists) -> Promise<GHGist> in
+        }.then { gists -> Promise<GHGist> in
             self.client.gists.gist(withId: gists[0].id!)
-        }.done { (gist) in
+        }.done { gist in
             print(String(describing: gist))
             expect.fulfill()
-        }.catch { (error) in
+        }.catch { error in
             print("Error: \(error)")
             expect.fulfill()
         }
@@ -67,7 +66,7 @@ class Examples: XCTestCase {
         let limit = 15
         var all = [GHGist]()
         queue.async {
-            self.client.gists.public.forEach(limit: limit) { (gist) in
+            self.client.gists.public.forEach(limit: limit) { gist in
                 all.append(gist)
             }
             expect.fulfill()
@@ -82,8 +81,8 @@ class Examples: XCTestCase {
         var all = [GHGist]()
         
         queue.async {
-            let found = self.client.gists.public.filter(limit: limit) { (gist) -> Bool in
-                return Bool.random()
+            let found = self.client.gists.public.filter(limit: limit) { _ -> Bool in
+                Bool.random()
             }
             all.append(contentsOf: found)
             expect.fulfill()
@@ -96,8 +95,8 @@ class Examples: XCTestCase {
         var found: GHGist?
         let expect = expectation(description: "first")
         queue.async {
-            found = self.client.gists.public.first { (gist) -> Bool in
-                gist.files?.contains(where: { (each) -> Bool in
+            found = self.client.gists.public.first { gist -> Bool in
+                gist.files?.contains(where: { each -> Bool in
                     each.value.language != nil
                 }) ?? false
             }
@@ -108,7 +107,7 @@ class Examples: XCTestCase {
         wait(for: [expect], timeout: Timeouts.short.rawValue)
         assert(found != nil, "Expected a result")
         assert(found!.files != nil, "Expected result to contain at least one file")
-        assert(found!.files!.contains(where: { (each) -> Bool in
+        assert(found!.files!.contains(where: { each -> Bool in
             each.value.language != nil
         }), "Expected at least one file w/o a language")
         print(String(describing: found?.files))
@@ -118,7 +117,7 @@ class Examples: XCTestCase {
         let expect = expectation(description: "Sorting")
         var result = [GHGist]()
         queue.async {
-            let sorted = self.client.gists.public.sorted(limit: 10) { (a, b) -> Bool in
+            let sorted = self.client.gists.public.sorted(limit: 10) { a, b -> Bool in
                 a.created! > b.created!
             }
             result.append(contentsOf: sorted)
@@ -127,7 +126,7 @@ class Examples: XCTestCase {
         wait(for: [expect], timeout: Timeouts.short.rawValue)
         assert(!result.isEmpty, "Expected non-empty result")
         let resultTimes = result.map { $0.created! }
-        assert(resultTimes == resultTimes.sorted(by: { (a, b) -> Bool in
+        assert(resultTimes == resultTimes.sorted(by: { a, b -> Bool in
             a > b
         }), "Result is not sorted")
     }
@@ -136,15 +135,15 @@ class Examples: XCTestCase {
         let expect = expectation(description: "Compact map")
         var result = [String]()
         queue.async {
-            let mapped = self.client.gists.public.compactMap(limit: 10) { (gist) -> String? in
-                return gist.gistDescription
+            let mapped = self.client.gists.public.compactMap(limit: 10) { gist -> String? in
+                gist.gistDescription
             }
             result.append(contentsOf: mapped)
             expect.fulfill()
         }
         wait(for: [expect], timeout: Timeouts.long.rawValue)
         assert(!result.isEmpty, "Expected non-empty result")
-        let descriptions = result.compactMap { return $0 }
+        let descriptions = result.compactMap { $0 }
         assert(descriptions.count == result.count, "Unexpected results from compactMap")
     }
     
@@ -154,12 +153,12 @@ class Examples: XCTestCase {
         let limit = 3
         let expect = expectation(description: "Reduce")
         queue.async {
-            result = self.client.gists.public.reduce(limit: limit, initialResult: "", { (run, gist) -> String in
-                return run.appending(gist.id!)
-            })
-            check = self.client.gists.public[0..<limit].reduce(into: "", { (run, gist) in
+            result = self.client.gists.public.reduce(limit: limit, initialResult: "") { run, gist -> String in
+                run.appending(gist.id!)
+            }
+            check = self.client.gists.public[0..<limit].reduce(into: "") { run, gist in
                 run?.append(gist.id!)
-            })
+            }
             expect.fulfill()
         }
         wait(for: [expect], timeout: Timeouts.short.rawValue)
@@ -200,7 +199,7 @@ class Examples: XCTestCase {
         var count = 0
         let limit = Int(Double(client.gists.public.makeCursor().pageSize) * 2.5)
         queue.async {
-            results = self.client.gists.public.prefix { (gist) -> Bool in
+            results = self.client.gists.public.prefix { _ -> Bool in
                 count += 1
                 return count <= limit
             }
@@ -250,5 +249,4 @@ class Examples: XCTestCase {
         let firstIds = first[range].map { $0.id! }
         assert(firstIds == resultIds)
     }
-    
 }

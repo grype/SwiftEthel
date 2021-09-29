@@ -1,6 +1,6 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Pavel Skaldin on 1/24/20.
 //
@@ -8,7 +8,7 @@
 import Foundation
 import PromiseKit
 
-struct LimitError : Error {}
+struct LimitError: Error {}
 
 /**
  I describe an iterator over a `SequenceEndpoint`.
@@ -16,7 +16,7 @@ struct LimitError : Error {}
  I extend `IteratorProtocol` with an additional variable `hasMore`,
  which should indicate whether there are any more results to fetch.
  */
-public protocol EndpointIterator : IteratorProtocol {
+public protocol EndpointIterator: IteratorProtocol {
     var hasMore: Bool { get }
 }
 
@@ -40,7 +40,7 @@ public protocol EndpointIterator : IteratorProtocol {
  In most cases, enumeration can be done via a simpler interface, using `CursorEndpoint`, which mimics
  this mechanism, using simple instances of `Cursor`, as opposed to iterators.
  */
-public protocol SequenceEndpoint : Sequence {
+public protocol SequenceEndpoint: Sequence {
     associatedtype Iterator = EndpointIterator
     
     func makeIterator() -> Iterator
@@ -58,29 +58,28 @@ public protocol SequenceEndpoint : Sequence {
     func compactMap<ElementOfResult>(limit: Int, transform: (Element) throws -> ElementOfResult?) rethrows -> [ElementOfResult]
     func compactMap<ElementOfResult>(until: (Element) -> Bool, transform: (Element) throws -> ElementOfResult?) rethrows -> [ElementOfResult]
     
-    func flatMap<SegmentOfResult>(limit: Int, transform: (Element) throws -> SegmentOfResult) rethrows -> [SegmentOfResult.Element] where SegmentOfResult : Sequence
-    func flatMap<SegmentOfResult>(until: (Element) -> Bool, transform: (Element) throws -> SegmentOfResult) rethrows -> [SegmentOfResult.Element] where SegmentOfResult : Sequence
+    func flatMap<SegmentOfResult>(limit: Int, transform: (Element) throws -> SegmentOfResult) rethrows -> [SegmentOfResult.Element] where SegmentOfResult: Sequence
+    func flatMap<SegmentOfResult>(until: (Element) -> Bool, transform: (Element) throws -> SegmentOfResult) rethrows -> [SegmentOfResult.Element] where SegmentOfResult: Sequence
     
     func reduce<Result>(limit: Int, initialResult: Result, _ nextPartialResult: (Result, Element) throws -> Result) rethrows -> Result
     func reduce<Result>(until: (Element) -> Bool, initialResult: Result, _ nextPartialResult: (Result, Element) throws -> Result) rethrows -> Result
 }
 
-extension SequenceEndpoint {
-    
-    public func forEach(limit: Int, body: (Element) throws -> Void) rethrows {
+public extension SequenceEndpoint {
+    func forEach(limit: Int, body: (Element) throws -> Void) rethrows {
         var count = 0
-        try forEach(until: { (each) -> Bool in
+        try forEach(until: { _ -> Bool in
             count += 1
             return count >= limit
         }, body: body)
     }
     
-    public func forEach(until: (Element) -> Bool, body: (Element) throws -> Void) rethrows {
+    func forEach(until: (Element) -> Bool, body: (Element) throws -> Void) rethrows {
         do {
-            try forEach { (each) in
+            try forEach { each in
                 try body(each)
                 if until(each) {
-                    throw(LimitError())
+                    throw (LimitError())
                 }
             }
         } catch {
@@ -91,22 +90,22 @@ extension SequenceEndpoint {
         }
     }
     
-    public func filter(limit: Int, isIncluded: (Element) throws -> Bool) rethrows -> [Element] {
+    func filter(limit: Int, isIncluded: (Element) throws -> Bool) rethrows -> [Element] {
         var count = 0
-        return try filter(until: { (each) -> Bool in
+        return try filter(until: { _ -> Bool in
             count += 1
             return count >= limit
         }, isIncluded: isIncluded)
     }
     
-    public func filter(until: (Element) -> Bool, isIncluded: (Element) throws -> Bool) rethrows -> [Element] {
+    func filter(until: (Element) -> Bool, isIncluded: (Element) throws -> Bool) rethrows -> [Element] {
         var results = [Element]()
         do {
-            let _ = try filter { (each) -> Bool in
+            _ = try filter { each -> Bool in
                 guard try isIncluded(each) else { return false }
                 results.append(each)
                 if until(each) {
-                    throw(LimitError())
+                    throw (LimitError())
                 }
                 return true
             }
@@ -119,74 +118,73 @@ extension SequenceEndpoint {
         return results
     }
     
-    public func sorted(limit: Int, by block: (Element, Element) throws -> Bool) rethrows -> [Element] {
+    func sorted(limit: Int, by block: (Element, Element) throws -> Bool) rethrows -> [Element] {
         var count = 0
-        return try sorted(until: { (each) -> Bool in
+        return try sorted(until: { _ -> Bool in
             count += 1
             return count >= limit
         }, by: block)
     }
     
-    public func sorted(until: (Element) -> Bool, by block: (Element, Element) throws -> Bool) rethrows -> [Element] {
+    func sorted(until: (Element) -> Bool, by block: (Element, Element) throws -> Bool) rethrows -> [Element] {
         var result = [Element]()
-        forEach(until: until) { (each) in
+        forEach(until: until) { each in
             result.append(each)
         }
         return try result.sorted(by: block)
     }
     
-    public func compactMap<ElementOfResult>(limit: Int, transform: (Element) throws -> ElementOfResult?) rethrows -> [ElementOfResult] {
+    func compactMap<ElementOfResult>(limit: Int, transform: (Element) throws -> ElementOfResult?) rethrows -> [ElementOfResult] {
         var count = 0
-        return try compactMap(until: { (each) -> Bool in
+        return try compactMap(until: { _ -> Bool in
             count += 1
             return count >= limit
         }, transform: transform)
     }
     
-    public func compactMap<ElementOfResult>(until: (Element) -> Bool, transform: (Element) throws -> ElementOfResult?) rethrows -> [ElementOfResult] {
+    func compactMap<ElementOfResult>(until: (Element) -> Bool, transform: (Element) throws -> ElementOfResult?) rethrows -> [ElementOfResult] {
         var result = [Element]()
-        forEach(until: until) { (each) in
+        forEach(until: until) { each in
             result.append(each)
         }
         return try result.compactMap(transform)
     }
     
-    public func flatMap<SegmentOfResult>(limit: Int, transform: (Element) throws -> SegmentOfResult) rethrows -> [SegmentOfResult.Element] where SegmentOfResult : Sequence {
+    func flatMap<SegmentOfResult>(limit: Int, transform: (Element) throws -> SegmentOfResult) rethrows -> [SegmentOfResult.Element] where SegmentOfResult: Sequence {
         var count = 0
-        return try flatMap(until: { (each) -> Bool in
+        return try flatMap(until: { _ -> Bool in
             count += 1
             return count >= limit
         }, transform: transform)
     }
     
-    public func flatMap<SegmentOfResult>(until: (Element) -> Bool, transform: (Element) throws -> SegmentOfResult) rethrows -> [SegmentOfResult.Element] where SegmentOfResult : Sequence {
+    func flatMap<SegmentOfResult>(until: (Element) -> Bool, transform: (Element) throws -> SegmentOfResult) rethrows -> [SegmentOfResult.Element] where SegmentOfResult: Sequence {
         var result = [Element]()
-        forEach(until: until) { (each) in
+        forEach(until: until) { each in
             result.append(each)
         }
         return try result.flatMap(transform)
     }
     
-    public func reduce<Result>(limit: Int, initialResult: Result, _ nextPartialResult: (Result, Element) throws -> Result) rethrows -> Result {
+    func reduce<Result>(limit: Int, initialResult: Result, _ nextPartialResult: (Result, Element) throws -> Result) rethrows -> Result {
         var count = 0
-        return try reduce(until: { (each) -> Bool in
+        return try reduce(until: { _ -> Bool in
             count += 1
             return count >= limit
         }, initialResult: initialResult, nextPartialResult)
     }
     
-    public func reduce<Result>(until: (Element) -> Bool, initialResult: Result, _ nextPartialResult: (Result, Element) throws -> Result) rethrows -> Result {
+    func reduce<Result>(until: (Element) -> Bool, initialResult: Result, _ nextPartialResult: (Result, Element) throws -> Result) rethrows -> Result {
         var result: Result = initialResult
         do {
-            result = try reduce(initialResult) { (aResult, element) -> Result in
+            result = try reduce(initialResult) { aResult, element -> Result in
                 result = try nextPartialResult(aResult, element)
                 if until(element) {
-                    throw(LimitError())
+                    throw (LimitError())
                 }
                 return result
             }
-        }
-        catch {
+        } catch {
             if let _ = error as? LimitError {
                 return result
             }
@@ -195,18 +193,17 @@ extension SequenceEndpoint {
         return result
     }
     
-    public func reduce<Result>(until: (Element) -> Bool, into initialResult: __owned Result, _ updateAccumulatingResult: (inout Result, Element) throws -> ()) rethrows -> Result {
+    func reduce<Result>(until: (Element) -> Bool, into initialResult: __owned Result, _ updateAccumulatingResult: (inout Result, Element) throws -> Void) rethrows -> Result {
         var result = initialResult
         do {
-            result = try reduce(into: initialResult, { (run, element) in
+            result = try reduce(into: initialResult) { run, element in
                 try updateAccumulatingResult(&run, element)
                 result = run
                 if until(element) {
-                    throw(LimitError())
+                    throw (LimitError())
                 }
-            })
-        }
-        catch {
+            }
+        } catch {
             if let _ = error as? LimitError {
                 return result
             }
@@ -215,12 +212,11 @@ extension SequenceEndpoint {
         return result
     }
     
-    public func prefix(_ maxLength: Int) -> [Element] {
+    func prefix(_ maxLength: Int) -> [Element] {
         var result = [Element]()
-        forEach(limit: maxLength) { (each) in
+        forEach(limit: maxLength) { each in
             result.append(each)
         }
         return result
     }
-    
 }

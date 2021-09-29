@@ -1,12 +1,12 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Pavel Skaldin on 2/11/20.
 //
 
-import Foundation
 @testable import Ethel
+import Foundation
 
 class RelativeEndpoint: Endpoint {
     override var path: Path {

@@ -1,16 +1,15 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Pavel Skaldin on 2/10/20.
 //
 
-import Foundation
 import Ethel
+import Foundation
 import PromiseKit
 
-class GHPaginatedEndpoint<T: Decodable> : GHEndpoint {
-
+class GHPaginatedEndpoint<T: Decodable>: GHEndpoint {
     typealias Element = T
     
     var page: Int = 1
@@ -24,7 +23,7 @@ class GHPaginatedEndpoint<T: Decodable> : GHEndpoint {
     }
     
     subscript(index: Int) -> Element? {
-        let cursor = self.makeCursor()
+        let cursor = makeCursor()
         cursor.page = index + 1
         cursor.pageSize = 1
         guard let results = try? next(with: cursor).wait(), !results.isEmpty else {
@@ -47,15 +46,13 @@ class GHPaginatedEndpoint<T: Decodable> : GHEndpoint {
             let low = Swift.max(range.lowerBound - startOffset, 0)
             let high = cursor.pageSize - Swift.max(endOffset - (range.lowerBound + range.count - 1), 0)
 
-            result.append(contentsOf: found[low..<high])
+            result.append(contentsOf: found[low ..< high])
         }
         return result
     }
-    
 }
 
-extension GHPaginatedEndpoint : CursoredEndpoint {
-    
+extension GHPaginatedEndpoint: CursoredEndpoint {
     typealias EndpointCursor = GHPageCursor
     
     func makeCursor() -> GHPageCursor {
@@ -68,10 +65,9 @@ extension GHPaginatedEndpoint : CursoredEndpoint {
     func next(with aCursor: GHPageCursor) -> Promise<[T]> {
         page = aCursor.page
         pageSize = aCursor.pageSize
-        return getJSON().get { (gists) in
+        return getJSON().get { gists in
             aCursor.page += 1
             aCursor.hasMore = gists.count >= self.pageSize
         }
     }
-    
 }

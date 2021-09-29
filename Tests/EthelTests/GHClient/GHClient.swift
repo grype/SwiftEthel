@@ -1,13 +1,13 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Pavel Skaldin on 1/25/20.
 //
 
+@testable import Ethel
 import Foundation
 import PromiseKit
-@testable import Ethel
 
 // MARK: - Configuration
 
@@ -20,8 +20,7 @@ struct GHClientConfiguration {
 
 // MARK: - Client
 
-class GHClient : Client {
-    
+class GHClient: Client {
     override var baseUrl: URL? { configuration.url }
     
     static var `default` = GHClient(configuration: GHClientConfiguration.default)
@@ -37,8 +36,7 @@ class GHClient : Client {
     
     // MARK: Endpoints
     
-    var gists : GHGistsEndpoint {
+    var gists: GHGistsEndpoint {
         return self / GHGistsEndpoint.self
     }
-    
 }
