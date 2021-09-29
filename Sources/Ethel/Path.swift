@@ -1,6 +1,6 @@
 //
 //  Path.swift
-//  
+//
 //
 //  Created by Pavel Skaldin on 7/20/19.
 //  Copyright © 2019 Pavel Skaldin. All rights reserved.
@@ -87,23 +87,23 @@ public struct Path : ExpressibleByStringInterpolation {
 
 // MARK: - Extensions (Path)
 
-extension Path {
-    public static func /(left: Path, right: String) -> Path {
+public extension Path {
+    static func / (left: Path, right: String) -> Path {
         return left.path(resolving: right)
     }
     
-    public static func /(left: Path, right: Path) -> Path {
+    static func / (left: Path, right: Path) -> Path {
         return left.path(resolving: right)
     }
     
-    public static func /(left: Path.Type, right: String) -> Path {
+    static func / (left: Path.Type, right: String) -> Path {
         return Path(right, isAbsolute: true, delimiter: Path.DefaultDelimiter)
     }
 }
 
 extension Path: CustomStringConvertible {
     public var description: String {
-        return String(format: "Path %@%@", isAbsolute ? delimiter :"", segments.joined(separator: delimiter))
+        return String(format: "Path %@%@", isAbsolute ? delimiter : "", segments.joined(separator: delimiter))
     }
 }
 
@@ -115,48 +115,49 @@ extension Path: Equatable {
 
 // MARK: - Extensions (Foundation)
 
-extension String {
+public extension String {
     /// Converts String to Path
-    public var pathValue: Path { Path(self) }
+    var pathValue: Path { Path(self) }
 }
 
-extension URL {
+public extension URL {
     /// Converts URL to Path
-    public var pathValue: Path { Path(path) }
+    var pathValue: Path { Path(path) }
     
     /// Strips path components from URL and returns a new URL that points to the root
-    public var rootURL: URL? { resolving("/") }
+    var rootURL: URL? { resolving("/") }
     
-    public static func / (left: URL, right: String) -> URL? {
+    static func / (left: URL, right: String) -> URL? {
         let leftPath = left.path.isEmpty ? "/" : left.path
         let newPath = Path(leftPath).path(resolving: right)
         return left.rootURL?.appendingPathComponent(newPath.pathString)
     }
     
-    public static func / (left: URL, right: Path) -> URL? {
+    static func / (left: URL, right: Path) -> URL? {
         let leftPath = left.path.isEmpty ? "/" : left.path
         let newPath = Path(leftPath).path(resolving: right)
         return left.rootURL?.appendingPathComponent(newPath.pathString)
     }
     
-    public mutating func removeAllPathComponents() {
+    mutating func removeAllPathComponents() {
         while pathComponents.count > 1 {
             deleteLastPathComponent()
         }
     }
     
-    public mutating func resolve(_ aPath: Path) {
+    mutating func resolve(_ aPath: Path) {
         if aPath.isAbsolute {
             removeAllPathComponents()
         }
-        aPath.segments.forEach { (aSegment) in
+        aPath.segments.forEach { aSegment in
             appendPathComponent(aSegment)
         }
     }
     
-    public func resolving(_ aPath: Path) -> URL {
+    func resolving(_ aPath: Path) -> URL {
         var url = URL(string: absoluteString)!
         url.resolve(aPath)
         return url
     }
+    
 }
