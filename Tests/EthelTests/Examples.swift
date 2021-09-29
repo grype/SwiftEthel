@@ -24,7 +24,7 @@ class Examples: XCTestCase {
         queue = DispatchQueue.global(qos: .background)
     }
     
-    // MARK:- Basic endpoint execution
+    // MARK: - Basic endpoint execution
     
     func testListPublicGists() {
         let publicGists = client.gists.public
@@ -42,7 +42,7 @@ class Examples: XCTestCase {
         assert(!result.isEmpty, "Expected to find at least one public gist")
     }
     
-    // MARK:- Per-method URL modifications
+    // MARK: - Per-method URL modifications
     
     func testGistById() {
         let expect = expectation(description: "Getting gist by id")
@@ -60,7 +60,7 @@ class Examples: XCTestCase {
         wait(for: [expect], timeout: Timeouts.short.rawValue)
     }
     
-    // MARK:- Enumeration
+    // MARK: - Enumeration
     
     func testForEach() {
         let expect = expectation(description: "forEach")
@@ -211,7 +211,7 @@ class Examples: XCTestCase {
         assert(results!.count == limit, "Expected \(limit) results, but got \(results!.count)")
     }
     
-    // MARK:- Subscripting
+    // MARK: - Subscripting
     
     func testSubscript() {
         var gist: GHGist?

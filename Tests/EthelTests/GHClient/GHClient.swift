@@ -9,7 +9,7 @@ import Foundation
 import PromiseKit
 @testable import Ethel
 
-// MARK:- Configuration
+// MARK: - Configuration
 
 struct GHClientConfiguration {
     var url: URL
@@ -18,7 +18,7 @@ struct GHClientConfiguration {
     static var `default` = GHClientConfiguration(url: URL(string: "https://api.github.com/")!, authToken: nil)
 }
 
-// MARK:- Client
+// MARK: - Client
 
 class GHClient : Client {
     

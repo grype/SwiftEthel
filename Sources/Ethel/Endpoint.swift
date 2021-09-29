@@ -9,7 +9,7 @@
 import Foundation
 import PromiseKit
 
-// MARK:- Endpoint
+// MARK: - Endpoint
 
 open class Endpoint {
     open var client: Client

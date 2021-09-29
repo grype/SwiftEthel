@@ -9,11 +9,11 @@
 import Foundation
 import PromiseKit
 
-// MARK:- Types
+// MARK: - Types
 
 public typealias TransportBlock = (Transport) -> Void
 
-// MARK:- Client
+// MARK: - Client
 
 /**
  I am a base class for defining a client for web APIs.
@@ -190,7 +190,7 @@ open class Client : NSObject, URLSessionDataDelegate {
     }
 }
 
-// MARK:- Extensions
+// MARK: - Extensions
 
 public func /<T: Endpoint>(left: Client, right: T.Type) -> T {
     return right.init(on: left)

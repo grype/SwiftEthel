@@ -22,7 +22,7 @@ public struct Path : ExpressibleByStringInterpolation {
     /// Path segments starting with the root.
     private(set) var segments: [String]!
     
-    // MARK:- Initializing
+    // MARK: - Initializing
     
     public init(stringLiteral value: String) {
         self.init(value)
@@ -44,7 +44,7 @@ public struct Path : ExpressibleByStringInterpolation {
         self.delimiter = delimiter
     }
     
-    // MARK:- Testing
+    // MARK: - Testing
     
     /// Whether the path is a root path and has no additional segments.
     public var isRoot: Bool {
@@ -56,7 +56,7 @@ public struct Path : ExpressibleByStringInterpolation {
         return segments.count == 0
     }
     
-    // MARK:- Resolving
+    // MARK: - Resolving
     
     /// Resolves a path by appending string argument
     public func path(resolving str: String) -> Path {
@@ -77,7 +77,7 @@ public struct Path : ExpressibleByStringInterpolation {
         }
     }
     
-    // MARK:- Converting
+    // MARK: - Converting
     
     /// Returns string representation of the path
     public var pathString: String {
@@ -94,7 +94,7 @@ public struct Path : ExpressibleByStringInterpolation {
     }
 }
 
-// MARK:- Extensions (Path)
+// MARK: - Extensions (Path)
 
 extension Path {
     public static func /(left: Path, right: String) -> Path {
@@ -122,7 +122,7 @@ extension Path: Equatable {
     }
 }
 
-// MARK:- Extensions (Foundation)
+// MARK: - Extensions (Foundation)
 
 extension String {
     /// Converts String to Path

@@ -9,7 +9,7 @@ import Foundation
 import PromiseKit
 import Beacon
 
-// MARK:- Cursor
+// MARK: - Cursor
 
 /**
  I describe a cursor for iterating over a `SequenceEndpoint`.
@@ -22,7 +22,7 @@ public protocol Cursor {
 }
 
 
-// MARK:- CursoredIterator
+// MARK: - CursoredIterator
 
 /**
  I am specialized implementation of `EndpointIterator` that uses
@@ -87,7 +87,7 @@ public class CursoredIterator<U: SequenceEndpoint, V: Cursor> : EndpointIterator
 }
 
 
-// MARK:- CursoredEndpoint
+// MARK: - CursoredEndpoint
 
 /**
  I extend `SequenceEndpoint` to simplify the implementation,
