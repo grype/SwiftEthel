@@ -47,24 +47,20 @@ public struct Path : ExpressibleByStringInterpolation {
     // MARK: - Testing
     
     /// Whether the path is a root path and has no additional segments.
-    public var isRoot: Bool {
-        return isAbsolute && isEmpty
-    }
+    public var isRoot: Bool { isAbsolute && isEmpty }
     
     /// An empty path has no segments. An absolute path that's empty is a root path.
-    public var isEmpty: Bool {
-        return segments.count == 0
-    }
+    public var isEmpty: Bool { segments.isEmpty }
     
     // MARK: - Resolving
     
-    /// Resolves a path by appending string argument
+    /// Resolves a path against receiver.
     public func path(resolving str: String) -> Path {
         let relativePath = Path(str, delimiter: delimiter)
         return path(resolving: relativePath)
     }
     
-    /// Resolves a path by appending another path
+    /// Resolves a path against receiver.
     public func path(resolving path: Path) -> Path {
         if path.isAbsolute {
             return Path(path.segments, isAbsolute: path.isAbsolute, delimiter: delimiter)
@@ -86,11 +82,6 @@ public struct Path : ExpressibleByStringInterpolation {
             result = delimiter + result
         }
         return result
-    }
-    
-    /// Returns relative path
-    public var relativePath: Path {
-        return Path(segments, isAbsolute: false, delimiter: delimiter)
     }
 }
 
@@ -126,26 +117,24 @@ extension Path: Equatable {
 
 extension String {
     /// Converts String to Path
-    public var pathValue: Path { return Path(self) }
+    public var pathValue: Path { Path(self) }
 }
 
 extension URL {
     /// Converts URL to Path
-    public var pathValue: Path { return Path(path) }
+    public var pathValue: Path { Path(path) }
     
     /// Strips path components from URL and returns a new URL that points to the root
-    public var rootURL: URL? {
-        return URL(string: "/", relativeTo: self)
-    }
+    public var rootURL: URL? { resolving("/") }
     
     public static func / (left: URL, right: String) -> URL? {
-        let leftPath = left.path.count == 0 ? "/" : left.path
+        let leftPath = left.path.isEmpty ? "/" : left.path
         let newPath = Path(leftPath).path(resolving: right)
         return left.rootURL?.appendingPathComponent(newPath.pathString)
     }
     
     public static func / (left: URL, right: Path) -> URL? {
-        let leftPath = left.path.count == 0 ? "/" : left.path
+        let leftPath = left.path.isEmpty ? "/" : left.path
         let newPath = Path(leftPath).path(resolving: right)
         return left.rootURL?.appendingPathComponent(newPath.pathString)
     }
