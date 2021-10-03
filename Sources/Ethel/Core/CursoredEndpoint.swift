@@ -9,20 +9,6 @@ import Beacon
 import Foundation
 import PromiseKit
 
-// MARK: - Cursor
-
-/**
- I describe a cursor for iterating over a `SequenceEndpoint`.
- 
- My implementor is expected to respond to `hasMore` with a false value
- when there are no more results left to fetch.
- */
-public protocol Cursor {
-    var hasMore: Bool { get }
-}
-
-// MARK: - CursoredIterator
-
 /**
  I am specialized implementation of `EndpointIterator` that uses
  `Cursor` for tracking enumeration of results from a `SequenceEndpoint`.
