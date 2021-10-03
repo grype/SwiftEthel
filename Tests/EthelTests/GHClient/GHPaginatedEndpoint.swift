@@ -9,6 +9,9 @@ import Ethel
 import Foundation
 import PromiseKit
 
+/**
+ I specialize the base `GHEndpoint` class with support for pagination.
+ */
 class GHPaginatedEndpoint<T: Decodable>: GHEndpoint {
     typealias Element = T
     
@@ -19,34 +22,5 @@ class GHPaginatedEndpoint<T: Decodable>: GHEndpoint {
     @TransportBuilder func prepare() -> TransportBuilding {
         AddQuery(name: "page", value: "\(page)")
         AddQuery(name: "per_page", value: "\(pageSize)")
-    }
-    
-    subscript(index: Int) -> Element? {
-        let cursor = makeCursor()
-        cursor.page = index + 1
-        cursor.pageSize = 1
-        guard let results = try? next(with: cursor).wait(), !results.isEmpty else {
-            return nil
-        }
-        return results[0]
-    }
-    
-    subscript(range: Range<Int>) -> [Element] {
-        let cursor = makeCursor()
-        cursor.page = Int(floor(Double(range.lowerBound / cursor.pageSize))) + 1
-        var result = [Element]()
-        while cursor.hasMore, result.count < range.count {
-            let currentPage = cursor.page
-            guard let found = try? next(with: cursor).wait() else { break }
-
-            let startOffset = (currentPage - 1) * cursor.pageSize
-            let endOffset = startOffset + cursor.pageSize - 1
-
-            let low = Swift.max(range.lowerBound - startOffset, 0)
-            let high = cursor.pageSize - Swift.max(endOffset - (range.lowerBound + range.count - 1), 0)
-
-            result.append(contentsOf: found[low ..< high])
-        }
-        return result
     }
 }
