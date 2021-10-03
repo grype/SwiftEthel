@@ -9,7 +9,11 @@
 import Foundation
 
 class AbsoluteEndpoint: Endpoint {
-    override var path: Path {
-        return Path("/absolute")
+    var client: Client
+    
+    var path: Path? { "/absolute" }
+    
+    required init(on aClient: Client) {
+        client = aClient
     }
 }

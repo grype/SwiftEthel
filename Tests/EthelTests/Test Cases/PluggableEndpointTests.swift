@@ -7,6 +7,7 @@
 
 @testable import Ethel
 import Foundation
+import Nimble
 import PromiseKit
 import XCTest
 
@@ -16,29 +17,29 @@ class PluggableEndpointTests: XCTestCase {
     
     override func setUp() {
         super.setUp()
-        client = TestClient(baseURL, sessionConfiguration: URLSessionConfiguration.default)
+        client = TestClient(baseURL, sessionConfiguration: .default)
     }
     
     func testEndpointFromClient() {
         let endpoint = client / "hello"
-        assert(type(of: endpoint) == PluggableEndpoint.self, "Derived endpoint is of wrong type")
-        assert(endpoint.path == Path("/hello"), "Invalid path on derived pluggable endpoint")
+        expect(endpoint).to(beAnInstanceOf(PluggableEndpoint.self))
+        expect(endpoint.path) == "/hello"
     }
     
     func testEndpointFromEndpoint() {
         let endpoint = (client / "hello") / "world"
-        assert(type(of: endpoint) == PluggableEndpoint.self, "Derived endpoint is of wrong type")
-        assert(endpoint.path == Path("/hello/world"), "Invalid path on derived pluggable endpoint")
+        expect(endpoint).to(beAnInstanceOf(PluggableEndpoint.self))
+        expect(endpoint.path) == "/hello/world"
     }
     
     func testGet() {
         let endpoint = client / "hello"
-        var transport: Transport!
-        let promise: Promise<Any> = endpoint.get { http in
-            transport = http
+        let promise: Promise<Any> = endpoint.get {
+            Get()
         }
-        assert(promise.isPending, "Expecting a pending promise")
-        assert(transport.request?.url != nil, "Expected there to be a request with URL")
-        assert(transport.request!.url! == baseURL.appendingPathComponent("hello"))
+        let transport: Transport = client.tasks.first!.value
+        expect(promise.isPending).to(beTrue())
+        expect(transport.request?.url).toNot(beNil())
+        expect(transport.request!.url!) == baseURL.appendingPathComponent("hello")
     }
 }

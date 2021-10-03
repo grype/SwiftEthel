@@ -9,7 +9,11 @@
 import Foundation
 
 class RelativeEndpoint: Endpoint {
-    override var path: Path {
-        return Path("relative")
+    var client: Client
+
+    var path: Path? = "relative"
+
+    required init(on aClient: Client) {
+        client = aClient
     }
 }

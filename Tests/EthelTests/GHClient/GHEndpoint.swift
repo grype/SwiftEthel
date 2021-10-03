@@ -9,6 +9,17 @@
 import Foundation
 import PromiseKit
 
+/**
+ I am an "abstract" Endpoint on which all other endpoints build on.
+
+ I store instance of the client on which I execute requests, default to root path, and provide common date formatter.
+ */
 class GHEndpoint: Endpoint {
+    var client: Client
+    var path: Path? { "/" }
     var dateFormatter = ISO8601DateFormatter()
+
+    required init(on aClient: Client) {
+        client = aClient
+    }
 }

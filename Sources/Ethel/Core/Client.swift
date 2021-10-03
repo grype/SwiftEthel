@@ -53,7 +53,9 @@ open class Client: NSObject, URLSessionDataDelegate {
     
     private(set) var session: URLSession!
     
-    private var tasks = [URLSessionTask: Transport]()
+    private(set) var tasks = [URLSessionTask: Transport]()
+    
+    private(set) var queue: DispatchQueue!
     
     // MARK: Init
     
@@ -64,12 +66,14 @@ open class Client: NSObject, URLSessionDataDelegate {
     public init(_ anUrl: URL, sessionConfiguration: URLSessionConfiguration? = nil) {
         super.init()
         baseUrl = anUrl
+        queue = DispatchQueue.global(qos: .utility)
         initializeURLSession(sessionConfiguration)
     }
     
     fileprivate func initializeURLSession(_ sessionConfiguration: URLSessionConfiguration?) {
         let sessionConfig = sessionConfiguration ?? URLSessionConfiguration.default
         session = URLSession(configuration: sessionConfig, delegate: self, delegateQueue: nil)
+        session.delegateQueue.underlyingQueue = queue
     }
     
     // MARK: Configuring
@@ -78,8 +82,13 @@ open class Client: NSObject, URLSessionDataDelegate {
         return Transport(session)
     }
     
-    open func configure(on aTransport: Transport) {
-        aTransport.request = URLRequest(url: baseUrl)
+    @TransportBuilder open func prepare() -> TransportBuilding {
+        if let path = queue.getSpecific(key: CurrentContext)?.endpoint.path {
+            Request(baseUrl.resolving(path))
+        }
+        else {
+            Request(baseUrl)
+        }
     }
     
     // MARK: Resolving
@@ -111,59 +120,37 @@ open class Client: NSObject, URLSessionDataDelegate {
     
     // MARK: Executing
     
-    open func execute<T>(_ endpoint: Endpoint, with block: TransportBlock? = nil) -> Promise<T> {
-        let transport = createTransport()
-        configure(on: transport)
-        endpoint.configure(on: transport)
-        
-        if let execBlock = block {
-            execBlock(transport)
-        }
-        
+    open func execute<T>(_ endpoint: Endpoint, @TransportBuilder with block: ()->TransportBuilding) -> Promise<T> {
         return Promise<T> { seal in
-            let task = transport.execute { transport, task in
-                self.resolve(seal, transport: transport)
-                if let task = task {
-                    self.tasks.removeValue(forKey: task)
+            let transport = createTransport()
+            let context = Context(endpoint: endpoint, transport: transport)
+            inContext(context) {
+                // 1. client configures transport
+                prepare().apply(to: transport)
+                
+                // 2. endpoint configures transport
+                endpoint.prepare().apply(to: transport)
+                
+                // 3. calling method configures transport
+                block().apply(to: transport)
+                
+                let task = transport.execute { transport, task in
+                    self.resolve(seal, transport: transport)
+                    if let task = task {
+                        self.tasks.removeValue(forKey: task)
+                    }
                 }
+                self.tasks[task] = transport
             }
-            self.tasks[task] = transport
         }
     }
     
-    open func execute<T>(method: String, endpoint: Endpoint, with block: TransportBlock? = nil) -> Promise<T> {
-        return execute(endpoint) { transport in
-            transport.request?.httpMethod = method
-            block?(transport)
+    func inContext(_ aContext: Context, do aBlock: ()->Void) {
+        queue.sync {
+            let oldValue = queue.getSpecific(key: CurrentContext)
+            queue.setSpecific(key: CurrentContext, value: aContext, during: aBlock)
+            queue.setSpecific(key: CurrentContext, value: oldValue)
         }
-    }
-    
-    open func get<T>(_ endpoint: Endpoint, with block: TransportBlock? = nil) -> Promise<T> {
-        return execute(method: "GET", endpoint: endpoint, with: block)
-    }
-    
-    open func delete<T>(_ endpoint: Endpoint, with block: TransportBlock? = nil) -> Promise<T> {
-        return execute(method: "DELETE", endpoint: endpoint, with: block)
-    }
-    
-    open func put<T>(_ endpoint: Endpoint, with block: TransportBlock? = nil) -> Promise<T> {
-        return execute(method: "PUT", endpoint: endpoint, with: block)
-    }
-    
-    open func post<T>(_ endpoint: Endpoint, with block: TransportBlock? = nil) -> Promise<T> {
-        return execute(method: "POST", endpoint: endpoint, with: block)
-    }
-    
-    open func patch<T>(_ endpoint: Endpoint, with block: TransportBlock? = nil) -> Promise<T> {
-        return execute(method: "PATCH", endpoint: endpoint, with: block)
-    }
-    
-    open func head<T>(_ endpoint: Endpoint, with block: TransportBlock? = nil) -> Promise<T> {
-        return execute(method: "HEAD", endpoint: endpoint, with: block)
-    }
-    
-    open func options<T>(_ endpoint: Endpoint, with block: TransportBlock? = nil) -> Promise<T> {
-        return execute(method: "OPTIONS", endpoint: endpoint, with: block)
     }
     
     // MARK: URLSessionDelegate

@@ -9,32 +9,15 @@
 import Foundation
 import PromiseKit
 
-// MARK: - Configuration
-
-struct GHClientConfiguration {
-    var url: URL
-    var authToken: String?
-    
-    static var `default` = GHClientConfiguration(url: URL(string: "https://api.github.com/")!)
-}
-
-// MARK: - Client
-
+/**
+ I am an example implementation of GitHub API client with support for gists.
+ 
+ I basically provide two things: 1) common Transport configuration and 2) access to the top tier endpoints (e.g. /gists)
+ */
 class GHClient: Client {
-    override var baseUrl: URL? { configuration.url }
-    
-    static var `default` = GHClient(configuration: .default)
-    
-    var configuration: GHClientConfiguration
-    
-    init(configuration aConfig: GHClientConfiguration) {
-        configuration = aConfig
-        super.init(aConfig.url, sessionConfiguration: URLSessionConfiguration.background(withIdentifier: "GHClient"))
-    }
-    
-    // MARK: Endpoints
-    
-    var gists: GHGistsEndpoint {
-        return self / GHGistsEndpoint.self
-    }
+    static var `default` = GHClient("https://api.github.com/")
+
+    // MARK: - Endpoints
+
+    var gists: GHGistsEndpoint { self / GHGistsEndpoint.self }
 }

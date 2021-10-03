@@ -11,51 +11,20 @@ import PromiseKit
 
 // MARK: - Endpoint
 
-open class Endpoint {
-    open var client: Client
-    
-    open var path: Path {
-        return Path()
+public protocol Endpoint {
+    var client: Client { get }
+    var path: Path? { get }
+    init(on aClient: Client)
+    @TransportBuilder func prepare() -> TransportBuilding
+}
+
+public extension Endpoint {
+    @TransportBuilder func prepare() -> TransportBuilding {
+        Noop
     }
-    
-    public required init(on aClient: Client) {
-        client = aClient
-    }
-    
-    open func configure(on aTransport: Transport) {
-        aTransport.request?.url?.resolve(path)
-    }
-    
-    open func execute<T>(_ block: TransportBlock? = nil) -> Promise<T> {
+
+    func execute<T>(@TransportBuilder _ block: () -> TransportBuilding) -> Promise<T> {
         return client.execute(self, with: block)
-    }
-    
-    open func get<T>(_ block: TransportBlock? = nil) -> Promise<T> {
-        return client.get(self, with: block)
-    }
-    
-    open func delete<T>(_ block: TransportBlock? = nil) -> Promise<T> {
-        return client.delete(self, with: block)
-    }
-    
-    open func post<T>(_ block: TransportBlock? = nil) -> Promise<T> {
-        return client.post(self, with: block)
-    }
-    
-    open func patch<T>(_ block: TransportBlock? = nil) -> Promise<T> {
-        return client.patch(self, with: block)
-    }
-    
-    open func put<T>(_ block: TransportBlock? = nil) -> Promise<T> {
-        return client.put(self, with: block)
-    }
-    
-    open func head<T>(_ block: TransportBlock? = nil) -> Promise<T> {
-        return client.head(self, with: block)
-    }
-    
-    open func options<T>(_ block: TransportBlock? = nil) -> Promise<T> {
-        return client.options(self, with: block)
     }
 }
 

@@ -9,9 +9,12 @@
 import Foundation
 
 struct GHIterator<U: SequenceEndpoint>: EndpointIterator {
+    // MARK: - Iterator
     typealias Element = U.Element
     
     var endpoint: U
+    
+    // MARK: - Properties
     
     var hasMore: Bool = true
     
@@ -23,9 +26,13 @@ struct GHIterator<U: SequenceEndpoint>: EndpointIterator {
     
     private var elements: [Element]?
     
+    // MARK: - Init
+    
     init(_ anEndpoint: U) {
         endpoint = anEndpoint
     }
+    
+    // MARK: - Iterating
     
     private var needsFetch: Bool {
         guard hasMore else { return false }

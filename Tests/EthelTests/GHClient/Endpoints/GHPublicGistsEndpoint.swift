@@ -10,20 +10,21 @@ import Foundation
 import PromiseKit
 
 class GHPublicGistsEndpoint: GHPaginatedEndpoint<GHGist> {
-    override var path: Path {
-        return Path("/gists/public")
-    }
+    override var path: Path { "/gists/public" }
 
     var since: Date?
 
-    override func configure(on aTransport: Transport) {
-        super.configure(on: aTransport)
+    @TransportBuilder override func prepare() -> TransportBuilding {
+        super.prepare()
         if let since = since {
-            aTransport.add(queryItem: URLQueryItem(name: "since", value: dateFormatter.string(from: since)))
+            AddQuery(name: "since", value: dateFormatter.string(from: since))
         }
     }
 
-    func list() -> Promise<[GHGist]> {
-        return getJSON()
+    func fetch() -> Promise<[GHGist]> {
+        execute {
+            Get()
+            DecodeJSON<[GHGist]>()
+        }
     }
 }

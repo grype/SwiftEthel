@@ -16,10 +16,9 @@ class GHPaginatedEndpoint<T: Decodable>: GHEndpoint {
     
     var pageSize: Int = 5
     
-    override func configure(on aTransport: Transport) {
-        super.configure(on: aTransport)
-        aTransport.add(queryItem: URLQueryItem(name: "page", value: "\(page)"))
-        aTransport.add(queryItem: URLQueryItem(name: "per_page", value: "\(pageSize)"))
+    @TransportBuilder func prepare() -> TransportBuilding {
+        AddQuery(name: "page", value: "\(page)")
+        AddQuery(name: "per_page", value: "\(pageSize)")
     }
     
     subscript(index: Int) -> Element? {
@@ -65,7 +64,9 @@ extension GHPaginatedEndpoint: CursoredEndpoint {
     func next(with aCursor: GHPageCursor) -> Promise<[T]> {
         page = aCursor.page
         pageSize = aCursor.pageSize
-        return getJSON().get { gists in
+        return execute {
+            Get()
+        }.get { gists in
             aCursor.page += 1
             aCursor.hasMore = gists.count >= self.pageSize
         }

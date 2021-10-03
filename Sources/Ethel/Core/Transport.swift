@@ -19,6 +19,8 @@ open class Transport: NSObject {
     
     // MARK: - Properties
     
+    public var type: RequestType = .data
+    
     public var session: URLSession
     
     public var request: URLRequest? {
@@ -29,21 +31,19 @@ open class Transport: NSObject {
         didSet { response?.transport = self }
     }
     
-    public var type: RequestType = .data
-    
     public var contentWriter: ((Any) throws -> Data?)?
     
     public var contentReader: ((Data) throws -> Any?)?
     
-    public private(set) var hasResponse = false
+    public fileprivate(set) var isComplete = false
     
-    public private(set) var responseData: Data?
+    public fileprivate(set) var responseData: Data?
     
-    public private(set) var responseError: Error?
+    public fileprivate(set) var responseError: Error?
     
     private var completion: Completion!
     
-    public private(set) var currentTask: URLSessionTask?
+    public fileprivate(set) var task: URLSessionTask?
     
     // MARK: - Initializating
     
@@ -55,87 +55,20 @@ open class Transport: NSObject {
     // MARK: - Executing
     
     public func execute(completion aCompletionBlock: @escaping Completion) -> URLSessionTask {
-        guard let request = request else {
-            fatalError("Transport has no configured request")
-        }
-        
-        var task: URLSessionTask!
-        
-        task = session.dataTask(with: request)
+        assert(request != nil, "Transport has no configured request")
+        let task = session.dataTask(with: request!)
         completion = aCompletionBlock
         task.resume()
-        currentTask = task
+        self.task = task
         emit(self, on: Beacon.ethel)
         return task
     }
     
-    // MARK: - URL
-    
-    public var url: URL? {
-        set {
-            request?.url = newValue
-        }
-        get {
-            return hasResponse ? response?.url : request?.url
-        }
-    }
-    
-    // MARK: - Testing
-    
-    public var isExecuting: Bool {
-        return currentTask != nil
-    }
-    
-    // MARK: - Querying
-    
-    public func add(queryItem: URLQueryItem) {
-        addAll(queryItems: [queryItem])
-    }
-    
-    public func remove(queryItem: URLQueryItem) {
-        removeAll(queryItems: [queryItem])
-    }
-    
-    public func addAll(queryItems: [URLQueryItem]) {
-        guard let url = request?.url else {
-            fatalError("No request configured with URL")
-        }
-        guard var components = URLComponents(url: url, resolvingAgainstBaseURL: true) else { return }
-        components.queryItems = (components.queryItems ?? []) + queryItems
-        request?.url = components.url
-    }
-    
-    public func removeAll(queryItems itemsToRemove: [URLQueryItem]) {
-        guard let url = request?.url else {
-            fatalError("No request configured with URL")
-        }
-        guard var components = URLComponents(url: url, resolvingAgainstBaseURL: true), var queryItems = components.queryItems else { return }
-        queryItems.removeAll { anItem -> Bool in
-            itemsToRemove.contains(anItem)
-        }
-        components.queryItems = queryItems
-        request?.url = components.url
-    }
-    
-    public func removeAllQueryItems() {
-        guard let url = request?.url else {
-            fatalError("No request configured with URL")
-        }
-        guard var components = URLComponents(url: url, resolvingAgainstBaseURL: true), var queryItems = components.queryItems else { return }
-        queryItems.removeAll()
-        components.queryItems = queryItems
-        request?.url = components.url
-    }
-    
     // MARK: - Contents
     
-    open var contents: Any? {
-        set {
-            try? setRequestContents(newValue)
-        }
-        get {
-            return try? getResponseContents()
-        }
+    open var requestContents: Any? {
+        get { request?.httpBody }
+        set { try? setRequestContents(newValue) }
     }
     
     open func setRequestContents(_ contents: Any?) throws {
@@ -147,8 +80,10 @@ open class Transport: NSObject {
         }
     }
     
+    open var responseContents: Any? { try? getResponseContents() }
+    
     open func getResponseContents() throws -> Any? {
-        guard hasResponse, let responseData = responseData else { return nil }
+        guard isComplete, let responseData = responseData else { return nil }
         if let contentReader = contentReader {
             return try contentReader(responseData)
         }
@@ -179,10 +114,9 @@ open class Transport: NSObject {
         }
         return """
         \(super.description)
-            Executing: \(String(describing: isExecuting))
             Request: \(requestDescription)
             Response: \(responseDescription)
-            Current Task: \((currentTask != nil) ? String(describing: currentTask!) : "<nil>")
+            Task: (\(task?.state.rawValue.description ?? "?") \(task?.description ?? "<nil>")
         """
     }
 }
@@ -192,8 +126,8 @@ open class Transport: NSObject {
 extension Transport: URLSessionDelegate {
     public func urlSession(_ session: URLSession, didBecomeInvalidWithError error: Error?) {
         responseError = error
-        hasResponse = true
-        currentTask = nil
+        isComplete = true
+        task = nil
         emit(self, on: Beacon.ethel)
         completion(self, nil)
     }
@@ -202,11 +136,11 @@ extension Transport: URLSessionDelegate {
 // MARK: - URLSessionTaskDelegate
 
 extension Transport: URLSessionTaskDelegate {
-    public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+    public func urlSession(_ session: URLSession, task aTask: URLSessionTask, didCompleteWithError error: Error?) {
         responseError = error
-        response = task.response
-        hasResponse = true
-        currentTask = nil
+        response = aTask.response
+        isComplete = true
+        task = nil
         emit(self, on: Beacon.ethel)
         completion(self, task)
     }
@@ -232,11 +166,10 @@ extension Transport: NSCopying {
         transport.type = type
         transport.request = request
         transport.response = response
-        transport.currentTask = currentTask
-        transport.contents = contents
+        transport.task = task
         transport.contentReader = contentReader
         transport.contentWriter = contentWriter
-        transport.hasResponse = hasResponse
+        transport.isComplete = isComplete
         transport.responseData = responseData
         transport.responseError = responseError
         return transport

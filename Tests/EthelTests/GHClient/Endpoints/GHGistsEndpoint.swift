@@ -10,17 +10,13 @@ import Foundation
 import PromiseKit
 
 class GHGistsEndpoint: GHEndpoint {
-    override var path: Path {
-        return Path("/gists")
-    }
+    override var path: Path? { "/gists" }
 
-    var `public`: GHPublicGistsEndpoint {
-        return self / GHPublicGistsEndpoint.self
-    }
-
-    func gist(withId id: String) -> Promise<GHGist> {
-        return getJSON(decoder: nil) { transport in
-            transport.request?.url?.appendPathComponent(id)
+    var `public`: GHPublicGistsEndpoint { self / GHPublicGistsEndpoint.self }
+    
+    func gist(with id: String) -> Promise<GHGist> {
+        return execute {
+            Get("\(id)")
         }
     }
 }

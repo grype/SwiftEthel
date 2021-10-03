@@ -6,6 +6,7 @@
 //
 
 @testable import Ethel
+import Nimble
 import PromiseKit
 import XCTest
 
@@ -28,17 +29,15 @@ class Examples: XCTestCase {
     func testListPublicGists() {
         let publicGists = client.gists.public
         publicGists.since = Date().addingTimeInterval(-86400)
-        let expect = expectation(description: "Listing public gists")
         var result = [GHGist]()
-        _ = publicGists.list().done { gists in
-            result.append(contentsOf: gists)
-            expect.fulfill()
-        }.catch { error in
-            print("Error: \(error)")
-            expect.fulfill()
+        waitUntil { done in
+            let _ = publicGists.fetch().done { gists in
+                result.append(contentsOf: gists)
+            }.ensure {
+                done()
+            }
         }
-        wait(for: [expect], timeout: Timeouts.short.rawValue)
-        assert(!result.isEmpty, "Expected to find at least one public gist")
+        expect(result.isEmpty).to(beFalse())
     }
     
     // MARK: - Per-method URL modifications
@@ -46,9 +45,9 @@ class Examples: XCTestCase {
     func testGistById() {
         let expect = expectation(description: "Getting gist by id")
         _ = firstly {
-            self.client.gists.public.list()
+            self.client.gists.public.fetch()
         }.then { gists -> Promise<GHGist> in
-            self.client.gists.gist(withId: gists[0].id!)
+            self.client.gists.gist(with: gists[0].id!)
         }.done { gist in
             print(String(describing: gist))
             expect.fulfill()
@@ -219,7 +218,7 @@ class Examples: XCTestCase {
         let expect = expectation(description: "Subscript by index")
         queue.async {
             gist = self.client.gists.public[index]
-            if let found = try? self.client.gists.public.list().wait() {
+            if let found = try? self.client.gists.public.fetch().wait() {
                 first.append(contentsOf: found)
             }
             expect.fulfill()
@@ -237,7 +236,7 @@ class Examples: XCTestCase {
         let expect = expectation(description: "Subscript by range")
         queue.async {
             result = self.client.gists.public[range]
-            if let found = try? self.client.gists.public.list().wait() {
+            if let found = try? self.client.gists.public.fetch().wait() {
                 first.append(contentsOf: found)
             }
             expect.fulfill()
