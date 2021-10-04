@@ -5,6 +5,7 @@
 //  Created by Pavel Skaldin on 1/8/20.
 //
 
+import Beacon
 @testable import Ethel
 import Nimble
 import PromiseKit
@@ -13,6 +14,7 @@ import XCTest
 class Examples: XCTestCase {
     var client = GHClient.default
     var queue: DispatchQueue!
+    let logger: ConsoleLogger = .init(name: "Examples")
     
     enum Timeouts: Double {
         case short = 3
@@ -22,6 +24,12 @@ class Examples: XCTestCase {
     override func setUp() {
         super.setUp()
         queue = DispatchQueue.global(qos: .background)
+        logger.start()
+    }
+    
+    override func tearDown() {
+        super.tearDown()
+        logger.stop()
     }
     
     // MARK: - Basic endpoint execution
