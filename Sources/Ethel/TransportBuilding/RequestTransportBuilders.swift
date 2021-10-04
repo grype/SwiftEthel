@@ -113,3 +113,21 @@ public struct AddQuery: TransportQuerying {
         self.init(URLQueryItem(name: name, value: value))
     }
 }
+
+// MARK: -
+
+public struct Header: TransportBuilding {
+    let name: String
+    let value: String
+    public func apply(to aTransport: Transport) {
+        aTransport.request?.setValue(value, forHTTPHeaderField: name)
+    }
+}
+
+public struct AddHeader: TransportBuilding {
+    let name: String
+    let value: String
+    public func apply(to aTransport: Transport) {
+        aTransport.request?.addValue(value, forHTTPHeaderField: name)
+    }
+}

@@ -9,14 +9,24 @@
 import Foundation
 import PromiseKit
 
-class GHGistsEndpoint: GHEndpoint {
+class GHGistsEndpoint: GHPaginatedEndpoint<GHGist> {
     override var path: Path? { "/gists" }
 
+    var since: Date?
+
     var `public`: GHPublicGistsEndpoint { self / GHPublicGistsEndpoint.self }
-    
-    func gist(with id: String) -> Promise<GHGist> {
-        return execute {
-            Get("\(id)")
+
+    @TransportBuilder override func prepare() -> TransportBuilding {
+        super.prepare()
+        if let since = since {
+            AddQuery(name: "since", value: dateFormatter.string(from: since))
+        }
+    }
+
+    func fetch() -> Promise<[GHGist]> {
+        execute {
+            Get()
+            DecodeJSON<[GHGist]>()
         }
     }
 }
