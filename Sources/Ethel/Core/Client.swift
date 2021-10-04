@@ -22,7 +22,7 @@ public typealias TransportBlock = (Transport) -> Void
  I maintain a reference to the base url of the API, which is typically the longest
  common path for all of my endpoints.
  
- **Instantiating**
+ *Instantiating*
  
  Instantiate me with a base URL and a `URLSessionConfiguration`, which I use
  for configuring `URLSession`s when making requests.
@@ -31,10 +31,12 @@ public typealias TransportBlock = (Transport) -> Void
  by groups of endpoints - i.e., I could provide methods for configuring authenticated
  requests vs un-authenticated.
  
- The rest of the behavior should be defined in the individual `Endpoint`s. I can create
- endpoints using `/` operator, much like an endpoints can. For example, the following
- two statements are equivalent - they both result in an instance of MyEndpoint configured
- with a client:
+ The rest of the behavior should be defined in the individual `Endpoint`s.
+ 
+ *Deriving endpoints*
+ 
+ I can create endpoints using `/` operator, much like an endpoints can. For example, the following
+ two statements are equivalent - they both result in an instance of MyEndpoint configured with a client:
  
  ```
  MyEndpoint(client: client)
@@ -44,7 +46,7 @@ public typealias TransportBlock = (Transport) -> Void
  When creating endpoints this way, the final path of the endpoint is resolved using
  both the client's `baseUrl` and the endpoints's `path`, if one is present.
  
- ** Making requests **
+ *Making requests*
  
  Requests are typically initiated by an endpoint calling its `execute()` method, which in turn
  calls my `execute()` method, passing in a reference to the endpoint. I then create a `Transport` object and
@@ -58,7 +60,7 @@ public typealias TransportBlock = (Transport) -> Void
  can access it via my `queue` variable. That context objet will contain both the transport and the endpoint objects that initiated
  current request.
  
- **Subclassing**
+ *Subclassing*
  
  * Override `prepare()` if you need to configure requests in a way that is common to all endpoints.
  * Provide accessors for top-tier endpoints (e.g. `var other: OtherEndpoint { self / OtherEndpoint.self}`.
