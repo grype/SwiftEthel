@@ -21,10 +21,10 @@ class GHPublicGistsEndpoint: GHPaginatedEndpoint<GHGist> {
         }
     }
 
-    func fetch() -> Promise<[GHGist]> {
+    func fetch() -> Promise<[Element]> {
         execute {
             Get()
-            DecodeJSON<[GHGist]>()
+            DecodeJSON<[Element]>()
         }
     }
 }

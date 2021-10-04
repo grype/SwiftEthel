@@ -19,11 +19,12 @@ extension GHPaginatedEndpoint: CursoredEndpoint {
         return cursor
     }
 
-    func next(with aCursor: GHPageCursor) -> Promise<[T]> {
+    func next(with aCursor: GHPageCursor) -> Promise<[Element]> {
         page = aCursor.page
         pageSize = aCursor.pageSize
         return execute {
             Get()
+            DecodeJSON<[Element]>()
         }.get { gists in
             aCursor.page += 1
             aCursor.hasMore = gists.count >= self.pageSize
