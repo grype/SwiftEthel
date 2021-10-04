@@ -116,7 +116,7 @@ open class Transport: NSObject {
         \(super.description)
             Request: \(requestDescription)
             Response: \(responseDescription)
-            Task: (\(task?.state.rawValue.description ?? "?") \(task?.description ?? "<nil>")
+            Task: (\(task?.state.rawValue.description ?? "")) \(task?.description ?? "<nil>")
         """
     }
 }
