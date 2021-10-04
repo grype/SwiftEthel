@@ -17,6 +17,7 @@ import PromiseKit
 class GHClient: Client {
     static var `default` = GHClient("https://api.github.com/")
 
+    /// Configure all requests with common headers
     @TransportBuilder override func prepare() -> TransportBuilding {
         super.prepare()
         Header(name: "Accept", value: "application/vnd.github.v3+json")
@@ -24,8 +25,10 @@ class GHClient: Client {
 
     // MARK: - Endpoints
 
+    /// Returns `GHGistsEndpoint` configured with this client
     var gists: GHGistsEndpoint { self / GHGistsEndpoint.self }
 
+    /// Returns `GHGistEndpoint` endpoint configured with this client
     func gist(id: String) -> GHGistEndpoint {
         let endpoint = self / GHGistEndpoint.self
         endpoint.id = id
