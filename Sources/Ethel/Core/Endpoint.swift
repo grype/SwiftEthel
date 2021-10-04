@@ -19,9 +19,7 @@ public protocol Endpoint {
 }
 
 public extension Endpoint {
-    @TransportBuilder func prepare() -> TransportBuilding {
-        Noop
-    }
+    @TransportBuilder func prepare() -> TransportBuilding { Noop }
 
     func execute<T>(@TransportBuilder _ block: () -> TransportBuilding) -> Promise<T> {
         return client.execute(self, with: block)
