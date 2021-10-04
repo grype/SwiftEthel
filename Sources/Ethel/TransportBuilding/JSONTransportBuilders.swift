@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Beacon
 
 public struct DecodeJSON<T: Decodable>: TransportBuilding {
     public func apply(to aTransport: Transport) {
@@ -15,8 +16,7 @@ public struct DecodeJSON<T: Decodable>: TransportBuilding {
                 result = try JSONDecoder().decode(T.self, from: data)
             }
             catch {
-                print("Error decoding JSON data: \(error)")
-                throw (error)
+                emit(error: error)
             }
             return result
         }
