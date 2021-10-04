@@ -55,7 +55,7 @@ open class Client: NSObject, URLSessionDataDelegate {
     
     private(set) var tasks = [URLSessionTask: Transport]()
     
-    private(set) var queue: DispatchQueue!
+    private(set) var queue: DispatchQueue
     
     // MARK: Init
     
@@ -63,10 +63,10 @@ open class Client: NSObject, URLSessionDataDelegate {
         self.init(URL(string: urlString)!, sessionConfiguration: sessionConfiguration)
     }
     
-    public init(_ anUrl: URL, sessionConfiguration: URLSessionConfiguration? = nil) {
+    public init(_ anUrl: URL, sessionConfiguration: URLSessionConfiguration? = nil, queue aQueue: DispatchQueue = DispatchQueue.global(qos: .utility)) {
+        queue = aQueue
         super.init()
         baseUrl = anUrl
-        queue = DispatchQueue.global(qos: .utility)
         initializeURLSession(sessionConfiguration)
     }
     
