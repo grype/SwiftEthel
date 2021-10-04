@@ -16,14 +16,16 @@ public typealias TransportBlock = (Transport) -> Void
 // MARK: - Client
 
 /**
- I am a base class for defining a client for web APIs.
+ I am a base class for defining a web API client.
  
  I typically need to be subclassed as I provide very limitted functionality.
- I maintain a reference to the base url of the API, which is the longest
+ I maintain a reference to the base url of the API, which is typically the longest
  common path for all of my endpoints.
  
- Instantiate me with a base URL and an `URLSessionConfiguration`, which I use
- for configuring `URLSession` when making requests.
+ **Instantiating**
+ 
+ Instantiate me with a base URL and a `URLSessionConfiguration`, which I use
+ for configuring `URLSession`s when making requests.
  
  My sole purpose is to capture common behavior that is shared by all endpoints, or
  by groups of endpoints - i.e., I could provide methods for configuring authenticated
@@ -39,14 +41,29 @@ public typealias TransportBlock = (Transport) -> Void
  client / MyEndpoint.self
  ```
  
- When creating endpoint instances this way, the final path of the endpoint is resolved using
- both the client's `baseUrl` and the endpoints's `path`
+ When creating endpoints this way, the final path of the endpoint is resolved using
+ both the client's `baseUrl` and the endpoints's `path`, if one is present.
  
- Subclassing notes:
+ ** Making requests **
  
- Override `configureTransport` if you need to configure the request. This is done
- via an intermediate `Transport` object that gets passed into the function as the sole
- argument.
+ Requests are typically initiated by an endpoint calling its `execute()` method, which in turn
+ calls my `execute()` method, passing in a reference to the endpoint. I then create a `Transport` object and
+ configure it by calling `prepare()`. I then ask the endpoint to do the same by calling its `prepare()` method.
+ If the caller provided a block, I'll then evaluate it, allowing the caller to further configure the transport
+ object before it is executed. Finally, I execute the transport object, which results in an asynchronous url task.
+ I maintain a table of those `tasks`, removing them as they complete (with or without errors).
+ 
+ Lastly, requests are executed on a dedicated `queue`, which I will create if one wasn't provided at the time of initialization.
+ During execution I will set up a queue-specific variable `CurrentContext`. Any method that is called from within the execution phase
+ can access it via my `queue` variable. That context objet will contain both the transport and the endpoint objects that initiated
+ current request.
+ 
+ **Subclassing**
+ 
+ * Override `prepare()` if you need to configure requests in a way that is common to all endpoints.
+ * Provide accessors for top-tier endpoints (e.g. `var other: OtherEndpoint { self / OtherEndpoint.self}`.
+   This makes it possible to mimic the API map.
+ 
  */
 open class Client: NSObject, URLSessionDataDelegate {
     private(set) var baseUrl: URL!

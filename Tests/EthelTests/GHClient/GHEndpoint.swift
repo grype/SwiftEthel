@@ -10,7 +10,7 @@ import Foundation
 import PromiseKit
 
 /**
- I am an "abstract" Endpoint on which all other endpoints build on.
+ I am a base Endpoint on which all other endpoints build on.
 
  I store instance of the client on which I execute requests, default to root path, and provide common date formatter.
  */
