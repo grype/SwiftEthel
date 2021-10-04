@@ -128,7 +128,7 @@ extension Transport: URLSessionDelegate {
         responseError = error
         isComplete = true
         task = nil
-        emit(self, on: Beacon.ethel)
+        emit(error: error, on: Beacon.ethel)
         completion(self, nil)
     }
 }
@@ -141,7 +141,12 @@ extension Transport: URLSessionTaskDelegate {
         response = aTask.response
         isComplete = true
         task = nil
-        emit(self, on: Beacon.ethel)
+        if let error = error {
+            emit(error: error, on: Beacon.ethel)
+        }
+        else {
+            emit(self, on: Beacon.ethel)
+        }
         completion(self, task)
     }
 }
