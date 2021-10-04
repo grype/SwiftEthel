@@ -20,11 +20,4 @@ class GHPublicGistsEndpoint: GHPaginatedEndpoint<GHGist> {
             AddQuery(name: "since", value: dateFormatter.string(from: since))
         }
     }
-
-    func fetch() -> Promise<[Element]> {
-        execute {
-            Get()
-            DecodeJSON<[Element]>()
-        }
-    }
 }
