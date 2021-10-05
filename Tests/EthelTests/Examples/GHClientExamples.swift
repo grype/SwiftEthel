@@ -11,7 +11,11 @@ import Nimble
 import PromiseKit
 import XCTest
 
-class Examples: XCTestCase {
+/**
+ These are examples that actually generate requests and are not meant to be run as a unit test, as the requsts are lilekly to timeout at some point.
+ */
+
+class GHClientExamples: XCTestCase {
     var client = GHClient.default
     var queue: DispatchQueue!
     let logger: ConsoleLogger = .init(name: "Examples")

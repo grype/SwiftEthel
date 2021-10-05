@@ -68,13 +68,13 @@ public typealias TransportBlock = (Transport) -> Void
  
  */
 open class Client: NSObject, URLSessionDataDelegate {
-    private(set) var baseUrl: URL!
+    var baseUrl: URL
     
-    private(set) var session: URLSession!
+    var session: URLSession = .init(configuration: .default)
     
-    private(set) var tasks = [URLSessionTask: Transport]()
+    var tasks = [URLSessionTask: Transport]()
     
-    private(set) var queue: DispatchQueue
+    var queue: DispatchQueue
     
     // MARK: Init
     
@@ -84,8 +84,8 @@ open class Client: NSObject, URLSessionDataDelegate {
     
     public init(_ anUrl: URL, sessionConfiguration: URLSessionConfiguration? = nil, queue aQueue: DispatchQueue = DispatchQueue.global(qos: .utility)) {
         queue = aQueue
-        super.init()
         baseUrl = anUrl
+        super.init()
         initializeURLSession(sessionConfiguration)
     }
     
@@ -140,26 +140,16 @@ open class Client: NSObject, URLSessionDataDelegate {
     // MARK: Executing
     
     open func execute<T>(_ endpoint: Endpoint, @TransportBuilder with block: ()->TransportBuilding) -> Promise<T> {
-        return Promise<T> { seal in
+        return Promise<T> { [self] seal in
             let transport = createTransport()
             let context = Context(endpoint: endpoint, transport: transport)
             inContext(context) {
-                // 1. client configures transport
                 prepare().apply(to: transport)
-                
-                // 2. endpoint configures transport
                 endpoint.prepare().apply(to: transport)
-                
-                // 3. calling method configures transport
                 block().apply(to: transport)
-                
-                let task = transport.execute { transport, task in
-                    self.resolve(seal, transport: transport)
-                    if let task = task {
-                        self.tasks.removeValue(forKey: task)
-                    }
+                execute(transport: transport) {
+                    resolve(seal, transport: transport)
                 }
-                self.tasks[task] = transport
             }
         }
     }
@@ -170,6 +160,16 @@ open class Client: NSObject, URLSessionDataDelegate {
             queue.setSpecific(key: CurrentContext, value: aContext, during: aBlock)
             queue.setSpecific(key: CurrentContext, value: oldValue)
         }
+    }
+    
+    func execute(transport: Transport, completion: @escaping ()->Void) {
+        let task = transport.execute { transport, task in
+            if let task = task {
+                self.tasks.removeValue(forKey: task)
+            }
+            completion()
+        }
+        tasks[task] = transport
     }
     
     // MARK: URLSessionDelegate

@@ -22,6 +22,7 @@ let package = Package(
         .package(url: "https://github.com/grype/SwiftBeacon", .branch("filtering-by-type")),
         .package(url: "https://github.com/mxcl/PromiseKit", .upToNextMajor(from: "6.12.0")),
         .package(url: "https://github.com/quick/nimble", .upToNextMajor(from: "9.2.0")),
+        .package(url: "https://github.com/Brightify/Cuckoo", .upToNextMajor(from: "1.5.0")),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -31,6 +32,6 @@ let package = Package(
             dependencies: ["Beacon", "PromiseKit"]),
         .testTarget(
             name: "EthelTests",
-            dependencies: ["Ethel", "PromiseKit", "Nimble"]),
+            dependencies: ["Ethel", "PromiseKit", "Nimble", "Cuckoo"]),
     ]
 )

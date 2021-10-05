@@ -17,13 +17,13 @@ public extension URL {
     static func / (left: URL, right: String) -> URL? {
         let leftPath = left.path.isEmpty ? "/" : left.path
         let newPath = Path(leftPath).path(resolving: right)
-        return left.rootURL?.appendingPathComponent(newPath.pathString)
+        return left.rootURL?.appendingPathComponent(String(newPath.pathString.dropFirst()))
     }
     
     static func / (left: URL, right: Path) -> URL? {
         let leftPath = left.path.isEmpty ? "/" : left.path
         let newPath = Path(leftPath).path(resolving: right)
-        return left.rootURL?.appendingPathComponent(newPath.pathString)
+        return left.rootURL?.appendingPathComponent(String(newPath.pathString.dropFirst()))
     }
     
     mutating func removeAllPathComponents() {

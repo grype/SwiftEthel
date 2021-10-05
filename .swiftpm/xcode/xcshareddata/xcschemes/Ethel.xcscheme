@@ -56,6 +56,9 @@
                <Test
                   Identifier = "Examples">
                </Test>
+               <Test
+                  Identifier = "GHClientExamples">
+               </Test>
             </SkippedTests>
          </TestableReference>
       </Testables>
