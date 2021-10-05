@@ -74,13 +74,16 @@ open class Transport: NSObject {
     // MARK: - Executing
     
     public func execute(completion aCompletionBlock: @escaping Completion) -> URLSessionTask {
-        assert(request != nil, "Transport has no configured request")
-        let task = session.dataTask(with: request!)
+        assert(request != nil, "Transport has no request object")
         completion = aCompletionBlock
-        task.resume()
-        self.task = task
+        task = session.dataTask(with: request!)
+        startTask()
         emit(self, on: Beacon.ethel)
-        return task
+        return task!
+    }
+    
+    func startTask() {
+        task?.resume()
     }
     
     // MARK: - Contents
@@ -190,12 +193,12 @@ extension Transport: NSCopying {
         transport.type = type
         transport.request = request
         transport.response = response
-        transport.task = task
         transport.contentReader = contentReader
         transport.contentWriter = contentWriter
         transport.isComplete = isComplete
         transport.responseData = responseData
         transport.responseError = responseError
+        transport.completion = completion
         return transport
     }
 }

@@ -91,17 +91,48 @@ class ClientTests: XCTestCase {
     
     // MARK: - Execution
     
-    func testCreatesRequestContext() {}
+    func testCreatesRequestContext() {
+        let endpoint = client / "somewhere"
+        var context: Context?
+        pauseTasks()
+        waitUntil { [self] done in
+            execute(endpoint: endpoint) { _ in
+                context = client.queue.getSpecific(key: CurrentContext)
+                done()
+            }
+        }
+        expect(context).toNot(beNil())
+    }
+    
+    func testContextHasTransport() {
+        let endpoint = client / "somewhere"
+        var context: Context?
+        pauseTasks()
+        waitUntil { [self] done in
+            execute(endpoint: endpoint) { _ in
+                context = client.queue.getSpecific(key: CurrentContext)
+                done()
+            }
+        }
+        expect(context?.transport).toNot(beNil())
+    }
+    
+    func testContextExistsOnlyDuringExecution() {
+        let endpoint = client / "somewhere"
+        pauseTasks()
+        waitUntil { [self] done in
+            execute(endpoint: endpoint) { _ in
+                done()
+            }
+        }
+        expect(self.client.queue.getSpecific(key: CurrentContext)).to(beNil())
+    }
     
     // MARK: - Utilities
     
     fileprivate func pauseTasks() {
         stub(transport) { stub in
-            when(stub.execute(completion: any())).then { [self] completion in
-                let task = client.session.dataTask(with: transport.request!)
-                completion(transport, task)
-                return task
-            }
+            when(stub.startTask()).thenDoNothing()
         }
     }
     

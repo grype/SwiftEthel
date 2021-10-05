@@ -277,6 +277,21 @@ public class MockTransport: Transport, Cuckoo.ClassMock {
     
     
     
+    public override func startTask()  {
+        
+    return cuckoo_manager.call("startTask()",
+            parameters: (),
+            escapingParameters: (),
+            superclassCall:
+                
+                super.startTask()
+                ,
+            defaultCall: __defaultImplStub!.startTask())
+        
+    }
+    
+    
+    
     public override func setRequestContents(_ contents: Any?) throws {
         
     return try cuckoo_manager.callThrows("setRequestContents(_: Any?) throws",
@@ -384,6 +399,11 @@ public class MockTransport: Transport, Cuckoo.ClassMock {
 	        return .init(stub: cuckoo_manager.createStub(for: MockTransport.self, method: "execute(completion: @escaping Completion) -> URLSessionTask", parameterMatchers: matchers))
 	    }
 	    
+	    func startTask() -> Cuckoo.ClassStubNoReturnFunction<()> {
+	        let matchers: [Cuckoo.ParameterMatcher<Void>] = []
+	        return .init(stub: cuckoo_manager.createStub(for: MockTransport.self, method: "startTask()", parameterMatchers: matchers))
+	    }
+	    
 	    func setRequestContents<M1: Cuckoo.OptionalMatchable>(_ contents: M1) -> Cuckoo.ClassStubNoReturnThrowingFunction<(Any?)> where M1.OptionalMatchedType == Any {
 	        let matchers: [Cuckoo.ParameterMatcher<(Any?)>] = [wrap(matchable: contents) { $0 }]
 	        return .init(stub: cuckoo_manager.createStub(for: MockTransport.self, method: "setRequestContents(_: Any?) throws", parameterMatchers: matchers))
@@ -479,6 +499,12 @@ public class MockTransport: Transport, Cuckoo.ClassMock {
 	    func execute<M1: Cuckoo.Matchable>(completion aCompletionBlock: M1) -> Cuckoo.__DoNotUse<(Completion), URLSessionTask> where M1.MatchedType == Completion {
 	        let matchers: [Cuckoo.ParameterMatcher<(Completion)>] = [wrap(matchable: aCompletionBlock) { $0 }]
 	        return cuckoo_manager.verify("execute(completion: @escaping Completion) -> URLSessionTask", callMatcher: callMatcher, parameterMatchers: matchers, sourceLocation: sourceLocation)
+	    }
+	    
+	    @discardableResult
+	    func startTask() -> Cuckoo.__DoNotUse<(), Void> {
+	        let matchers: [Cuckoo.ParameterMatcher<Void>] = []
+	        return cuckoo_manager.verify("startTask()", callMatcher: callMatcher, parameterMatchers: matchers, sourceLocation: sourceLocation)
 	    }
 	    
 	    @discardableResult
@@ -618,6 +644,10 @@ public class TransportStub: Transport {
     
     public override func execute(completion aCompletionBlock: @escaping Completion) -> URLSessionTask  {
         return DefaultValueRegistry.defaultValue(for: (URLSessionTask).self)
+    }
+    
+    public override func startTask()   {
+        return DefaultValueRegistry.defaultValue(for: (Void).self)
     }
     
     public override func setRequestContents(_ contents: Any?) throws  {
