@@ -1,6 +1,7 @@
 import Cuckoo
 @testable import Ethel
 
+import Beacon
 import Foundation
 import PromiseKit
 
@@ -36,16 +37,6 @@ public class MockClient: Client, Cuckoo.ClassMock {
                 defaultCall: __defaultImplStub!.baseUrl)
         }
         
-        set {
-            cuckoo_manager.setter("baseUrl",
-                value: newValue,
-                superclassCall:
-                    
-                    super.baseUrl = newValue
-                    ,
-                defaultCall: __defaultImplStub!.baseUrl = newValue)
-        }
-        
     }
     
     
@@ -60,20 +51,7 @@ public class MockClient: Client, Cuckoo.ClassMock {
                 defaultCall: __defaultImplStub!.tasks)
         }
         
-        set {
-            cuckoo_manager.setter("tasks",
-                value: newValue,
-                superclassCall:
-                    
-                    super.tasks = newValue
-                    ,
-                defaultCall: __defaultImplStub!.tasks = newValue)
-        }
-        
     }
-
-    
-
     
     
     
@@ -137,10 +115,10 @@ public class MockClient: Client, Cuckoo.ClassMock {
     
     
     
-    public override func execute<T>(_ endpoint: Endpoint, with block: ()->TransportBuilding) -> Promise<T> {
-        	return withoutActuallyEscaping(block, do: { (block: @escaping ()->TransportBuilding) -> Promise<T> in
+    public override func execute<T>(_ endpoint: Endpoint, with block: () -> TransportBuilding) -> Promise<T> {
+        	return withoutActuallyEscaping(block, do: { (block: @escaping () -> TransportBuilding) -> Promise<T> in
 
-    return cuckoo_manager.call("execute(_: Endpoint, with: ()->TransportBuilding) -> Promise<T>",
+    return cuckoo_manager.call("execute(_: Endpoint, with: () -> TransportBuilding) -> Promise<T>",
             parameters: (endpoint, block),
             escapingParameters: (endpoint, { () -> TransportBuilding in fatalError("This is a stub! It's not supposed to be called!") }),
             superclassCall:
@@ -154,10 +132,10 @@ public class MockClient: Client, Cuckoo.ClassMock {
     
     
     
-    public override func inContext(_ aContext: Context, do aBlock: ()->Void)  {
-        	return withoutActuallyEscaping(aBlock, do: { (aBlock: @escaping ()->Void) -> Void in
+    public override func inContext(_ aContext: Context, do aBlock: () -> Void)  {
+        	return withoutActuallyEscaping(aBlock, do: { (aBlock: @escaping () -> Void) -> Void in
 
-    return cuckoo_manager.call("inContext(_: Context, do: ()->Void)",
+    return cuckoo_manager.call("inContext(_: Context, do: () -> Void)",
             parameters: (aContext, aBlock),
             escapingParameters: (aContext, { () in fatalError("This is a stub! It's not supposed to be called!") }),
             superclassCall:
@@ -171,9 +149,9 @@ public class MockClient: Client, Cuckoo.ClassMock {
     
     
     
-    public override func execute(transport: Transport, completion: @escaping ()->Void)  {
+    public override func execute(transport: Transport, completion: @escaping () -> Void)  {
         
-    return cuckoo_manager.call("execute(transport: Transport, completion: @escaping ()->Void)",
+    return cuckoo_manager.call("execute(transport: Transport, completion: @escaping () -> Void)",
             parameters: (transport, completion),
             escapingParameters: (transport, completion),
             superclassCall:
@@ -238,22 +216,22 @@ public class MockClient: Client, Cuckoo.ClassMock {
 	    }
 	    
 	    
-	    var baseUrl: Cuckoo.ClassToBeStubbedProperty<MockClient, URL> {
+	    var baseUrl: Cuckoo.ClassToBeStubbedReadOnlyProperty<MockClient, URL> {
 	        return .init(manager: cuckoo_manager, name: "baseUrl")
 	    }
 	    
 	    
-	    var session: Cuckoo.ClassToBeStubbedProperty<MockClient, URLSession> {
+	    var session: Cuckoo.ClassToBeStubbedReadOnlyProperty<MockClient, URLSession?> {
 	        return .init(manager: cuckoo_manager, name: "session")
 	    }
 	    
 	    
-	    var tasks: Cuckoo.ClassToBeStubbedProperty<MockClient, [URLSessionTask: Transport]> {
+	    var tasks: Cuckoo.ClassToBeStubbedReadOnlyProperty<MockClient, [URLSessionTask: Transport]> {
 	        return .init(manager: cuckoo_manager, name: "tasks")
 	    }
 	    
 	    
-	    var queue: Cuckoo.ClassToBeStubbedProperty<MockClient, DispatchQueue> {
+	    var queue: Cuckoo.ClassToBeStubbedReadOnlyProperty<MockClient, DispatchQueue> {
 	        return .init(manager: cuckoo_manager, name: "queue")
 	    }
 	    
@@ -278,19 +256,19 @@ public class MockClient: Client, Cuckoo.ClassMock {
 	        return .init(stub: cuckoo_manager.createStub(for: MockClient.self, method: "validate(response: URLResponse) -> Error?", parameterMatchers: matchers))
 	    }
 	    
-	    func execute<M1: Cuckoo.Matchable, M2: Cuckoo.Matchable, T>(_ endpoint: M1, with block: M2) -> Cuckoo.ClassStubFunction<(Endpoint, ()->TransportBuilding), Promise<T>> where M1.MatchedType == Endpoint, M2.MatchedType == ()->TransportBuilding {
-	        let matchers: [Cuckoo.ParameterMatcher<(Endpoint, ()->TransportBuilding)>] = [wrap(matchable: endpoint) { $0.0 }, wrap(matchable: block) { $0.1 }]
-	        return .init(stub: cuckoo_manager.createStub(for: MockClient.self, method: "execute(_: Endpoint, with: ()->TransportBuilding) -> Promise<T>", parameterMatchers: matchers))
+	    func execute<M1: Cuckoo.Matchable, M2: Cuckoo.Matchable, T>(_ endpoint: M1, with block: M2) -> Cuckoo.ClassStubFunction<(Endpoint, () -> TransportBuilding), Promise<T>> where M1.MatchedType == Endpoint, M2.MatchedType == () -> TransportBuilding {
+	        let matchers: [Cuckoo.ParameterMatcher<(Endpoint, () -> TransportBuilding)>] = [wrap(matchable: endpoint) { $0.0 }, wrap(matchable: block) { $0.1 }]
+	        return .init(stub: cuckoo_manager.createStub(for: MockClient.self, method: "execute(_: Endpoint, with: () -> TransportBuilding) -> Promise<T>", parameterMatchers: matchers))
 	    }
 	    
-	    func inContext<M1: Cuckoo.Matchable, M2: Cuckoo.Matchable>(_ aContext: M1, do aBlock: M2) -> Cuckoo.ClassStubNoReturnFunction<(Context, ()->Void)> where M1.MatchedType == Context, M2.MatchedType == ()->Void {
-	        let matchers: [Cuckoo.ParameterMatcher<(Context, ()->Void)>] = [wrap(matchable: aContext) { $0.0 }, wrap(matchable: aBlock) { $0.1 }]
-	        return .init(stub: cuckoo_manager.createStub(for: MockClient.self, method: "inContext(_: Context, do: ()->Void)", parameterMatchers: matchers))
+	    func inContext<M1: Cuckoo.Matchable, M2: Cuckoo.Matchable>(_ aContext: M1, do aBlock: M2) -> Cuckoo.ClassStubNoReturnFunction<(Context, () -> Void)> where M1.MatchedType == Context, M2.MatchedType == () -> Void {
+	        let matchers: [Cuckoo.ParameterMatcher<(Context, () -> Void)>] = [wrap(matchable: aContext) { $0.0 }, wrap(matchable: aBlock) { $0.1 }]
+	        return .init(stub: cuckoo_manager.createStub(for: MockClient.self, method: "inContext(_: Context, do: () -> Void)", parameterMatchers: matchers))
 	    }
 	    
-	    func execute<M1: Cuckoo.Matchable, M2: Cuckoo.Matchable>(transport: M1, completion: M2) -> Cuckoo.ClassStubNoReturnFunction<(Transport, ()->Void)> where M1.MatchedType == Transport, M2.MatchedType == ()->Void {
-	        let matchers: [Cuckoo.ParameterMatcher<(Transport, ()->Void)>] = [wrap(matchable: transport) { $0.0 }, wrap(matchable: completion) { $0.1 }]
-	        return .init(stub: cuckoo_manager.createStub(for: MockClient.self, method: "execute(transport: Transport, completion: @escaping ()->Void)", parameterMatchers: matchers))
+	    func execute<M1: Cuckoo.Matchable, M2: Cuckoo.Matchable>(transport: M1, completion: M2) -> Cuckoo.ClassStubNoReturnFunction<(Transport, () -> Void)> where M1.MatchedType == Transport, M2.MatchedType == () -> Void {
+	        let matchers: [Cuckoo.ParameterMatcher<(Transport, () -> Void)>] = [wrap(matchable: transport) { $0.0 }, wrap(matchable: completion) { $0.1 }]
+	        return .init(stub: cuckoo_manager.createStub(for: MockClient.self, method: "execute(transport: Transport, completion: @escaping () -> Void)", parameterMatchers: matchers))
 	    }
 	    
 	    func urlSession<M1: Cuckoo.Matchable, M2: Cuckoo.OptionalMatchable>(_ session: M1, didBecomeInvalidWithError error: M2) -> Cuckoo.ClassStubNoReturnFunction<(URLSession, Error?)> where M1.MatchedType == URLSession, M2.OptionalMatchedType == Error {
@@ -323,22 +301,22 @@ public class MockClient: Client, Cuckoo.ClassMock {
 	
 	    
 	    
-	    var baseUrl: Cuckoo.VerifyProperty<URL> {
+	    var baseUrl: Cuckoo.VerifyReadOnlyProperty<URL> {
 	        return .init(manager: cuckoo_manager, name: "baseUrl", callMatcher: callMatcher, sourceLocation: sourceLocation)
 	    }
 	    
 	    
-	    var session: Cuckoo.VerifyProperty<URLSession> {
+	    var session: Cuckoo.VerifyReadOnlyProperty<URLSession?> {
 	        return .init(manager: cuckoo_manager, name: "session", callMatcher: callMatcher, sourceLocation: sourceLocation)
 	    }
 	    
 	    
-	    var tasks: Cuckoo.VerifyProperty<[URLSessionTask: Transport]> {
+	    var tasks: Cuckoo.VerifyReadOnlyProperty<[URLSessionTask: Transport]> {
 	        return .init(manager: cuckoo_manager, name: "tasks", callMatcher: callMatcher, sourceLocation: sourceLocation)
 	    }
 	    
 	    
-	    var queue: Cuckoo.VerifyProperty<DispatchQueue> {
+	    var queue: Cuckoo.VerifyReadOnlyProperty<DispatchQueue> {
 	        return .init(manager: cuckoo_manager, name: "queue", callMatcher: callMatcher, sourceLocation: sourceLocation)
 	    }
 	    
@@ -369,21 +347,21 @@ public class MockClient: Client, Cuckoo.ClassMock {
 	    }
 	    
 	    @discardableResult
-	    func execute<M1: Cuckoo.Matchable, M2: Cuckoo.Matchable, T>(_ endpoint: M1, with block: M2) -> Cuckoo.__DoNotUse<(Endpoint, ()->TransportBuilding), Promise<T>> where M1.MatchedType == Endpoint, M2.MatchedType == ()->TransportBuilding {
-	        let matchers: [Cuckoo.ParameterMatcher<(Endpoint, ()->TransportBuilding)>] = [wrap(matchable: endpoint) { $0.0 }, wrap(matchable: block) { $0.1 }]
-	        return cuckoo_manager.verify("execute(_: Endpoint, with: ()->TransportBuilding) -> Promise<T>", callMatcher: callMatcher, parameterMatchers: matchers, sourceLocation: sourceLocation)
+	    func execute<M1: Cuckoo.Matchable, M2: Cuckoo.Matchable, T>(_ endpoint: M1, with block: M2) -> Cuckoo.__DoNotUse<(Endpoint, () -> TransportBuilding), Promise<T>> where M1.MatchedType == Endpoint, M2.MatchedType == () -> TransportBuilding {
+	        let matchers: [Cuckoo.ParameterMatcher<(Endpoint, () -> TransportBuilding)>] = [wrap(matchable: endpoint) { $0.0 }, wrap(matchable: block) { $0.1 }]
+	        return cuckoo_manager.verify("execute(_: Endpoint, with: () -> TransportBuilding) -> Promise<T>", callMatcher: callMatcher, parameterMatchers: matchers, sourceLocation: sourceLocation)
 	    }
 	    
 	    @discardableResult
-	    func inContext<M1: Cuckoo.Matchable, M2: Cuckoo.Matchable>(_ aContext: M1, do aBlock: M2) -> Cuckoo.__DoNotUse<(Context, ()->Void), Void> where M1.MatchedType == Context, M2.MatchedType == ()->Void {
-	        let matchers: [Cuckoo.ParameterMatcher<(Context, ()->Void)>] = [wrap(matchable: aContext) { $0.0 }, wrap(matchable: aBlock) { $0.1 }]
-	        return cuckoo_manager.verify("inContext(_: Context, do: ()->Void)", callMatcher: callMatcher, parameterMatchers: matchers, sourceLocation: sourceLocation)
+	    func inContext<M1: Cuckoo.Matchable, M2: Cuckoo.Matchable>(_ aContext: M1, do aBlock: M2) -> Cuckoo.__DoNotUse<(Context, () -> Void), Void> where M1.MatchedType == Context, M2.MatchedType == () -> Void {
+	        let matchers: [Cuckoo.ParameterMatcher<(Context, () -> Void)>] = [wrap(matchable: aContext) { $0.0 }, wrap(matchable: aBlock) { $0.1 }]
+	        return cuckoo_manager.verify("inContext(_: Context, do: () -> Void)", callMatcher: callMatcher, parameterMatchers: matchers, sourceLocation: sourceLocation)
 	    }
 	    
 	    @discardableResult
-	    func execute<M1: Cuckoo.Matchable, M2: Cuckoo.Matchable>(transport: M1, completion: M2) -> Cuckoo.__DoNotUse<(Transport, ()->Void), Void> where M1.MatchedType == Transport, M2.MatchedType == ()->Void {
-	        let matchers: [Cuckoo.ParameterMatcher<(Transport, ()->Void)>] = [wrap(matchable: transport) { $0.0 }, wrap(matchable: completion) { $0.1 }]
-	        return cuckoo_manager.verify("execute(transport: Transport, completion: @escaping ()->Void)", callMatcher: callMatcher, parameterMatchers: matchers, sourceLocation: sourceLocation)
+	    func execute<M1: Cuckoo.Matchable, M2: Cuckoo.Matchable>(transport: M1, completion: M2) -> Cuckoo.__DoNotUse<(Transport, () -> Void), Void> where M1.MatchedType == Transport, M2.MatchedType == () -> Void {
+	        let matchers: [Cuckoo.ParameterMatcher<(Transport, () -> Void)>] = [wrap(matchable: transport) { $0.0 }, wrap(matchable: completion) { $0.1 }]
+	        return cuckoo_manager.verify("execute(transport: Transport, completion: @escaping () -> Void)", callMatcher: callMatcher, parameterMatchers: matchers, sourceLocation: sourceLocation)
 	    }
 	    
 	    @discardableResult
@@ -415,17 +393,13 @@ public class ClientStub: Client {
             return DefaultValueRegistry.defaultValue(for: (URL).self)
         }
         
-        set { }
-        
     }
     
     
-    public override var session: URLSession {
+    public override var session: URLSession! {
         get {
-            return DefaultValueRegistry.defaultValue(for: (URLSession).self)
+            return DefaultValueRegistry.defaultValue(for: (URLSession?).self)
         }
-        
-        set { }
         
     }
     
@@ -435,8 +409,6 @@ public class ClientStub: Client {
             return DefaultValueRegistry.defaultValue(for: ([URLSessionTask: Transport]).self)
         }
         
-        set { }
-        
     }
     
     
@@ -444,8 +416,6 @@ public class ClientStub: Client {
         get {
             return DefaultValueRegistry.defaultValue(for: (DispatchQueue).self)
         }
-        
-        set { }
         
     }
     
@@ -469,15 +439,15 @@ public class ClientStub: Client {
         return DefaultValueRegistry.defaultValue(for: (Error?).self)
     }
     
-    public override func execute<T>(_ endpoint: Endpoint, with block: ()->TransportBuilding) -> Promise<T>  {
+    public override func execute<T>(_ endpoint: Endpoint, with block: () -> TransportBuilding) -> Promise<T>  {
         return DefaultValueRegistry.defaultValue(for: (Promise<T>).self)
     }
     
-    public override func inContext(_ aContext: Context, do aBlock: ()->Void)   {
+    public override func inContext(_ aContext: Context, do aBlock: () -> Void)   {
         return DefaultValueRegistry.defaultValue(for: (Void).self)
     }
     
-    public override func execute(transport: Transport, completion: @escaping ()->Void)   {
+    public override func execute(transport: Transport, completion: @escaping () -> Void)   {
         return DefaultValueRegistry.defaultValue(for: (Void).self)
     }
     

@@ -50,78 +50,6 @@ public class MockTransport: Transport, Cuckoo.ClassMock {
     
     
     
-    public override var session: URLSession {
-        get {
-            return cuckoo_manager.getter("session",
-                superclassCall:
-                    
-                    super.session
-                    ,
-                defaultCall: __defaultImplStub!.session)
-        }
-        
-        set {
-            cuckoo_manager.setter("session",
-                value: newValue,
-                superclassCall:
-                    
-                    super.session = newValue
-                    ,
-                defaultCall: __defaultImplStub!.session = newValue)
-        }
-        
-    }
-    
-    
-    
-    public override var request: URLRequest? {
-        get {
-            return cuckoo_manager.getter("request",
-                superclassCall:
-                    
-                    super.request
-                    ,
-                defaultCall: __defaultImplStub!.request)
-        }
-        
-        set {
-            cuckoo_manager.setter("request",
-                value: newValue,
-                superclassCall:
-                    
-                    super.request = newValue
-                    ,
-                defaultCall: __defaultImplStub!.request = newValue)
-        }
-        
-    }
-    
-    
-    
-    public override var response: URLResponse? {
-        get {
-            return cuckoo_manager.getter("response",
-                superclassCall:
-                    
-                    super.response
-                    ,
-                defaultCall: __defaultImplStub!.response)
-        }
-        
-        set {
-            cuckoo_manager.setter("response",
-                value: newValue,
-                superclassCall:
-                    
-                    super.response = newValue
-                    ,
-                defaultCall: __defaultImplStub!.response = newValue)
-        }
-        
-    }
-    
-    
-    
     public override var contentWriter: ((Any) throws -> Data?)? {
         get {
             return cuckoo_manager.getter("contentWriter",
@@ -164,6 +92,58 @@ public class MockTransport: Transport, Cuckoo.ClassMock {
                     super.contentReader = newValue
                     ,
                 defaultCall: __defaultImplStub!.contentReader = newValue)
+        }
+        
+    }
+    
+    
+    
+    public override var session: URLSession {
+        get {
+            return cuckoo_manager.getter("session",
+                superclassCall:
+                    
+                    super.session
+                    ,
+                defaultCall: __defaultImplStub!.session)
+        }
+        
+    }
+    
+    
+    
+    public override var request: URLRequest? {
+        get {
+            return cuckoo_manager.getter("request",
+                superclassCall:
+                    
+                    super.request
+                    ,
+                defaultCall: __defaultImplStub!.request)
+        }
+        
+        set {
+            cuckoo_manager.setter("request",
+                value: newValue,
+                superclassCall:
+                    
+                    super.request = newValue
+                    ,
+                defaultCall: __defaultImplStub!.request = newValue)
+        }
+        
+    }
+    
+    
+    
+    public override var response: URLResponse? {
+        get {
+            return cuckoo_manager.getter("response",
+                superclassCall:
+                    
+                    super.response
+                    ,
+                defaultCall: __defaultImplStub!.response)
         }
         
     }
@@ -339,7 +319,17 @@ public class MockTransport: Transport, Cuckoo.ClassMock {
 	    }
 	    
 	    
-	    var session: Cuckoo.ClassToBeStubbedProperty<MockTransport, URLSession> {
+	    var contentWriter: Cuckoo.ClassToBeStubbedOptionalProperty<MockTransport, ((Any) throws -> Data?)> {
+	        return .init(manager: cuckoo_manager, name: "contentWriter")
+	    }
+	    
+	    
+	    var contentReader: Cuckoo.ClassToBeStubbedOptionalProperty<MockTransport, ((Data) throws -> Any?)> {
+	        return .init(manager: cuckoo_manager, name: "contentReader")
+	    }
+	    
+	    
+	    var session: Cuckoo.ClassToBeStubbedReadOnlyProperty<MockTransport, URLSession> {
 	        return .init(manager: cuckoo_manager, name: "session")
 	    }
 	    
@@ -349,18 +339,8 @@ public class MockTransport: Transport, Cuckoo.ClassMock {
 	    }
 	    
 	    
-	    var response: Cuckoo.ClassToBeStubbedOptionalProperty<MockTransport, URLResponse> {
+	    var response: Cuckoo.ClassToBeStubbedReadOnlyProperty<MockTransport, URLResponse?> {
 	        return .init(manager: cuckoo_manager, name: "response")
-	    }
-	    
-	    
-	    var contentWriter: Cuckoo.ClassToBeStubbedOptionalProperty<MockTransport, ((Any) throws -> Data?)> {
-	        return .init(manager: cuckoo_manager, name: "contentWriter")
-	    }
-	    
-	    
-	    var contentReader: Cuckoo.ClassToBeStubbedOptionalProperty<MockTransport, ((Data) throws -> Any?)> {
-	        return .init(manager: cuckoo_manager, name: "contentReader")
 	    }
 	    
 	    
@@ -434,7 +414,17 @@ public class MockTransport: Transport, Cuckoo.ClassMock {
 	    }
 	    
 	    
-	    var session: Cuckoo.VerifyProperty<URLSession> {
+	    var contentWriter: Cuckoo.VerifyOptionalProperty<((Any) throws -> Data?)> {
+	        return .init(manager: cuckoo_manager, name: "contentWriter", callMatcher: callMatcher, sourceLocation: sourceLocation)
+	    }
+	    
+	    
+	    var contentReader: Cuckoo.VerifyOptionalProperty<((Data) throws -> Any?)> {
+	        return .init(manager: cuckoo_manager, name: "contentReader", callMatcher: callMatcher, sourceLocation: sourceLocation)
+	    }
+	    
+	    
+	    var session: Cuckoo.VerifyReadOnlyProperty<URLSession> {
 	        return .init(manager: cuckoo_manager, name: "session", callMatcher: callMatcher, sourceLocation: sourceLocation)
 	    }
 	    
@@ -444,18 +434,8 @@ public class MockTransport: Transport, Cuckoo.ClassMock {
 	    }
 	    
 	    
-	    var response: Cuckoo.VerifyOptionalProperty<URLResponse> {
+	    var response: Cuckoo.VerifyReadOnlyProperty<URLResponse?> {
 	        return .init(manager: cuckoo_manager, name: "response", callMatcher: callMatcher, sourceLocation: sourceLocation)
-	    }
-	    
-	    
-	    var contentWriter: Cuckoo.VerifyOptionalProperty<((Any) throws -> Data?)> {
-	        return .init(manager: cuckoo_manager, name: "contentWriter", callMatcher: callMatcher, sourceLocation: sourceLocation)
-	    }
-	    
-	    
-	    var contentReader: Cuckoo.VerifyOptionalProperty<((Data) throws -> Any?)> {
-	        return .init(manager: cuckoo_manager, name: "contentReader", callMatcher: callMatcher, sourceLocation: sourceLocation)
 	    }
 	    
 	    
@@ -529,12 +509,30 @@ public class TransportStub: Transport {
     }
     
     
+    public override var contentWriter: ((Any) throws -> Data?)? {
+        get {
+            return DefaultValueRegistry.defaultValue(for: (((Any) throws -> Data?)?).self)
+        }
+        
+        set { }
+        
+    }
+    
+    
+    public override var contentReader: ((Data) throws -> Any?)? {
+        get {
+            return DefaultValueRegistry.defaultValue(for: (((Data) throws -> Any?)?).self)
+        }
+        
+        set { }
+        
+    }
+    
+    
     public override var session: URLSession {
         get {
             return DefaultValueRegistry.defaultValue(for: (URLSession).self)
         }
-        
-        set { }
         
     }
     
@@ -553,28 +551,6 @@ public class TransportStub: Transport {
         get {
             return DefaultValueRegistry.defaultValue(for: (URLResponse?).self)
         }
-        
-        set { }
-        
-    }
-    
-    
-    public override var contentWriter: ((Any) throws -> Data?)? {
-        get {
-            return DefaultValueRegistry.defaultValue(for: (((Any) throws -> Data?)?).self)
-        }
-        
-        set { }
-        
-    }
-    
-    
-    public override var contentReader: ((Data) throws -> Any?)? {
-        get {
-            return DefaultValueRegistry.defaultValue(for: (((Data) throws -> Any?)?).self)
-        }
-        
-        set { }
         
     }
     
