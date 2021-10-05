@@ -8,6 +8,7 @@
 
 import Foundation
 import PromiseKit
+import Beacon
 
 // MARK: - Types
 
@@ -68,13 +69,13 @@ public typealias TransportBlock = (Transport) -> Void
  
  */
 open class Client: NSObject, URLSessionDataDelegate {
-    var baseUrl: URL
+    private(set) var baseUrl: URL
     
-    var session: URLSession = .init(configuration: .default)
+    private(set) var session: URLSession!
     
-    var tasks = [URLSessionTask: Transport]()
+    private(set) var tasks = [URLSessionTask: Transport]()
     
-    var queue: DispatchQueue
+    private(set) var queue: DispatchQueue
     
     // MARK: Init
     
@@ -89,7 +90,7 @@ open class Client: NSObject, URLSessionDataDelegate {
         initializeURLSession(sessionConfiguration)
     }
     
-    fileprivate func initializeURLSession(_ sessionConfiguration: URLSessionConfiguration?) {
+    private func initializeURLSession(_ sessionConfiguration: URLSessionConfiguration?) {
         let sessionConfig = sessionConfiguration ?? URLSessionConfiguration.default
         session = URLSession(configuration: sessionConfig, delegate: self, delegateQueue: nil)
         session.delegateQueue.underlyingQueue = queue
@@ -112,7 +113,7 @@ open class Client: NSObject, URLSessionDataDelegate {
     
     // MARK: Resolving
     
-    open func resolve<T>(_ resolver: Resolver<T>, transport: Transport) {
+    func resolve<T>(_ resolver: Resolver<T>, transport: Transport) {
         var contents: T?
         do {
             contents = try transport.getResponseContents() as? T
@@ -139,7 +140,7 @@ open class Client: NSObject, URLSessionDataDelegate {
     
     // MARK: Executing
     
-    open func execute<T>(_ endpoint: Endpoint, @TransportBuilder with block: ()->TransportBuilding) -> Promise<T> {
+    open func execute<T>(_ endpoint: Endpoint, @TransportBuilder with block: () -> TransportBuilding) -> Promise<T> {
         return Promise<T> { [self] seal in
             let transport = createTransport()
             let context = Context(endpoint: endpoint, transport: transport)
@@ -154,7 +155,7 @@ open class Client: NSObject, URLSessionDataDelegate {
         }
     }
     
-    func inContext(_ aContext: Context, do aBlock: ()->Void) {
+    func inContext(_ aContext: Context, do aBlock: () -> Void) {
         queue.sync {
             let oldValue = queue.getSpecific(key: CurrentContext)
             queue.setSpecific(key: CurrentContext, value: aContext, during: aBlock)
@@ -162,8 +163,8 @@ open class Client: NSObject, URLSessionDataDelegate {
         }
     }
     
-    func execute(transport: Transport, completion: @escaping ()->Void) {
-        let task = transport.execute { transport, task in
+    func execute(transport: Transport, completion: @escaping () -> Void) {
+        let task = transport.execute { _, task in
             if let task = task {
                 self.tasks.removeValue(forKey: task)
             }
@@ -175,6 +176,12 @@ open class Client: NSObject, URLSessionDataDelegate {
     // MARK: URLSessionDelegate
     
     open func urlSession(_ session: URLSession, didBecomeInvalidWithError error: Error?) {
+        if let error = error {
+            emit(error: error, on: Beacon.ethel)
+        }
+        else {
+            emit(session, on: Beacon.ethel)
+        }
         tasks.forEach { _, transport in
             transport.urlSession(session, didBecomeInvalidWithError: error)
         }
@@ -183,6 +190,12 @@ open class Client: NSObject, URLSessionDataDelegate {
     // MARK: URLSessionTaskDelegate
     
     open func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+        if let error = error {
+            emit(error: error, on: Beacon.ethel)
+        }
+        else {
+            emit(task, on: Beacon.ethel)
+        }
         tasks.forEach { task, transport in
             transport.urlSession(session, task: task, didCompleteWithError: error)
         }
