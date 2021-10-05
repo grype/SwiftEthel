@@ -8,6 +8,25 @@
 import Beacon
 import Foundation
 
+/**
+ I encapsulate a single complete communication between the client and the server.
+ 
+ I am typically initialized by a client and use its session for creating tasks. The type of
+ task I create is governed by my `type` property.
+ 
+ I need a `request` before I can `execute()`. When I am done executing, I set `isComplete` to indicate
+ that I am done. Response will be captured in `response`, along with any `responseData` and/or `responseError`.
+ 
+ *Example*
+ ```
+ let session = URLSession(configuration: .default)
+ let transport = Transport(session)
+ transport.request = URLRequest(url: URL("http://example.com/"))
+ transport.execute {
+   // response received
+ }
+ ```
+ */
 open class Transport: NSObject {
     // MARK: - Types
     
@@ -21,19 +40,19 @@ open class Transport: NSObject {
     
     public var type: RequestType = .data
     
-    public var session: URLSession
+    public var contentWriter: ((Any) throws -> Data?)?
+    
+    public var contentReader: ((Data) throws -> Any?)?
+    
+    public private(set) var session: URLSession
     
     public var request: URLRequest? {
         didSet { request?.transport = self }
     }
     
-    public var response: URLResponse? {
+    public fileprivate(set) var response: URLResponse? {
         didSet { response?.transport = self }
     }
-    
-    public var contentWriter: ((Any) throws -> Data?)?
-    
-    public var contentReader: ((Data) throws -> Any?)?
     
     public fileprivate(set) var isComplete = false
     
@@ -41,9 +60,9 @@ open class Transport: NSObject {
     
     public fileprivate(set) var responseError: Error?
     
-    private var completion: Completion!
-    
     public fileprivate(set) var task: URLSessionTask?
+    
+    private var completion: Completion!
     
     // MARK: - Initializating
     
