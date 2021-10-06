@@ -9,7 +9,16 @@ import Foundation
 
 public var CurrentContext = DispatchSpecificKey<Context>()
 
-public struct Context {
-    var endpoint: Endpoint
-    var transport: Transport
+public class Context {
+    public private(set) var endpoint: Endpoint
+
+    public private(set) var transport: Transport
+
+    public var userInfo: [AnyHashable: Any]?
+
+    public init(endpoint anEndpoint: Endpoint, transport aTransport: Transport, userInfo aUserInfo: [AnyHashable : Any]? = nil) {
+        endpoint = anEndpoint
+        transport = aTransport
+        userInfo = aUserInfo
+    }
 }
