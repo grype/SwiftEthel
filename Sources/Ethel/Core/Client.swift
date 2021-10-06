@@ -69,13 +69,13 @@ public typealias TransportBlock = (Transport) -> Void
  
  */
 open class Client: NSObject, URLSessionDataDelegate {
-    private(set) var baseUrl: URL
+    open private(set) var baseUrl: URL
     
-    private(set) var session: URLSession!
+    open private(set) var session: URLSession!
     
     private(set) var tasks = [URLSessionTask: Transport]()
     
-    private(set) var queue: DispatchQueue
+    public private(set) var queue: DispatchQueue
     
     // MARK: Init
     
