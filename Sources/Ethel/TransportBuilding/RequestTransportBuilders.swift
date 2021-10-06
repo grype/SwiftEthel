@@ -7,7 +7,7 @@
 
 import Foundation
 
-// MARK: -
+// MARK: - Protocols
 
 public protocol TransportRouting : TransportBuilding {
     var method: String { get }
@@ -34,7 +34,7 @@ public extension TransportQuerying {
     }
 }
 
-// MARK: -
+// MARK: - Request
 
 public struct Request: TransportBuilding {
     var url: URL
@@ -45,6 +45,8 @@ public struct Request: TransportBuilding {
         aTransport.request = URLRequest(url: url)
     }
 }
+
+// MARK: - Method
 
 public struct Get: TransportRouting {
     public var method: String { "GET" }
@@ -102,7 +104,7 @@ public struct Head: TransportRouting {
     }
 }
 
-// MARK: -
+// MARK: - Query
 
 public struct AddQuery: TransportQuerying {
     public var query: URLQueryItem
@@ -114,7 +116,7 @@ public struct AddQuery: TransportQuerying {
     }
 }
 
-// MARK: -
+// MARK: - Headers
 
 public struct SetHeader: TransportBuilding {
     let name: String
@@ -137,5 +139,17 @@ public struct AddHeader: TransportBuilding {
     }
     public func apply(to aTransport: Transport) {
         aTransport.request?.addValue(value, forHTTPHeaderField: name)
+    }
+}
+
+// MARK: - Content
+
+public struct Content: TransportBuilding {
+    public private(set) var value: Any?
+    public init(_ aValue: Any? = nil) {
+        value = aValue
+    }
+    public func apply(to aTransport: Transport) {
+        aTransport.requestContents = value
     }
 }
