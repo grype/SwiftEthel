@@ -119,6 +119,10 @@ public struct AddQuery: TransportQuerying {
 public struct SetHeader: TransportBuilding {
     let name: String
     let value: String
+    public init(name aName: String, value aValue: String) {
+        name = aName
+        value = aValue
+    }
     public func apply(to aTransport: Transport) {
         aTransport.request?.setValue(value, forHTTPHeaderField: name)
     }
@@ -127,6 +131,10 @@ public struct SetHeader: TransportBuilding {
 public struct AddHeader: TransportBuilding {
     let name: String
     let value: String
+    public init(name aName: String, value aValue: String) {
+        name = aName
+        value = aValue
+    }
     public func apply(to aTransport: Transport) {
         aTransport.request?.addValue(value, forHTTPHeaderField: name)
     }

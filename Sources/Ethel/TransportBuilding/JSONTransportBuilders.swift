@@ -13,13 +13,13 @@ import AnyCodable
  Sets up transport with a content reader that materializes JSON data into instance of associated type.
  */
 public struct DecodeJSON<T: Decodable>: TransportBuilding {
-    typealias InitBlock = (T) -> Void
+    public typealias InitBlock = (T) -> Void
 
-    var decoder: JSONDecoder
+    public private(set) var decoder: JSONDecoder
     
-    var initBlock: InitBlock?
+    public private(set) var initBlock: InitBlock?
 
-    init(decoder aDecoder: JSONDecoder = JSONDecoder(), init aBlock: InitBlock? = nil) {
+    public init(decoder aDecoder: JSONDecoder = JSONDecoder(), init aBlock: InitBlock? = nil) {
         decoder = aDecoder
         initBlock = aBlock
     }
@@ -44,9 +44,9 @@ public struct DecodeJSON<T: Decodable>: TransportBuilding {
  Sets up transport with a content writer that serializes objects into JSON.
  */
 public struct EncodeJSON<T: Encodable>: TransportBuilding {
-    var encoder: JSONEncoder
+    public private(set) var encoder: JSONEncoder
     
-    init(encoder anEncoder: JSONEncoder = JSONEncoder()) {
+    public init(encoder anEncoder: JSONEncoder = JSONEncoder()) {
         encoder = anEncoder
     }
     
