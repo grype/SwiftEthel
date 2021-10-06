@@ -6,6 +6,7 @@
 //  Copyright © 2019 Pavel Skaldin. All rights reserved.
 //
 
+import Beacon
 import Foundation
 import PromiseKit
 
@@ -22,7 +23,19 @@ public extension Endpoint {
     @TransportBuilder func prepare() -> TransportBuilding { Noop }
 
     func execute<T>(@TransportBuilder _ block: () -> TransportBuilding) -> Promise<T> {
+        if willLog(type: EndpointSignal.self, on: [Beacon.ethel]) {
+            EndpointSignal(self).emit(on: [Beacon.ethel], userInfo: beaconUserInfo)
+        }
         return client.execute(self, with: block)
+    }
+
+    var beaconUserInfo: [AnyHashable: Any] {
+        var userInfo = [AnyHashable: Any]()
+        Mirror(reflecting: self).children.forEach { aChild in
+            guard let label = aChild.label else { return }
+            userInfo[label] = aChild.value
+        }
+        return userInfo
     }
 }
 

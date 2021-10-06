@@ -9,13 +9,9 @@ import Beacon
 import Foundation
 
 open class TransportSignal: WrapperSignal {
-    var transport: Transport {
-        return value as! Transport
-    }
+    var transport: Transport { value as! Transport }
 
-    override open var signalName: String {
-        return "🚛"
-    }
+    override open var signalName: String { "🚛" }
 
     public init(_ aTransport: Transport) {
         super.init(aTransport)
