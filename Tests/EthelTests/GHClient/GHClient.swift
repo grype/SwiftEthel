@@ -20,7 +20,7 @@ class GHClient: Client {
     /// Configure all requests with common headers
     @TransportBuilder override func prepare() -> TransportBuilding {
         super.prepare()
-        Header(name: "Accept", value: "application/vnd.github.v3+json")
+        SetHeader(name: "Accept", value: "application/vnd.github.v3+json")
     }
 
     // MARK: - Endpoints

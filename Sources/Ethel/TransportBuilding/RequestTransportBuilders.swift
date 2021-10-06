@@ -116,7 +116,7 @@ public struct AddQuery: TransportQuerying {
 
 // MARK: -
 
-public struct Header: TransportBuilding {
+public struct SetHeader: TransportBuilding {
     let name: String
     let value: String
     public func apply(to aTransport: Transport) {
