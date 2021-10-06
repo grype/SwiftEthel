@@ -43,7 +43,7 @@ public struct DecodeJSON<T: Decodable>: TransportBuilding {
 /**
  Sets up transport with a content writer that serializes objects into JSON.
  */
-public struct EncodeJSON<T: Encodable>: TransportBuilding {
+public struct EncodeJSON: TransportBuilding {
     public private(set) var encoder: JSONEncoder
     
     public init(encoder anEncoder: JSONEncoder = JSONEncoder()) {
