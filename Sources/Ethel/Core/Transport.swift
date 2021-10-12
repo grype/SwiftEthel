@@ -149,7 +149,6 @@ extension Transport: URLSessionDelegate {
     public func urlSession(_ session: URLSession, didBecomeInvalidWithError error: Error?) {
         responseError = error
         isComplete = true
-        task = nil
         emit(error: error, on: Beacon.ethel)
         completion(self, nil)
     }
@@ -162,7 +161,6 @@ extension Transport: URLSessionTaskDelegate {
         responseError = error
         response = aTask.response
         isComplete = true
-        task = nil
         if let error = error {
             emit(error: error, on: Beacon.ethel)
         }
