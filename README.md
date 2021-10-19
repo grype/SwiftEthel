@@ -10,6 +10,15 @@ Ethel has a simple architecture that is able to support a wide range of APIs, in
 
 This is a swift package. Use swift package manager to add to a project...
 
+## Logging
+
+Ethel uses ![Beacon](https://github.com/grype/SwiftBeacon) for logging. To start logging, simply create a logger and start it on `Beacon.ethel` object - which is the default `Beacon` on which the framework emits signals.
+
+``` swift
+let logger = ConsoleLogger(name: "Playground")
+logger.start(on: [Beacon.ethel])
+```
+
 ## Example
 
 Let's take GitHub's Gists API for example. We'll start by defining the client class.
