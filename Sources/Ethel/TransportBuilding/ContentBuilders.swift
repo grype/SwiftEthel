@@ -12,7 +12,7 @@ import Foundation
  */
 public struct Read<T>: TransportBuilding {
     private(set) var block: ((Data) throws -> T?)?
-    init(_ aBlock: @escaping (Data) throws -> T?) {
+    public init(_ aBlock: @escaping (Data) throws -> T?) {
         block = aBlock
     }
 
@@ -27,7 +27,7 @@ public struct Read<T>: TransportBuilding {
  */
 public struct Write: TransportBuilding {
     private(set) var block: (Any) throws -> Data?
-    init(_ aBlock: @escaping (Any) throws -> Data?) {
+    public init(_ aBlock: @escaping (Any) throws -> Data?) {
         block = aBlock
     }
 
