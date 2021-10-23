@@ -24,8 +24,8 @@
         "repositoryURL": "https://github.com/mattgallagher/CwlCatchException.git",
         "state": {
           "branch": null,
-          "revision": "682841464136f8c66e04afe5dbd01ab51a3a56f2",
-          "version": "2.1.0"
+          "revision": "35f9e770f54ce62dd8526470f14c6e137cef3eea",
+          "version": "2.1.1"
         }
       },
       {
@@ -33,8 +33,8 @@
         "repositoryURL": "https://github.com/mattgallagher/CwlPreconditionTesting.git",
         "state": {
           "branch": null,
-          "revision": "0630439888c94657a235ffcd5977d6047ef3c87b",
-          "version": "2.0.1"
+          "revision": "fb7a26374e8570ff5c68142e5c83406d6abae0d8",
+          "version": "2.0.2"
         }
       },
       {
@@ -69,8 +69,8 @@
         "repositoryURL": "https://github.com/grype/SwiftAnnouncements",
         "state": {
           "branch": null,
-          "revision": "f570ce8b03954f23b35deaef9b7d84df55e29ed3",
-          "version": "1.0.3"
+          "revision": "dedf28cd49da4ad893fefdc135b50c8e034966c6",
+          "version": "1.0.4"
         }
       },
       {
@@ -78,7 +78,7 @@
         "repositoryURL": "https://github.com/grype/SwiftBeacon",
         "state": {
           "branch": "filtering-by-type",
-          "revision": "6161751162245c4aa0db8bfd41369ffb8f4c0f9b",
+          "revision": "2c4e85d8a8ef1a61e8442c67642bbede88e26782",
           "version": null
         }
       }
