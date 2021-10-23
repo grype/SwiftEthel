@@ -77,9 +77,9 @@
         "package": "Beacon",
         "repositoryURL": "https://github.com/grype/SwiftBeacon",
         "state": {
-          "branch": "filtering-by-type",
+          "branch": null,
           "revision": "2c4e85d8a8ef1a61e8442c67642bbede88e26782",
-          "version": null
+          "version": "2.1.0"
         }
       }
     ]

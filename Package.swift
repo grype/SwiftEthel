@@ -19,7 +19,7 @@ let package = Package(
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
-        .package(url: "https://github.com/grype/SwiftBeacon", .branch("filtering-by-type")),
+        .package(url: "https://github.com/grype/SwiftBeacon", .upToNextMajor(from: "2.1.0")),
         .package(url: "https://github.com/mxcl/PromiseKit", .upToNextMajor(from: "6.12.0")),
         .package(url: "https://github.com/quick/nimble", .upToNextMajor(from: "9.2.0")),
         .package(url: "https://github.com/Brightify/Cuckoo", .upToNextMajor(from: "1.5.0")),
