@@ -7,7 +7,7 @@
 
 import Foundation
 
-public var CurrentContext = DispatchSpecificKey<Context>()
+public var CurrentContextKey = DispatchSpecificKey<Context>()
 
 public class Context {
     public private(set) var endpoint: Endpoint

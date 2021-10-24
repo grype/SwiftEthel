@@ -103,7 +103,7 @@ open class Client: NSObject, URLSessionDataDelegate {
     }
     
     @TransportBuilder open func prepare() -> TransportBuilding {
-        if let path = queue.getSpecific(key: CurrentContext)?.endpoint.path {
+        if let path = queue.getSpecific(key: CurrentContextKey)?.endpoint.path {
             Request(baseUrl.resolving(path))
         }
         else {
@@ -157,9 +157,9 @@ open class Client: NSObject, URLSessionDataDelegate {
     
     func inContext(_ aContext: Context, do aBlock: () -> Void) {
         queue.sync {
-            let oldValue = queue.getSpecific(key: CurrentContext)
-            queue.setSpecific(key: CurrentContext, value: aContext, during: aBlock)
-            queue.setSpecific(key: CurrentContext, value: oldValue)
+            let oldValue = queue.getSpecific(key: CurrentContextKey)
+            queue.setSpecific(key: CurrentContextKey, value: aContext, during: aBlock)
+            queue.setSpecific(key: CurrentContextKey, value: oldValue)
         }
     }
     

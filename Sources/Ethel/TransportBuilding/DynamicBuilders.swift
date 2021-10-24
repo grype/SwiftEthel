@@ -25,7 +25,7 @@ struct Eval: TransportBuilding {
 /**
  Evaluates a block, passing it current execution context.
  */
-struct GetContext: TransportBuilding {
+struct CurrentContext: TransportBuilding {
     var queue: DispatchQueue
     var block: (Context)->Void
 
@@ -35,7 +35,7 @@ struct GetContext: TransportBuilding {
     }
 
     func apply(to aTransport: Transport) {
-        guard let context = queue.getSpecific(key: CurrentContext) else { return }
+        guard let context = queue.getSpecific(key: CurrentContextKey) else { return }
         block(context)
     }
 }

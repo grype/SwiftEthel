@@ -97,7 +97,7 @@ class ClientTests: XCTestCase {
         pauseTasks()
         waitUntil { [self] done in
             execute(endpoint: endpoint) { _ in
-                context = client.queue.getSpecific(key: CurrentContext)
+                context = client.queue.getSpecific(key: CurrentContextKey)
                 done()
             }
         }
@@ -110,7 +110,7 @@ class ClientTests: XCTestCase {
         pauseTasks()
         waitUntil { [self] done in
             execute(endpoint: endpoint) { _ in
-                context = client.queue.getSpecific(key: CurrentContext)
+                context = client.queue.getSpecific(key: CurrentContextKey)
                 done()
             }
         }
@@ -125,7 +125,7 @@ class ClientTests: XCTestCase {
                 done()
             }
         }
-        expect(self.client.queue.getSpecific(key: CurrentContext)).to(beNil())
+        expect(self.client.queue.getSpecific(key: CurrentContextKey)).to(beNil())
     }
     
     // MARK: - Utilities
