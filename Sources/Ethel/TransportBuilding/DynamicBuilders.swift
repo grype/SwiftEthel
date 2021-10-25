@@ -10,14 +10,14 @@ import Foundation
 /**
  Evaluates a block, passing it a transport object as the sole argument.
  */
-struct Eval: TransportBuilding {
-    var block: (Transport)->Void
+public struct Eval: TransportBuilding {
+    public private(set) var block: (Transport)->Void
 
-    init(_ aBlock: @escaping (Transport)->Void) {
+    public init(_ aBlock: @escaping (Transport)->Void) {
         block = aBlock
     }
 
-    func apply(to aTransport: Transport) {
+    public func apply(to aTransport: Transport) {
         block(aTransport)
     }
 }
@@ -25,16 +25,16 @@ struct Eval: TransportBuilding {
 /**
  Evaluates a block, passing it current execution context.
  */
-struct CurrentContext: TransportBuilding {
-    var queue: DispatchQueue
-    var block: (Context)->Void
+public struct CurrentContext: TransportBuilding {
+    public private(set) var queue: DispatchQueue
+    public private(set) var block: (Context)->Void
 
-    init(queue aQueue: DispatchQueue, block aBlock: @escaping (Context)->Void) {
+    public init(queue aQueue: DispatchQueue, block aBlock: @escaping (Context)->Void) {
         queue = aQueue
         block = aBlock
     }
 
-    func apply(to aTransport: Transport) {
+    public func apply(to aTransport: Transport) {
         guard let context = queue.getSpecific(key: CurrentContextKey) else { return }
         block(context)
     }
