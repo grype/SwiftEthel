@@ -18,51 +18,51 @@ open class PluggableEndpoint: Endpoint {
         client = aClient
     }
     
-    open func get<T>(@TransportBuilder _ block: ()->TransportBuilding) -> Promise<T> {
+    open func get<T>(@TransportBuilder _ block: @escaping ()->TransportBuilding) -> Promise<T> {
         execute {
-            Get(path)
+            Get()
             block()
         }
     }
     
-    open func delete<T>(@TransportBuilder _ block: ()->TransportBuilding) -> Promise<T> {
+    open func delete<T>(@TransportBuilder _ block: @escaping ()->TransportBuilding) -> Promise<T> {
         execute {
-            Delete(path)
+            Delete()
             block()
         }
     }
     
-    open func post<T>(@TransportBuilder _ block: ()->TransportBuilding) -> Promise<T> {
+    open func post<T>(@TransportBuilder _ block: @escaping ()->TransportBuilding) -> Promise<T> {
         execute {
-            Post(path)
+            Post()
             block()
         }
     }
     
-    open func patch<T>(@TransportBuilder _ block: ()->TransportBuilding) -> Promise<T> {
+    open func patch<T>(@TransportBuilder _ block: @escaping ()->TransportBuilding) -> Promise<T> {
         execute {
-            Patch(path)
+            Patch()
             block()
         }
     }
     
-    open func put<T>(@TransportBuilder _ block: ()->TransportBuilding) -> Promise<T> {
+    open func put<T>(@TransportBuilder _ block: @escaping ()->TransportBuilding) -> Promise<T> {
         execute {
-            Put(path)
+            Put()
             block()
         }
     }
     
-    open func head<T>(@TransportBuilder _ block: ()->TransportBuilding) -> Promise<T> {
+    open func head<T>(@TransportBuilder _ block: @escaping ()->TransportBuilding) -> Promise<T> {
         execute {
-            Head(path)
+            Head()
             block()
         }
     }
     
-    open func options<T>(@TransportBuilder _ block: ()->TransportBuilding) -> Promise<T> {
+    open func options<T>(@TransportBuilder _ block: @escaping ()->TransportBuilding) -> Promise<T> {
         execute {
-            Options(path)
+            Options()
             block()
         }
     }

@@ -115,36 +115,32 @@ public class MockClient: Client, Cuckoo.ClassMock {
     
     
     
-    public override func execute<T>(_ endpoint: Endpoint, with block: () -> TransportBuilding) -> Promise<T> {
-        	return withoutActuallyEscaping(block, do: { (block: @escaping () -> TransportBuilding) -> Promise<T> in
-
-    return cuckoo_manager.call("execute(_: Endpoint, with: () -> TransportBuilding) -> Promise<T>",
+    public override func execute<T>(_ endpoint: Endpoint, with block: @escaping () -> TransportBuilding) -> Promise<T> {
+        
+    return cuckoo_manager.call("execute(_: Endpoint, with: @escaping () -> TransportBuilding) -> Promise<T>",
             parameters: (endpoint, block),
-            escapingParameters: (endpoint, { () -> TransportBuilding in fatalError("This is a stub! It's not supposed to be called!") }),
+            escapingParameters: (endpoint, block),
             superclassCall:
                 
                 super.execute(endpoint, with: block)
                 ,
             defaultCall: __defaultImplStub!.execute(endpoint, with: block))
-        	})
-
+        
     }
     
     
     
-    public override func inContext(_ aContext: Context, do aBlock: () -> Void)  {
-        	return withoutActuallyEscaping(aBlock, do: { (aBlock: @escaping () -> Void) -> Void in
-
-    return cuckoo_manager.call("inContext(_: Context, do: () -> Void)",
+    public override func inContext(_ aContext: Context, do aBlock: @escaping () -> Void)  {
+        
+    return cuckoo_manager.call("inContext(_: Context, do: @escaping () -> Void)",
             parameters: (aContext, aBlock),
-            escapingParameters: (aContext, { () in fatalError("This is a stub! It's not supposed to be called!") }),
+            escapingParameters: (aContext, aBlock),
             superclassCall:
                 
                 super.inContext(aContext, do: aBlock)
                 ,
             defaultCall: __defaultImplStub!.inContext(aContext, do: aBlock))
-        	})
-
+        
     }
     
     
@@ -258,12 +254,12 @@ public class MockClient: Client, Cuckoo.ClassMock {
 	    
 	    func execute<M1: Cuckoo.Matchable, M2: Cuckoo.Matchable, T>(_ endpoint: M1, with block: M2) -> Cuckoo.ClassStubFunction<(Endpoint, () -> TransportBuilding), Promise<T>> where M1.MatchedType == Endpoint, M2.MatchedType == () -> TransportBuilding {
 	        let matchers: [Cuckoo.ParameterMatcher<(Endpoint, () -> TransportBuilding)>] = [wrap(matchable: endpoint) { $0.0 }, wrap(matchable: block) { $0.1 }]
-	        return .init(stub: cuckoo_manager.createStub(for: MockClient.self, method: "execute(_: Endpoint, with: () -> TransportBuilding) -> Promise<T>", parameterMatchers: matchers))
+	        return .init(stub: cuckoo_manager.createStub(for: MockClient.self, method: "execute(_: Endpoint, with: @escaping () -> TransportBuilding) -> Promise<T>", parameterMatchers: matchers))
 	    }
 	    
 	    func inContext<M1: Cuckoo.Matchable, M2: Cuckoo.Matchable>(_ aContext: M1, do aBlock: M2) -> Cuckoo.ClassStubNoReturnFunction<(Context, () -> Void)> where M1.MatchedType == Context, M2.MatchedType == () -> Void {
 	        let matchers: [Cuckoo.ParameterMatcher<(Context, () -> Void)>] = [wrap(matchable: aContext) { $0.0 }, wrap(matchable: aBlock) { $0.1 }]
-	        return .init(stub: cuckoo_manager.createStub(for: MockClient.self, method: "inContext(_: Context, do: () -> Void)", parameterMatchers: matchers))
+	        return .init(stub: cuckoo_manager.createStub(for: MockClient.self, method: "inContext(_: Context, do: @escaping () -> Void)", parameterMatchers: matchers))
 	    }
 	    
 	    func execute<M1: Cuckoo.Matchable, M2: Cuckoo.Matchable>(transport: M1, completion: M2) -> Cuckoo.ClassStubNoReturnFunction<(Transport, () -> Void)> where M1.MatchedType == Transport, M2.MatchedType == () -> Void {
@@ -349,13 +345,13 @@ public class MockClient: Client, Cuckoo.ClassMock {
 	    @discardableResult
 	    func execute<M1: Cuckoo.Matchable, M2: Cuckoo.Matchable, T>(_ endpoint: M1, with block: M2) -> Cuckoo.__DoNotUse<(Endpoint, () -> TransportBuilding), Promise<T>> where M1.MatchedType == Endpoint, M2.MatchedType == () -> TransportBuilding {
 	        let matchers: [Cuckoo.ParameterMatcher<(Endpoint, () -> TransportBuilding)>] = [wrap(matchable: endpoint) { $0.0 }, wrap(matchable: block) { $0.1 }]
-	        return cuckoo_manager.verify("execute(_: Endpoint, with: () -> TransportBuilding) -> Promise<T>", callMatcher: callMatcher, parameterMatchers: matchers, sourceLocation: sourceLocation)
+	        return cuckoo_manager.verify("execute(_: Endpoint, with: @escaping () -> TransportBuilding) -> Promise<T>", callMatcher: callMatcher, parameterMatchers: matchers, sourceLocation: sourceLocation)
 	    }
 	    
 	    @discardableResult
 	    func inContext<M1: Cuckoo.Matchable, M2: Cuckoo.Matchable>(_ aContext: M1, do aBlock: M2) -> Cuckoo.__DoNotUse<(Context, () -> Void), Void> where M1.MatchedType == Context, M2.MatchedType == () -> Void {
 	        let matchers: [Cuckoo.ParameterMatcher<(Context, () -> Void)>] = [wrap(matchable: aContext) { $0.0 }, wrap(matchable: aBlock) { $0.1 }]
-	        return cuckoo_manager.verify("inContext(_: Context, do: () -> Void)", callMatcher: callMatcher, parameterMatchers: matchers, sourceLocation: sourceLocation)
+	        return cuckoo_manager.verify("inContext(_: Context, do: @escaping () -> Void)", callMatcher: callMatcher, parameterMatchers: matchers, sourceLocation: sourceLocation)
 	    }
 	    
 	    @discardableResult
@@ -439,11 +435,11 @@ public class ClientStub: Client {
         return DefaultValueRegistry.defaultValue(for: (Error?).self)
     }
     
-    public override func execute<T>(_ endpoint: Endpoint, with block: () -> TransportBuilding) -> Promise<T>  {
+    public override func execute<T>(_ endpoint: Endpoint, with block: @escaping () -> TransportBuilding) -> Promise<T>  {
         return DefaultValueRegistry.defaultValue(for: (Promise<T>).self)
     }
     
-    public override func inContext(_ aContext: Context, do aBlock: () -> Void)   {
+    public override func inContext(_ aContext: Context, do aBlock: @escaping () -> Void)   {
         return DefaultValueRegistry.defaultValue(for: (Void).self)
     }
     

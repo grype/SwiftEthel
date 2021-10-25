@@ -22,7 +22,7 @@ public protocol Endpoint {
 public extension Endpoint {
     @TransportBuilder func prepare() -> TransportBuilding { Noop }
 
-    func execute<T>(@TransportBuilder _ block: () -> TransportBuilding) -> Promise<T> {
+    func execute<T>(@TransportBuilder _ block: @escaping () -> TransportBuilding) -> Promise<T> {
         if willLog(type: EndpointSignal.self, on: [Beacon.ethel]) {
             EndpointSignal(self).emit(on: [Beacon.ethel], userInfo: beaconUserInfo)
         }

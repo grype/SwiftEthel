@@ -140,7 +140,7 @@ open class Client: NSObject, URLSessionDataDelegate {
     
     // MARK: Executing
     
-    open func execute<T>(_ endpoint: Endpoint, @TransportBuilder with block: () -> TransportBuilding) -> Promise<T> {
+    open func execute<T>(_ endpoint: Endpoint, @TransportBuilder with block: @escaping () -> TransportBuilding) -> Promise<T> {
         return Promise<T> { [self] seal in
             let transport = createTransport()
             let context = Context(endpoint: endpoint, transport: transport)
@@ -155,8 +155,9 @@ open class Client: NSObject, URLSessionDataDelegate {
         }
     }
     
-    func inContext(_ aContext: Context, do aBlock: () -> Void) {
-        queue.sync {
+    func inContext(_ aContext: Context, do aBlock: @escaping () -> Void) {
+        let queue = self.queue
+        queue.async {
             let oldValue = queue.getSpecific(key: CurrentContextKey)
             queue.setSpecific(key: CurrentContextKey, value: aContext, during: aBlock)
             queue.setSpecific(key: CurrentContextKey, value: oldValue)
