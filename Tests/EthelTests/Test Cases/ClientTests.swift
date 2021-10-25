@@ -111,11 +111,11 @@ class ClientTests: ClientTestCase {
         resolveRequest(in: 0.25)
         waitUntil { [self] done in
             _ = execute(endpoint: endpoint) { _ in
-                //
+                expect(self.client.queue.getSpecific(key: CurrentContextKey)).toNot(beNil())
             }.ensure {
+                expect(self.client.queue.getSpecific(key: CurrentContextKey)).to(beNil())
                 done()
             }
         }
-        expect(self.client.queue.getSpecific(key: CurrentContextKey)).to(beNil())
     }
 }
