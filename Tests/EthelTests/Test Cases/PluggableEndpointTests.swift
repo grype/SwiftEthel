@@ -31,7 +31,6 @@ class PluggableEndpointTests: ClientTestCase {
         resolveRequest(in: 0.2)
         waitUntil { done in
             let _: Promise<Void> = endpoint.get {
-                Get()
                 Eval { aTransport in
                     transport = aTransport
                 }
