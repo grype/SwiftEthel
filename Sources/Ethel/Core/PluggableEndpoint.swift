@@ -83,12 +83,12 @@ public func / <T: Endpoint>(left: T, right: Path) -> PluggableEndpoint {
 
 public func/ <T: Client>(left: T, right: String) -> PluggableEndpoint {
     let endpoint = PluggableEndpoint(on: left)
-    endpoint.path = Path() / right
+    endpoint.path = Path(right)
     return endpoint
 }
 
 public func/ <T: Client>(left: T, right: Path) -> PluggableEndpoint {
     let endpoint = PluggableEndpoint(on: left)
-    endpoint.path = Path() / right
+    endpoint.path = right
     return endpoint
 }

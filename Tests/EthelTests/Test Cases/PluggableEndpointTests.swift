@@ -11,35 +11,35 @@ import Nimble
 import PromiseKit
 import XCTest
 
-class PluggableEndpointTests: XCTestCase {
-    var client: TestClient!
-    let baseURL = URL(string: "https://example.com")!
-    
-    override func setUp() {
-        super.setUp()
-        client = TestClient(baseURL, sessionConfiguration: .default)
-    }
-    
+class PluggableEndpointTests: ClientTestCase {
     func testEndpointFromClient() {
         let endpoint = client / "hello"
         expect(endpoint).to(beAnInstanceOf(PluggableEndpoint.self))
-        expect(endpoint.path) == "/hello"
+        expect(endpoint.path) == "hello"
     }
-    
+
     func testEndpointFromEndpoint() {
         let endpoint = (client / "hello") / "world"
         expect(endpoint).to(beAnInstanceOf(PluggableEndpoint.self))
-        expect(endpoint.path) == "/hello/world"
+        expect(endpoint.path) == "hello/world"
     }
-    
+
     func testGet() {
         let endpoint = client / "hello"
-        let promise: Promise<Any> = endpoint.get {
-            Get()
+        var transport: Transport?
+        pauseTasks()
+        resolveRequest(in: 0.2)
+        waitUntil { done in
+            let _: Promise<Void> = endpoint.get {
+                Get()
+                Eval { aTransport in
+                    transport = aTransport
+                }
+            }.ensure {
+                done()
+            }
         }
-        let transport: Transport = client.tasks.first!.value
-        expect(promise.isPending).to(beTrue())
-        expect(transport.request?.url).toNot(beNil())
-        expect(transport.request!.url!) == baseURL.appendingPathComponent("hello")
+        expect(transport?.request?.url).toNot(beNil())
+        expect(transport?.request?.url) == client.baseUrl.appendingPathComponent("hello")
     }
 }

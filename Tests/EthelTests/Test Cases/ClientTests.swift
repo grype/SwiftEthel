@@ -12,20 +12,7 @@ import Nimble
 import PromiseKit
 import XCTest
 
-class ClientTests: XCTestCase {
-    var client: MockClient!
-    var transport: MockTransport!
-    var urlString = "http://example.com/api/"
-
-    override func setUp() {
-        super.setUp()
-        client = MockClient(urlString, sessionConfiguration: URLSessionConfiguration.background(withIdentifier: "test-session")).withEnabledSuperclassSpy()
-        transport = MockTransport(client.session).withEnabledSuperclassSpy()
-        stub(client) { stub in
-            when(stub.createTransport()).thenReturn(transport)
-        }
-    }
-    
+class ClientTests: ClientTestCase {
     // MARK: - Init
 
     func testInit() {
@@ -71,7 +58,8 @@ class ClientTests: XCTestCase {
         let endpoint = client / "/absolute"
         pauseTasks()
         waitUntil { done in
-            self.execute(endpoint: endpoint) { _ in
+            self.execute(endpoint: endpoint) { aTransport in
+                let url = aTransport.request?.url
                 done()
             }
         }
@@ -86,13 +74,13 @@ class ClientTests: XCTestCase {
                 done()
             }
         }
-        expect(self.transport.request?.url) == client.baseUrl.rootURL?.resolving("relative")
+        expect(self.transport.request?.url) == client.baseUrl.resolving("relative")
     }
     
     // MARK: - Execution
     
     func testCreatesRequestContext() {
-        let endpoint = client / "somewhere"
+        let endpoint = client / "somewhere1"
         var context: Context?
         pauseTasks()
         waitUntil { [self] done in
@@ -105,7 +93,7 @@ class ClientTests: XCTestCase {
     }
     
     func testContextHasTransport() {
-        let endpoint = client / "somewhere"
+        let endpoint = client / "somewhere2"
         var context: Context?
         pauseTasks()
         waitUntil { [self] done in
@@ -118,27 +106,16 @@ class ClientTests: XCTestCase {
     }
     
     func testContextExistsOnlyDuringExecution() {
-        let endpoint = client / "somewhere"
+        let endpoint = client / "somewhere3"
         pauseTasks()
+        resolveRequest(in: 0.25)
         waitUntil { [self] done in
-            execute(endpoint: endpoint) { _ in
+            _ = execute(endpoint: endpoint) { _ in
+                //
+            }.ensure {
                 done()
             }
         }
         expect(self.client.queue.getSpecific(key: CurrentContextKey)).to(beNil())
-    }
-    
-    // MARK: - Utilities
-    
-    fileprivate func pauseTasks() {
-        stub(transport) { stub in
-            when(stub.startTask()).thenDoNothing()
-        }
-    }
-    
-    private func execute(endpoint: Endpoint, with aBlock: @escaping (Transport) -> Void) {
-        let _: Promise<Void> = endpoint.execute {
-            Eval(aBlock)
-        }
     }
 }
