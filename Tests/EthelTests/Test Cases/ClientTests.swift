@@ -59,7 +59,6 @@ class ClientTests: ClientTestCase {
         pauseTasks()
         waitUntil { done in
             self.execute(endpoint: endpoint) { aTransport in
-                let url = aTransport.request?.url
                 done()
             }
         }
