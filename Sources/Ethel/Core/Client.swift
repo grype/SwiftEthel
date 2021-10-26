@@ -149,7 +149,9 @@ open class Client: NSObject, URLSessionDataDelegate {
                 endpoint.prepare().apply(to: transport)
                 block().apply(to: transport)
                 execute(transport: transport) {
-                    resolve(seal, transport: transport)
+                    inContext(context) {
+                        resolve(seal, transport: transport)
+                    }
                 }
             }
         }
