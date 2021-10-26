@@ -42,7 +42,11 @@ open class Transport: NSObject {
     
     public var contentWriter: ((Any) throws -> Data?)?
     
-    public var contentReader: ((Data) throws -> Any?)?
+    public var contentReader: ((Data) throws -> Any?)? {
+        didSet {
+            cachedResponseContents = nil
+        }
+    }
     
     public private(set) var session: URLSession
     
@@ -76,6 +80,10 @@ open class Transport: NSObject {
     public func execute(completion aCompletionBlock: @escaping Completion) -> URLSessionTask {
         assert(request != nil, "Transport has no request object")
         completion = aCompletionBlock
+        cachedResponseContents = nil
+        isComplete = false
+        response = nil
+        responseData = nil
         task = session.dataTask(with: request!)
         startTask()
         emit(self, on: Beacon.ethel)
