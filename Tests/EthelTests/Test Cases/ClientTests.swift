@@ -80,32 +80,30 @@ class ClientTests: ClientTestCase {
     
     func testCreatesRequestContext() {
         let endpoint = client / "somewhere1"
-        var context: Context?
         pauseTasks()
         waitUntil { [self] done in
             execute(endpoint: endpoint) { _ in
-                context = client.queue.getSpecific(key: CurrentContextKey)
+                expect(client.queue.getSpecific(key: CurrentContextKey)).toNot(beNil())
                 done()
             }
         }
-        expect(context).toNot(beNil())
     }
     
     func testContextHasTransport() {
         let endpoint = client / "somewhere2"
-        var context: Context?
         pauseTasks()
         waitUntil { [self] done in
             execute(endpoint: endpoint) { _ in
-                context = client.queue.getSpecific(key: CurrentContextKey)
+                let context = client.queue.getSpecific(key: CurrentContextKey)
+                expect(context?.transport).toNot(beNil())
                 done()
             }
         }
-        expect(context?.transport).toNot(beNil())
     }
     
     func testContextExistsOnlyDuringExecution() {
         let endpoint = client / "somewhere3"
+        expect(self.client.queue.getSpecific(key: CurrentContextKey)).to(beNil())
         pauseTasks()
         resolveRequest(in: 0.25)
         waitUntil { [self] done in
@@ -116,5 +114,6 @@ class ClientTests: ClientTestCase {
                 done()
             }
         }
+        expect(self.client.queue.getSpecific(key: CurrentContextKey)).to(beNil())
     }
 }
