@@ -83,9 +83,9 @@ open class Client: NSObject, URLSessionDataDelegate {
         self.init(URL(string: urlString)!, sessionConfiguration: sessionConfiguration)
     }
     
-    public init(_ anUrl: URL, sessionConfiguration: URLSessionConfiguration? = nil, queue aQueue: DispatchQueue = DispatchQueue.global(qos: .utility)) {
-        queue = aQueue
+    public init(_ anUrl: URL, sessionConfiguration: URLSessionConfiguration? = nil, queue aQueue: DispatchQueue? = nil) {
         baseUrl = anUrl
+        queue = aQueue ?? DispatchQueue(label: "Ethel.Client", qos: .background, attributes: [], autoreleaseFrequency: .inherit, target: nil)
         super.init()
         initializeURLSession(sessionConfiguration)
     }
