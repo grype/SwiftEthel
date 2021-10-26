@@ -90,7 +90,10 @@ open class Transport: NSObject {
     
     open var requestContents: Any? {
         get { request?.httpBody }
-        set { try? setRequestContents(newValue) }
+        set {
+            do { try setRequestContents(newValue) }
+            catch { emit(error: error) }
+        }
     }
     
     open func setRequestContents(_ contents: Any?) throws {
@@ -102,7 +105,10 @@ open class Transport: NSObject {
         }
     }
     
-    open var responseContents: Any? { try? getResponseContents() }
+    open var responseContents: Any? {
+        do { try getResponseContents() }
+        catch { emit(error: error) }
+    }
     
     open func getResponseContents() throws -> Any? {
         guard isComplete, let responseData = responseData else { return nil }
