@@ -106,14 +106,21 @@ open class Transport: NSObject {
     }
     
     open var responseContents: Any? {
-        do { try getResponseContents() }
+        do { return try getResponseContents() }
         catch { emit(error: error) }
+        return nil
     }
+    
+    private var cachedResponseContents: Any?
     
     open func getResponseContents() throws -> Any? {
         guard isComplete, let responseData = responseData else { return nil }
+        if let cached = cachedResponseContents {
+            return cached
+        }
         if let contentReader = contentReader {
-            return try contentReader(responseData)
+            cachedResponseContents = try contentReader(responseData)
+            return cachedResponseContents
         }
         return responseData
     }
