@@ -72,12 +72,14 @@ open class PluggableEndpoint: Endpoint {
 public func / <T: Endpoint>(left: T, right: String) -> PluggableEndpoint {
     let endpoint = PluggableEndpoint(on: left.client)
     endpoint.path = left.path?.path(resolving: right)
+    left.configureDerivedEndpoint(endpoint)
     return endpoint
 }
 
 public func / <T: Endpoint>(left: T, right: Path) -> PluggableEndpoint {
     let endpoint = PluggableEndpoint(on: left.client)
     endpoint.path = left.path?.path(resolving: right)
+    left.configureDerivedEndpoint(endpoint)
     return endpoint
 }
 
