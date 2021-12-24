@@ -114,14 +114,16 @@ open class Client: NSObject, URLSessionDataDelegate {
     // MARK: Resolving
     
     func resolve<T>(_ resolver: Resolver<T>, transport: Transport) {
-        var contents: T?
+        if let response = transport.response, let error = validate(response: response) {
+            resolver.reject(error)
+        }
+        else if let error = transport.responseError {
+            resolver.reject(error)
+        }
+        
         do {
-            contents = try transport.getResponseContents() as? T
-            var error: Error?
-            if let response = transport.response {
-                error = validate(response: response)
-            }
-            resolver.resolve(contents, error ?? transport.responseError)
+            let contents: T = try transport.getResponseContents() as! T
+            resolver.fulfill(contents)
         }
         catch {
             resolver.reject(error)

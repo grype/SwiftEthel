@@ -44,7 +44,7 @@ class ClientTestCase: XCTestCase {
     }
 
     @discardableResult
-    func execute(endpoint: Endpoint, with aBlock: @escaping (Transport) -> Void) -> Promise<Void> {
+    func execute(endpoint: Endpoint, with aBlock: @escaping (Transport) -> Void) -> Promise<Any?> {
         return endpoint.execute {
             Eval(aBlock)
         }

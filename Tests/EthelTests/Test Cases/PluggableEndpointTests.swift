@@ -30,7 +30,7 @@ class PluggableEndpointTests: ClientTestCase {
         pauseTasks()
         resolveRequest(in: 0.2)
         waitUntil { done in
-            let _: Promise<Void> = endpoint.get {
+            let _: Promise<Any?> = endpoint.get {
                 Eval { aTransport in
                     transport = aTransport
                 }
