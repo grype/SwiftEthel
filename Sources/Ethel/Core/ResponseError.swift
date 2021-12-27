@@ -1,30 +1,50 @@
 //
-//  File.swift
+//  ResponseError.swift
+//  
 //
-//
-//  Created by Pavel Skaldin on 1/9/20.
+//  Created by Pavel Skaldin on 12/27/21.
 //
 
 import Foundation
 
-public struct RequestError: Error {
-    public var request: URLRequest!
-    public init(_ aRequest: URLRequest) {
-        request = aRequest
+enum ResponseError : LocalizedError {
+    case unexpectedResponseType(expected: Any.Type, actual: Any.Type)
+    case httpError(code: Int)
+    
+    var errorDescription: String? {
+        switch self {
+        case let .unexpectedResponseType(expected, actual):
+            return "Unexpected response type - expected \(expected), but got \(actual))"
+        case let .httpError(code: code):
+            var description = "HTTP \(code)"
+            if let status = HTTPStatusCodes[code] {
+                description.append(contentsOf: ": \(status)")
+            }
+            return description
+        }
+    }
+
+    /// A localized message describing the reason for the failure.
+    var failureReason: String? {
+        switch self {
+        case let .unexpectedResponseType(expected: expected, actual: actual):
+            return "Client expected response data to be decodable as \(expected), but found \(actual) instead."
+        default:
+            return nil
+        }
+    }
+
+    /// A localized message describing how one might recover from the failure.
+    var recoverySuggestion: String? {
+        switch self {
+        case .unexpectedResponseType:
+            return "You may want to make the expected type optional, if the response returned no content. Otherwise, ensure correct response type is expected and that the received data can be decoded as the specified type."
+        default:
+            return nil
+        }
     }
 }
 
-public struct ResponseError: Error {
-    var code: Int
-
-    public var localizedDescription: String {
-        return "\(code) \(ResponseError.description(for: code))"
-    }
-
-    public static func description(for code: Int) -> String {
-        return HTTPStatusCodes[code] ?? "Unknown Error"
-    }
-}
 
 private var HTTPStatusCodes: [Int: String] = [
     100: "Continue",

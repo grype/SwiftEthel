@@ -122,8 +122,11 @@ open class Client: NSObject, URLSessionDataDelegate {
         }
         
         do {
-            let contents: T = try transport.getResponseContents() as! T
-            resolver.fulfill(contents)
+            let contents = try transport.getResponseContents()
+            guard let typedContents = contents as? T else {
+                throw ResponseError.unexpectedResponseType(expected: T.self, actual: type(of: contents))
+            }
+            resolver.fulfill(typedContents)
         }
         catch {
             resolver.reject(error)
@@ -137,7 +140,7 @@ open class Client: NSObject, URLSessionDataDelegate {
         if response.statusCode >= 200, response.statusCode < 300 {
             return nil
         }
-        return ResponseError(code: response.statusCode)
+        return ResponseError.httpError(code: response.statusCode)
     }
     
     // MARK: Executing

@@ -58,7 +58,7 @@ class ClientTests: ClientTestCase {
         let endpoint = client / "/absolute"
         pauseTasks()
         waitUntil { done in
-            self.execute(endpoint: endpoint) { aTransport in
+            self.execute(endpoint: endpoint) { _ in
                 done()
             }
         }
@@ -116,4 +116,28 @@ class ClientTests: ClientTestCase {
         }
         expect(self.client.queue.getSpecific(key: CurrentContextKey)).to(beNil())
     }
+    
+    func testUnexpectedResponseType() {
+        var error: Error?
+        let endpoint = client / "omg"
+        let result: Promise<Uncodable> = endpoint.get {
+            DecodeJSON<Uncodable>()
+        }
+        result.catch { anError in
+            error = anError
+        }
+        pauseTasks()
+        resolveRequest(in: 0.25)
+        waitUntil { [self] done in
+            _ = execute(endpoint: endpoint) { _ in
+            }.ensure {
+                done()
+            }
+        }
+        expect(error).toNot(beNil())
+    }
+}
+
+class Uncodable: Codable {
+    var uncodable: Uncodable?
 }
