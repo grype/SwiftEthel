@@ -21,7 +21,7 @@ class GHGistEndpoint: GHEndpoint {
         }
     }
     
-    func delete() -> Promise<Void> {
+    func delete() -> Promise<Any?> {
         execute {
             Delete()
         }
