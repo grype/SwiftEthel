@@ -204,13 +204,18 @@ open class Client: NSObject, URLSessionDataDelegate {
         else {
             emit(task, on: Beacon.ethel)
         }
-        tasks.forEach { task, transport in
-            transport.urlSession(session, task: task, didCompleteWithError: error)
+        guard let transport = tasks[task] else {
+            emit("Could not find task in registry: \(task)")
+            return
         }
+        transport.urlSession(session, task: task, didCompleteWithError: error)
     }
     
     open func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
-        guard let transport = tasks[dataTask] else { return }
+        guard let transport = tasks[dataTask] else {
+            emit("Could not find task in registry: \(dataTask)")
+            return
+        }
         transport.urlSession(session, dataTask: dataTask, didReceive: data)
     }
 }
