@@ -31,14 +31,12 @@ open class Transport: NSObject {
     // MARK: - Types
     
     public enum RequestType {
-        case data, download, upload
+        case data, download, uploadData(Data), uploadFile(URL)
     }
     
     public typealias Completion = (Transport, URLSessionTask?) -> Void
     
     // MARK: - Properties
-    
-    public var type: RequestType = .data
     
     public var contentWriter: ((Any) throws -> Data?)?
     
@@ -53,6 +51,8 @@ open class Transport: NSObject {
     public var request: URLRequest? {
         didSet { request?.transport = self }
     }
+    
+    public var requestType: RequestType
     
     public fileprivate(set) var response: URLResponse? {
         didSet { response?.transport = self }
@@ -70,8 +70,9 @@ open class Transport: NSObject {
     
     // MARK: - Initializating
     
-    public init(_ aSession: URLSession) {
+    public init(_ aSession: URLSession, requestType aRequestType: RequestType = .data) {
         session = aSession
+        requestType = aRequestType
         super.init()
     }
     
@@ -88,6 +89,19 @@ open class Transport: NSObject {
         startTask()
         emit(self, on: Beacon.ethel)
         return task!
+    }
+    
+    func createTask() -> URLSessionTask {
+        switch requestType {
+        case .download:
+            return session.downloadTask(with: request!)
+        case let .uploadData(data):
+            return session.uploadTask(with: request!, from: data)
+        case let .uploadFile(url):
+            return session.uploadTask(with: request!, fromFile: url)
+        case .data:
+            return session.dataTask(with: request!)
+        }
     }
     
     func startTask() {
@@ -209,7 +223,7 @@ extension Transport: URLSessionDataDelegate {
 extension Transport: NSCopying {
     public func copy(with zone: NSZone? = nil) -> Any {
         let transport = Transport(session)
-        transport.type = type
+        transport.requestType = requestType
         transport.request = request
         transport.response = response
         transport.contentReader = contentReader
