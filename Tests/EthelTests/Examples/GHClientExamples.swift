@@ -225,6 +225,23 @@ class GHClientExamples: XCTestCase {
         expect(results).toNot(beNil())
         expect(results!.count) == limit
     }
+    
+    func testListingRepositoryDirectory() {
+        let client = client
+        var result: OneOrMany<GHFileDescription>?
+        waitUntil { done in
+            DispatchQueue.global(qos: .background).async {
+                result = client.repository("SwiftEthel", owner: "grype").contents["README.md"]
+                done()
+            }
+        }
+        expect(result).toNot(beNil())
+        if case let .one(aFile) = result {
+            expect(aFile.path).to(equal("README.md"))
+        } else {
+            expect(result).to(beNil())
+        }
+    }
 
 //    // MARK: - Subscripting
 //

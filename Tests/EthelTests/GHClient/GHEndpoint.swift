@@ -22,4 +22,12 @@ class GHEndpoint: Endpoint {
     required init(on aClient: Client) {
         client = aClient
     }
+    
+    func configureDerivedEndpoint(_ anEndpoint: Endpoint) {
+        // Intentionally blank
+        // Since there's a default implementation defined in the protocol extension
+        // any subclass of `GHEndpoint` that wishes to implement this method, relies on
+        // this class to implement is in the first place, otherwise, Swift will call
+        // the default implementation. Swift...
+    }
 }

@@ -26,14 +26,14 @@ public class MockTransport: Transport, Cuckoo.ClassMock {
     
     
     
-    public override var type: RequestType {
+    public override var requestType: RequestType {
         get {
             return cuckoo_manager.getter("type",
                 superclassCall:
                     
-                    super.type
+                    super.requestType
                     ,
-                defaultCall: __defaultImplStub!.type)
+                defaultCall: __defaultImplStub!.requestType)
         }
         
         set {
@@ -41,9 +41,9 @@ public class MockTransport: Transport, Cuckoo.ClassMock {
                 value: newValue,
                 superclassCall:
                     
-                    super.type = newValue
+                    super.requestType = newValue
                     ,
-                defaultCall: __defaultImplStub!.type = newValue)
+                defaultCall: __defaultImplStub!.requestType = newValue)
         }
         
     }
@@ -525,7 +525,7 @@ public class MockTransport: Transport, Cuckoo.ClassMock {
 public class TransportStub: Transport {
     
     
-    public override var type: RequestType {
+    public override var requestType: RequestType {
         get {
             return DefaultValueRegistry.defaultValue(for: (RequestType).self)
         }
