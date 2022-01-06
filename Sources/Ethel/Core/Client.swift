@@ -68,7 +68,8 @@ public typealias TransportBlock = (Transport) -> Void
    This makes it possible to mimic the API map.
  
  */
-open class Client: NSObject, URLSessionDataDelegate {
+open class Client: NSObject, URLSessionDataDelegate, URLSessionDownloadDelegate {
+    
     open private(set) var baseUrl: URL
     
     open private(set) var session: URLSession!
@@ -217,6 +218,23 @@ open class Client: NSObject, URLSessionDataDelegate {
             return
         }
         transport.urlSession(session, dataTask: dataTask, didReceive: data)
+    }
+    
+    // MARK: - URLSessionDownloadDelegate
+    open func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
+        guard let transport = tasks[downloadTask] else {
+            emit("Could not find task in registry: \(downloadTask)")
+            return
+        }
+        transport.urlSession(session, downloadTask: downloadTask, didFinishDownloadingTo: location)
+    }
+    
+    public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
+        guard let transport = tasks[downloadTask] else {
+            emit("Could not find task in registry: \(downloadTask)")
+            return
+        }
+        transport.urlSession(session, downloadTask: downloadTask, didWriteData: bytesWritten, totalBytesWritten: totalBytesWritten, totalBytesExpectedToWrite: totalBytesExpectedToWrite)
     }
 }
 

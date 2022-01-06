@@ -35,3 +35,13 @@ public struct Write: TransportBuilding {
         aTransport.contentWriter = block
     }
 }
+
+public struct Download: TransportBuilding {
+    var url: URL
+    public init(to aUrl: URL) {
+        url = aUrl
+    }
+    public func apply(to aTransport: Transport) {
+        aTransport.requestType = .download(url)
+    }
+}

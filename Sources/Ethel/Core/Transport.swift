@@ -31,7 +31,7 @@ open class Transport: NSObject {
     // MARK: - Types
     
     public enum RequestType {
-        case data, download, uploadData(Data), uploadFile(URL)
+        case data, download(URL), uploadData(Data), uploadFile(URL)
     }
     
     public typealias Completion = (Transport, URLSessionTask?) -> Void
@@ -64,9 +64,13 @@ open class Transport: NSObject {
     
     public fileprivate(set) var responseError: Error?
     
+    public fileprivate(set) var responseDataURL: URL?
+    
     public fileprivate(set) var task: URLSessionTask?
     
     private var completion: Completion!
+    
+    private(set) var downloadProgress: Progress?
     
     // MARK: - Initializating
     
@@ -85,7 +89,7 @@ open class Transport: NSObject {
         isComplete = false
         response = nil
         responseData = nil
-        task = session.dataTask(with: request!)
+        task = createTask()
         startTask()
         emit(self, on: Beacon.ethel)
         return task!
@@ -108,7 +112,7 @@ open class Transport: NSObject {
         task?.resume()
     }
     
-    // MARK: - Contents
+    // MARK: - Request
     
     open var requestContents: Any? {
         get { request?.httpBody }
@@ -127,6 +131,8 @@ open class Transport: NSObject {
         }
     }
     
+    // MARK: - Response
+    
     open var responseContents: Any? {
         do { return try getResponseContents() }
         catch { emit(error: error) }
@@ -136,13 +142,27 @@ open class Transport: NSObject {
     private var cachedResponseContents: Any?
     
     open func getResponseContents() throws -> Any? {
-        guard isComplete, let responseData = responseData else { return nil }
+        guard isComplete else { return nil }
         if let cached = cachedResponseContents {
             return cached
         }
+        var result: Any?
+        switch requestType {
+        case .data:
+            result = try getResponseContentFromData()
+        case .download:
+            result = responseDataURL
+        default:
+            break
+        }
+        cachedResponseContents = result
+        return result
+    }
+    
+    func getResponseContentFromData() throws -> Any? {
+        guard let responseData = responseData else { return nil }
         if let contentReader = contentReader {
-            cachedResponseContents = try contentReader(responseData)
-            return cachedResponseContents
+            return try contentReader(responseData)
         }
         return responseData
     }
@@ -189,10 +209,49 @@ extension Transport: URLSessionDelegate {
     }
 }
 
+extension Transport: URLSessionDownloadDelegate {
+    public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
+        emit()
+        response = downloadTask.response
+        responseDataURL = location
+
+        guard case let .download(aUrl) = requestType else { return }
+
+        let fileManager = FileManager.default
+        guard fileManager.fileExists(atPath: location.path) else {
+            emit("Downloaded file does not appear to exist at: \(location.path)")
+            return
+        }
+        
+        do {
+            try fileManager.moveItem(at: location, to: aUrl)
+        }
+        catch {
+            emit(error: error)
+            responseError = error
+        }
+        completion(self, downloadTask)
+    }
+    
+    public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
+        guard totalBytesExpectedToWrite != NSURLSessionTransferSizeUnknown else { return }
+        if downloadProgress == nil {
+            downloadProgress = Progress(totalUnitCount: totalBytesExpectedToWrite)
+            downloadProgress?.kind = .file
+        }
+        else {
+            downloadProgress?.totalUnitCount = totalBytesExpectedToWrite
+        }
+        downloadProgress?.completedUnitCount = totalBytesWritten
+    }
+}
+
 // MARK: - URLSessionTaskDelegate
 
 extension Transport: URLSessionTaskDelegate {
     public func urlSession(_ session: URLSession, task aTask: URLSessionTask, didCompleteWithError error: Error?) {
+        if case .download = requestType { return }
+        emit()
         responseError = error
         response = aTask.response
         isComplete = true

@@ -242,6 +242,21 @@ class GHClientExamples: XCTestCase {
             expect(result).to(beNil())
         }
     }
+    
+    func testDownloadingFile() {
+        let location = URL(fileURLWithPath: NSHomeDirectory().appending("/Downloads/SwiftEthel-archive.zip"))
+        waitUntil(timeout: .seconds(10)) { done in
+            self.client.repository("SwiftEthel", owner: "grype").downloadArchive(to: location).done {
+                done()
+            }.catch { anError in
+                emit(error: anError)
+                done()
+            }
+        }
+        let fileManager = FileManager.default
+        expect(fileManager.fileExists(atPath: location.path)).to(beTrue())
+        try? fileManager.removeItem(at: location)
+    }
 
 //    // MARK: - Subscripting
 //

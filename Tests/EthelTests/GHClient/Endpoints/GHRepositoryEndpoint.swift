@@ -7,15 +7,24 @@
 
 import Ethel
 import Foundation
+import PromiseKit
 
 class GHRepositoryEndpoint: GHEndpoint, GHRepositoryBasedEndpoint {
     var owner: String?
     var repository: String?
+    override var path: Path? { "/repos/\(owner!)/\(repository!)" }
 
     override func configureDerivedEndpoint(_ anEndpoint: Endpoint) {
         guard var repoEndpoint = anEndpoint as? GHRepositoryBasedEndpoint else { return }
         repoEndpoint.repository = repository
         repoEndpoint.owner = owner
+    }
+
+    func downloadArchive(to aUrl: URL) -> Promise<Void> {
+        execute {
+            Get("zipball")
+            Download(to: aUrl)
+        }
     }
 }
 
