@@ -45,9 +45,11 @@ class GHClientExamples: XCTestCase {
         waitUntil { done in
             _ = publicGists.fetch().done { gists in
                 result.append(contentsOf: gists)
-            }.ensure {
                 done()
-            }
+            }.catch({ anError in
+                emit(error: anError)
+                done()
+            })
         }
         expect(result.isEmpty).to(beFalse())
     }
@@ -63,10 +65,10 @@ class GHClientExamples: XCTestCase {
                 self.client.gist(id: gists[0].id!).get()
             }.done { gist in
                 result = gist
-            }.ensure {
                 done()
             }.catch { error in
-                print("Error: \(error)")
+                emit(error: error)
+                done()
             }
         }
         expect(result).toNot(beNil())
@@ -78,7 +80,7 @@ class GHClientExamples: XCTestCase {
         let limit = 15
         var all: [GHGist] = .init()
         waitUntil { done in
-            self.client.queue.async {
+            DispatchQueue.global(qos: .background).async {
                 self.client.gists.public.forEach(limit: limit) { gist in
                     all.append(gist)
                 }
@@ -93,7 +95,7 @@ class GHClientExamples: XCTestCase {
         var all = [GHGist]()
         
         waitUntil { done in
-            self.client.queue.async {
+            DispatchQueue.global(qos: .background).async {
                 let found = self.client.gists.public.filter(limit: limit) { _ -> Bool in
                     Bool.random()
                 }
@@ -108,7 +110,7 @@ class GHClientExamples: XCTestCase {
         var found: GHGist?
         
         waitUntil { done in
-            self.client.queue.async {
+            DispatchQueue.global(qos: .background).async {
                 found = self.client.gists.public.first { gist -> Bool in
                     gist.files?.contains(where: { each -> Bool in
                         each.value.language != nil
@@ -119,16 +121,20 @@ class GHClientExamples: XCTestCase {
         }
         
         expect(found).toNot(beNil())
-        expect(found!.files).toNot(beNil())
-        expect(found!.files).to(containElementSatisfying { each in
-            each.value.language != nil
-        })
+        if let files = found?.files {
+            expect(files).to(containElementSatisfying { each in
+                each.value.language != nil
+            })
+        }
+        else {
+            expect(found?.files ?? nil).toNot(beNil())
+        }
     }
 
     func testSort() {
         var result = [GHGist]()
         waitUntil { done in
-            self.client.queue.async {
+            DispatchQueue.global(qos: .background).async {
                 let sorted = self.client.gists.public.sorted(limit: 10) { a, b -> Bool in
                     a.created! > b.created!
                 }
@@ -146,7 +152,7 @@ class GHClientExamples: XCTestCase {
     func testCompactMap() {
         var result = [String]()
         waitUntil { done in
-            self.client.queue.async {
+            DispatchQueue.global(qos: .background).async {
                 let mapped = self.client.gists.public.compactMap(limit: 10) { gist -> String? in
                     gist.gistDescription
                 }
@@ -165,7 +171,7 @@ class GHClientExamples: XCTestCase {
         var check: String?
         let limit = 3
         waitUntil { done in
-            self.client.queue.async {
+            DispatchQueue.global(qos: .background).async {
                 result = self.client.gists.public.reduce(limit: limit, initialResult: "") { run, gist -> String in
                     run.appending(gist.id!)
                 }
@@ -186,27 +192,27 @@ class GHClientExamples: XCTestCase {
         let limit = Int(client.gists.public.makeCursor().pageSize / 2)
 
         waitUntil { done in
-            self.client.queue.async {
+            DispatchQueue.global(qos: .background).async {
                 result = self.client.gists.public.prefix(limit)
                 done()
             }
         }
         expect(result).toNot(beNil())
-        expect(result!.count) == limit
+        expect(result?.count ?? 0) == limit
     }
 
     func testPrefixMaxLengthMulitpleRequests() {
         var result: [GHGist]?
         let limit = Int(Double(client.gists.public.makeCursor().pageSize) * 2.5)
         waitUntil { done in
-            self.client.queue.async {
+            DispatchQueue.global(qos: .background).async {
                 result = self.client.gists.public.prefix(limit)
                 done()
             }
         }
         
         expect(result).toNot(beNil())
-        expect(result!.count) == limit
+        expect(result?.count ?? 0) == limit
     }
 
     func testPrefixWhile() {
@@ -214,7 +220,7 @@ class GHClientExamples: XCTestCase {
         var count = 0
         let limit = Int(Double(client.gists.public.makeCursor().pageSize) * 2.5)
         waitUntil { done in
-            self.client.queue.async {
+            DispatchQueue.global(qos: .background).async {
                 results = self.client.gists.public.prefix { _ -> Bool in
                     count += 1
                     return count <= limit
@@ -223,13 +229,13 @@ class GHClientExamples: XCTestCase {
             }
         }
         expect(results).toNot(beNil())
-        expect(results!.count) == limit
+        expect(results?.count ?? 0) == limit
     }
     
     func testListingRepositoryDirectory() {
         let client = client
         var result: OneOrMany<GHFileDescription>?
-        waitUntil { done in
+        waitUntil(timeout: .seconds(10)) { done in
             DispatchQueue.global(qos: .background).async {
                 result = client.repository("SwiftEthel", owner: "grype").contents["README.md"]
                 done()
