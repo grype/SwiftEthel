@@ -220,6 +220,14 @@ open class Client: NSObject, URLSessionDataDelegate, URLSessionDownloadDelegate 
         transport.urlSession(session, dataTask: dataTask, didReceive: data)
     }
     
+    public func urlSession(_ session: URLSession, task: URLSessionTask, didSendBodyData bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) {
+        guard let transport = tasks[task] else {
+            emit("Could not find task in registry: \(task)")
+            return
+        }
+        transport.urlSession(session, task: task, didSendBodyData: bytesSent, totalBytesSent: totalBytesSent, totalBytesExpectedToSend: totalBytesExpectedToSend)
+    }
+    
     // MARK: - URLSessionDownloadDelegate
     open func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         guard let transport = tasks[downloadTask] else {

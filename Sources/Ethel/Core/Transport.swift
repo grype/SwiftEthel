@@ -7,6 +7,7 @@
 
 import Beacon
 import Foundation
+import SwiftAnnouncements
 
 /**
  I encapsulate a single complete communication between the client and the server.
@@ -29,6 +30,10 @@ import Foundation
  */
 open class Transport: NSObject {
     // MARK: - Types
+    
+    public enum Announcement: Announceable {
+        case taskStarted, taskEnded, uploadProgressed, downloadProgressed
+    }
     
     public enum RequestType {
         case data, download(URL), uploadData(Data), uploadFile(URL)
@@ -70,7 +75,11 @@ open class Transport: NSObject {
     
     private var completion: Completion!
     
-    private(set) var downloadProgress: Progress?
+    public private(set) var downloadProgress: Progress?
+    
+    public private(set) var uploadProgress: Progress?
+    
+    public let announcer: Announcer = .init()
     
     // MARK: - Initializating
     
@@ -91,6 +100,7 @@ open class Transport: NSObject {
         responseData = nil
         task = createTask()
         startTask()
+        announcer.announce(Announcement.taskStarted)
         emit(self, on: Beacon.ethel)
         return task!
     }
@@ -110,6 +120,11 @@ open class Transport: NSObject {
     
     func startTask() {
         task?.resume()
+    }
+    
+    func completed(_ aTask: URLSessionTask?) {
+        completion(self, aTask)
+        announcer.announce(Announcement.taskEnded)
     }
     
     // MARK: - Request
@@ -205,7 +220,19 @@ extension Transport: URLSessionDelegate {
         responseError = error
         isComplete = true
         emit(error: error, on: Beacon.ethel)
-        completion(self, nil)
+        completed(nil)
+    }
+    
+    public func urlSession(_ session: URLSession, task: URLSessionTask, didSendBodyData bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) {
+        guard totalBytesExpectedToSend != NSURLSessionTransferSizeUnknown else { return }
+        if uploadProgress == nil {
+            uploadProgress = Progress(totalUnitCount: totalBytesExpectedToSend)
+        }
+        else {
+            uploadProgress?.totalUnitCount = totalBytesExpectedToSend
+        }
+        uploadProgress?.completedUnitCount = totalBytesSent
+        announcer.announce(Announcement.uploadProgressed)
     }
 }
 
@@ -230,7 +257,7 @@ extension Transport: URLSessionDownloadDelegate {
             emit(error: error)
             responseError = error
         }
-        completion(self, downloadTask)
+        completed(downloadTask)
     }
     
     public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
@@ -243,6 +270,7 @@ extension Transport: URLSessionDownloadDelegate {
             downloadProgress?.totalUnitCount = totalBytesExpectedToWrite
         }
         downloadProgress?.completedUnitCount = totalBytesWritten
+        announcer.announce(Announcement.downloadProgressed)
     }
 }
 
@@ -261,7 +289,7 @@ extension Transport: URLSessionTaskDelegate {
         else {
             emit(self, on: Beacon.ethel)
         }
-        completion(self, task)
+        completed(task)
     }
 }
 
