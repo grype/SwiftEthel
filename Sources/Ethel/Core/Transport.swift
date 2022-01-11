@@ -163,12 +163,10 @@ open class Transport: NSObject {
         }
         var result: Any?
         switch requestType {
-        case .data:
-            result = try getResponseContentFromData()
         case .download:
             result = responseDataURL
         default:
-            break
+            result = try getResponseContentFromData()
         }
         cachedResponseContents = result
         return result
