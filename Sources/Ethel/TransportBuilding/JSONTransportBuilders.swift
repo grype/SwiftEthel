@@ -80,17 +80,13 @@ public struct EncodeJSON: TransportBuilding {
 
     public func apply(to aTransport: Transport) {
         aTransport.contentWriter = { content throws -> Data? in
-            var data: Data?
-            guard let encodableContent = content as? Encodable else { return data }
-            let value = AnyEncodable(encodableContent)
             do {
-                data = try encoder.encode(value)
+                return try encoder.encode(AnyEncodable(content))
             }
             catch {
                 emit(error: error)
                 throw error
             }
-            return data
         }
     }
 }
