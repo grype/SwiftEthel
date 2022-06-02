@@ -101,4 +101,20 @@ class JSONCodingTests: XCTestCase {
         expect(result).to(beAKindOf(Sample.self))
         expect(result).to(equal(sample))
     }
+    
+    func testEncodingTypeErasedValues() {
+        let encoder = EncodeJSON()
+        // apply to transport to setup content reader
+        encoder.apply(to: transport)
+        let sample: [String: Any] = ["one": 1, "two": "Two", "three": [1, 2, 3]]
+        let data = try! transport.contentWriter!(sample)!
+        let result = try! JSONSerialization.jsonObject(with: data) as! [String: Any]
+        expect(result["one"]).to(beAKindOf(Int.self))
+        expect(result["one"] as? Int) == sample["one"] as? Int
+        expect(result["two"]).to(beAKindOf(String.self))
+        expect(result["two"] as? String) == sample["two"] as? String
+        expect(result["three"]).to(beAKindOf([Int].self))
+        expect((result["three"] as? [Int])?.count) == 3
+        expect(result["three"] as? [Int]) == sample["three"] as? [Int]
+    }
 }
