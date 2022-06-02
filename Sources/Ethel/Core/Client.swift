@@ -147,16 +147,16 @@ open class Client: NSObject, URLSessionDataDelegate, URLSessionDownloadDelegate 
     // MARK: Executing
     
     open func execute<T>(_ endpoint: Endpoint, @TransportBuilder with block: @escaping () -> TransportBuilding) -> Promise<T> {
-        return Promise<T> { [self] seal in
+        return Promise<T> { seal in
             let transport = createTransport()
             let context = Context(endpoint: endpoint, transport: transport)
-            inContext(context) {
-                prepare().apply(to: transport)
+            self.inContext(context) {
+                self.prepare().apply(to: transport)
                 endpoint.prepare().apply(to: transport)
                 block().apply(to: transport)
-                execute(transport: transport) {
-                    inContext(context) {
-                        resolve(seal, transport: transport)
+                self.execute(transport: transport) {
+                    self.inContext(context) {
+                        self.resolve(seal, transport: transport)
                     }
                 }
             }

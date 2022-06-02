@@ -83,7 +83,7 @@ class ClientTests: ClientTestCase {
         pauseTasks()
         waitUntil { [self] done in
             execute(endpoint: endpoint) { _ in
-                expect(client.queue.getSpecific(key: CurrentContextKey)).toNot(beNil())
+                expect(self.client.queue.getSpecific(key: CurrentContextKey)).toNot(beNil())
                 done()
             }
         }
@@ -93,7 +93,7 @@ class ClientTests: ClientTestCase {
         let endpoint = client / "somewhere2"
         pauseTasks()
         waitUntil { [self] done in
-            execute(endpoint: endpoint) { _ in
+            execute(endpoint: endpoint) { [self] _ in
                 let context = client.queue.getSpecific(key: CurrentContextKey)
                 expect(context?.transport).toNot(beNil())
                 done()
