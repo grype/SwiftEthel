@@ -116,6 +116,21 @@ public struct AddQuery: TransportQuerying {
     }
 }
 
+public struct AddAllQueries: TransportBuilding {
+    public var queries: [URLQueryItem]
+    public init(_ queries: [URLQueryItem]) {
+        self.queries = queries
+    }
+    public init(_ queries: [(String, String)]) {
+        self.init(queries.map { URLQueryItem(name: $0.0, value: $0.1) })
+    }
+    public func apply(to aTransport: Transport) {
+        queries.forEach {
+            aTransport.request?.add(queryItem: $0)
+        }
+    }
+}
+
 // MARK: - Headers
 
 public struct SetHeader: TransportBuilding {
