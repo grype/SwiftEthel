@@ -12,7 +12,7 @@ This is a swift package. Use swift package manager to add to a project...
 
 ## Logging
 
-Ethel uses ![Beacon](https://github.com/grype/SwiftBeacon) for logging. To start logging, simply create a logger and start it on `Beacon.ethel` object - which is the default `Beacon` on which the framework emits signals.
+Ethel uses [Beacon](https://github.com/grype/SwiftBeacon) for logging. To start logging, simply create a logger and start it on `Beacon.ethel` object - which is the default `Beacon` on which the framework emits signals.
 
 ``` swift
 let logger = ConsoleLogger(name: "Playground")
