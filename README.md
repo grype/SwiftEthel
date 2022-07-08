@@ -1,6 +1,6 @@
 # Ethel
 
-![Build status](https://travis-ci.com/grype/SwiftEthel.svg?branch=main)
+[![CI](https://github.com/grype/SwiftEthel/actions/workflows/swift.yml/badge.svg)](https://github.com/grype/SwiftEthel/actions/workflows/swift.yml)
 
 Lightweight framework for composing web service clients in Swift. It encourages to reason about web services in terms of logical structures, and promotes clean and easy to maintain architecture.
 
