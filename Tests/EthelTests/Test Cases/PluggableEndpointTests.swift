@@ -1,8 +1,9 @@
 //
-//  File.swift
-//
+//  PluggableEndpointTests.swift
+//  Ethel
 //
 //  Created by Pavel Skaldin on 1/27/20.
+//  Copyright © 2020 Pavel Skaldin. All rights reserved.
 //
 
 @testable import Ethel

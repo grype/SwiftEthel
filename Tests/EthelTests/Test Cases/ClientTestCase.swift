@@ -1,8 +1,9 @@
 //
 //  ClientTestCase.swift
-//
+//  Ethel
 //
 //  Created by Pavel Skaldin on 10/24/21.
+//  Copyright © 2021 Pavel Skaldin. All rights reserved.
 //
 
 import Cuckoo

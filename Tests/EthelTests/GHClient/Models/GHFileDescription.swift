@@ -1,8 +1,9 @@
 //
 //  GHFileDescription.swift
-//
+//  Ethel
 //
 //  Created by Pavel Skaldin on 1/4/22.
+//  Copyright © 2022 Pavel Skaldin. All rights reserved.
 //
 
 import Foundation

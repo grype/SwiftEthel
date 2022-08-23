@@ -1,8 +1,9 @@
 //
-//  File.swift
-//  
+//  RequestTransportBuilderTests.swift
+//  Ethel
 //
 //  Created by Pavel Skaldin on 7/6/22.
+//  Copyright © 2022 Pavel Skaldin. All rights reserved.
 //
 
 @testable import Ethel

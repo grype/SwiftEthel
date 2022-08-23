@@ -1,8 +1,9 @@
 //
-//  File.swift
-//
+//  GHRepositoryBasedEndpoint.swift
+//  Ethel
 //
 //  Created by Pavel Skaldin on 1/5/22.
+//  Copyright © 2022 Pavel Skaldin. All rights reserved.
 //
 
 import Ethel

@@ -1,8 +1,9 @@
 //
-//  File.swift
-//
+//  GHClientExamples.swift
+//  Ethel
 //
 //  Created by Pavel Skaldin on 1/8/20.
+//  Copyright © 2020 Pavel Skaldin. All rights reserved.
 //
 
 import Beacon

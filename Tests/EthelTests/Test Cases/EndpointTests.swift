@@ -1,8 +1,9 @@
 //
-//  File.swift
-//  
+//  EndpointTests.swift
+//  Ethel
 //
 //  Created by Pavel Skaldin on 12/22/21.
+//  Copyright © 2021 Pavel Skaldin. All rights reserved.
 //
 
 import Cuckoo

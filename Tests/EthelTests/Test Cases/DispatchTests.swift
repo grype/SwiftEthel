@@ -1,8 +1,9 @@
 //
-//  File.swift
-//
+//  DispatchTests.swift
+//  Ethel
 //
 //  Created by Pavel Skaldin on 10/26/21.
+//  Copyright © 2021 Pavel Skaldin. All rights reserved.
 //
 
 @testable import Ethel
