@@ -8,11 +8,11 @@
 
 import Foundation
 
-enum ResponseError : LocalizedError {
+public enum ResponseError : LocalizedError {
     case unexpectedResponseType(expected: Any.Type, actual: Any.Type)
     case httpError(code: Int)
     
-    var errorDescription: String? {
+    public var errorDescription: String? {
         switch self {
         case let .unexpectedResponseType(expected, actual):
             return "Unexpected response type - expected \(expected), but got \(actual))"
@@ -26,7 +26,7 @@ enum ResponseError : LocalizedError {
     }
 
     /// A localized message describing the reason for the failure.
-    var failureReason: String? {
+    public var failureReason: String? {
         switch self {
         case let .unexpectedResponseType(expected: expected, actual: actual):
             return "Client expected response data to be decodable as \(expected), but found \(actual) instead."
@@ -36,7 +36,7 @@ enum ResponseError : LocalizedError {
     }
 
     /// A localized message describing how one might recover from the failure.
-    var recoverySuggestion: String? {
+    public var recoverySuggestion: String? {
         switch self {
         case .unexpectedResponseType:
             return "You may want to make the expected type optional, if the response returned no content. Otherwise, ensure correct response type is expected and that the received data can be decoded as the specified type."
