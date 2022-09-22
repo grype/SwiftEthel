@@ -28,7 +28,7 @@ public extension Endpoint {
     
     func configureDerivedEndpoint(_ anEndpoint: Endpoint) {}
 
-    func execute<T>(@TransportBuilder _ block: @escaping () -> TransportBuilding) -> Promise<T> {
+    func execute<T>(@TransportBuilder _ block: @escaping () -> TransportBuilding) async throws -> T {
         if willLog(type: EndpointSignal.self, on: [Beacon.ethel]) {
             EndpointSignal(self).emit(on: [Beacon.ethel], userInfo: beaconUserInfo)
         }

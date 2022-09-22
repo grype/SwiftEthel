@@ -48,9 +48,9 @@ public class CursoredIterator<U: SequenceEndpoint, V: Cursor>: EndpointIterator 
     
     // MARK: Enumerating
     
-    open func next() -> Element? {
+    open func next() async throws -> Element? {
         if needsFetch {
-            fetch()
+            try await fetch()
             currentOffset = 0
         }
         
@@ -61,13 +61,8 @@ public class CursoredIterator<U: SequenceEndpoint, V: Cursor>: EndpointIterator 
         return result
     }
     
-    open func fetch() {
-        do {
-            elements = try endpoint.next(with: self as! U.Iterator).wait()
-        } catch {
-            elements = nil
-            emit(error: error, on: Beacon.ethel)
-        }
+    open func fetch() async throws {
+        elements = try await endpoint.next(with: self as! U.Iterator)
     }
 }
 
@@ -80,7 +75,7 @@ public class CursoredIterator<U: SequenceEndpoint, V: Cursor>: EndpointIterator 
 public protocol CursoredEndpoint: SequenceEndpoint {
     associatedtype EndpointCursor: Cursor
     func makeCursor() -> EndpointCursor
-    func next(with: EndpointCursor) -> Promise<[Element]>
+    func next(with: EndpointCursor) async throws -> [Element]
 }
 
 public extension CursoredEndpoint {
@@ -88,8 +83,8 @@ public extension CursoredEndpoint {
         return CursoredIterator(endpoint: self, cursor: makeCursor())
     }
     
-    func next(with anIterator: Iterator) -> Promise<[Element]> {
+    func next(with anIterator: Iterator) async throws -> [Element] {
         let cursoredIterator = anIterator as! CursoredIterator<Self, EndpointCursor>
-        return next(with: cursoredIterator.cursor)
+        return try await next(with: cursoredIterator.cursor)
     }
 }

@@ -44,7 +44,7 @@ public protocol SequenceEndpoint: Sequence {
     associatedtype Iterator = EndpointIterator
     
     func makeIterator() -> Iterator
-    func next(with: Iterator) -> Promise<[Element]>
+    func next(with: Iterator) async throws -> [Element]
     
     func forEach(limit: Int, body: (Element) throws -> Void) rethrows
     func forEach(until: (Element) -> Bool, body: (Element) throws -> Void) rethrows

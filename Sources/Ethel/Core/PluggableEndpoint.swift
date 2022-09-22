@@ -17,55 +17,54 @@ open class PluggableEndpoint: Endpoint {
         client = aClient
     }
     
-    open func get<T>(@TransportBuilder _ block: @escaping ()->TransportBuilding) -> Promise<T> {
-        execute {
+    open func get<T>(@TransportBuilder _ block: @escaping () -> TransportBuilding) async throws -> T {
+        try await execute {
             Get()
             block()
         }
     }
     
-    open func delete<T>(@TransportBuilder _ block: @escaping ()->TransportBuilding) -> Promise<T> {
-        execute {
+    open func delete<T>(@TransportBuilder _ block: @escaping () -> TransportBuilding) async throws -> T {
+        try await execute {
             Delete()
             block()
         }
     }
     
-    open func post<T>(@TransportBuilder _ block: @escaping ()->TransportBuilding) -> Promise<T> {
-        execute {
+    open func post<T>(@TransportBuilder _ block: @escaping () -> TransportBuilding) async throws -> T {
+        try await execute {
             Post()
             block()
         }
     }
     
-    open func patch<T>(@TransportBuilder _ block: @escaping ()->TransportBuilding) -> Promise<T> {
-        execute {
+    open func patch<T>(@TransportBuilder _ block: @escaping () -> TransportBuilding) async throws -> T {
+        try await execute {
             Patch()
             block()
         }
     }
     
-    open func put<T>(@TransportBuilder _ block: @escaping ()->TransportBuilding) -> Promise<T> {
-        execute {
+    open func put<T>(@TransportBuilder _ block: @escaping () -> TransportBuilding) async throws -> T {
+        try await execute {
             Put()
             block()
         }
     }
     
-    open func head<T>(@TransportBuilder _ block: @escaping ()->TransportBuilding) -> Promise<T> {
-        execute {
+    open func head<T>(@TransportBuilder _ block: @escaping () -> TransportBuilding) async throws -> T {
+        try await execute {
             Head()
             block()
         }
     }
     
-    open func options<T>(@TransportBuilder _ block: @escaping ()->TransportBuilding) -> Promise<T> {
-        execute {
+    open func options<T>(@TransportBuilder _ block: @escaping () -> TransportBuilding) async throws -> T {
+        try await execute {
             Options()
             block()
         }
     }
-    
 }
 
 public func / <T: Endpoint>(left: T, right: String) -> PluggableEndpoint {
