@@ -8,7 +8,6 @@
 
 @testable import Ethel
 import Foundation
-import PromiseKit
 
 /**
  I am a base Endpoint on which all other endpoints build on.

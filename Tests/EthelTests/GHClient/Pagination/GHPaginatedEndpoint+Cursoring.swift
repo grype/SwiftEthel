@@ -8,7 +8,6 @@
 
 @testable import Ethel
 import Foundation
-import PromiseKit
 
 extension GHPaginatedEndpoint: CursoredEndpoint {
     typealias EndpointCursor = GHPageCursor

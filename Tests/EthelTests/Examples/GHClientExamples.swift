@@ -9,7 +9,6 @@
 import Beacon
 @testable import Ethel
 import Nimble
-import PromiseKit
 import XCTest
 
 /**

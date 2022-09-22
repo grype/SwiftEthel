@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import PromiseKit
 
 open class PluggableEndpoint: Endpoint {
     public var client: Client

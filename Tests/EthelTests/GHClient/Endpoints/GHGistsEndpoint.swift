@@ -8,7 +8,6 @@
 
 @testable import Ethel
 import Foundation
-import PromiseKit
 
 class GHGistsEndpoint: GHPaginatedEndpoint<GHGist> {
     override var path: Path? { "/gists" }

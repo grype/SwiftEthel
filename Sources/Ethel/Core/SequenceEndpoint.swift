@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import PromiseKit
 
 struct LimitError: Error {}
 

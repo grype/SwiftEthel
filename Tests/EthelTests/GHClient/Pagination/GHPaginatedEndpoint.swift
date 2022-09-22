@@ -8,7 +8,6 @@
 
 @testable import Ethel
 import Foundation
-import PromiseKit
 
 /**
  I specialize the base `GHEndpoint` class with support for pagination.

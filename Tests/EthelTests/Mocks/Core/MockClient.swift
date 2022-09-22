@@ -3,7 +3,6 @@ import Cuckoo
 
 import Beacon
 import Foundation
-import PromiseKit
 
 
 public class MockClient: Client, Cuckoo.ClassMock {

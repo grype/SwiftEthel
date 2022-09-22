@@ -8,7 +8,6 @@
 
 import Ethel
 import Foundation
-import PromiseKit
 
 class GHRepositoryEndpoint: GHEndpoint, GHRepositoryBasedEndpoint {
     var owner: String?

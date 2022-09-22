@@ -8,7 +8,6 @@
 
 import Beacon
 import Foundation
-import PromiseKit
 
 // MARK: - Endpoint
 

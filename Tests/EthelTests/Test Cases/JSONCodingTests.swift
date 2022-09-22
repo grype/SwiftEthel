@@ -10,7 +10,6 @@ import Cuckoo
 @testable import Ethel
 import Foundation
 import Nimble
-import PromiseKit
 import XCTest
 
 private struct Sample: Codable, Equatable {

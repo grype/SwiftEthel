@@ -9,7 +9,6 @@
 @testable import Ethel
 import Foundation
 import Nimble
-import PromiseKit
 import XCTest
 
 class RequestTransportBuilderTests: ClientTestCase {

@@ -1,88 +1,77 @@
 {
-  "object": {
-    "pins": [
-      {
-        "package": "AnyCodable",
-        "repositoryURL": "https://github.com/Flight-School/AnyCodable",
-        "state": {
-          "branch": null,
-          "revision": "b1a7a8a6186f2fcb28f7bda67cfc545de48b3c80",
-          "version": "0.6.2"
-        }
-      },
-      {
-        "package": "Cuckoo",
-        "repositoryURL": "https://github.com/Brightify/Cuckoo",
-        "state": {
-          "branch": null,
-          "revision": "79b13331e5068f28c563a66eac9c38c45ed7fef4",
-          "version": "1.5.2"
-        }
-      },
-      {
-        "package": "CwlCatchException",
-        "repositoryURL": "https://github.com/mattgallagher/CwlCatchException.git",
-        "state": {
-          "branch": null,
-          "revision": "35f9e770f54ce62dd8526470f14c6e137cef3eea",
-          "version": "2.1.1"
-        }
-      },
-      {
-        "package": "CwlPreconditionTesting",
-        "repositoryURL": "https://github.com/mattgallagher/CwlPreconditionTesting.git",
-        "state": {
-          "branch": null,
-          "revision": "c21f7bab5ca8eee0a9998bbd17ca1d0eb45d4688",
-          "version": "2.1.0"
-        }
-      },
-      {
-        "package": "Nimble",
-        "repositoryURL": "https://github.com/quick/nimble",
-        "state": {
-          "branch": null,
-          "revision": "c93f16c25af5770f0d3e6af27c9634640946b068",
-          "version": "9.2.1"
-        }
-      },
-      {
-        "package": "PromiseKit",
-        "repositoryURL": "https://github.com/mxcl/PromiseKit",
-        "state": {
-          "branch": null,
-          "revision": "93c8d41ce96ed78f36c3948be396d76f3ca3de1b",
-          "version": "6.16.2"
-        }
-      },
-      {
-        "package": "RWLock",
-        "repositoryURL": "https://github.com/grype/RWLock-Swift",
-        "state": {
-          "branch": null,
-          "revision": "fc7781a5b696c9e26942d8175b7d2363cd2d3680",
-          "version": "1.0.0"
-        }
-      },
-      {
-        "package": "SwiftAnnouncements",
-        "repositoryURL": "https://github.com/grype/SwiftAnnouncements",
-        "state": {
-          "branch": null,
-          "revision": "dedf28cd49da4ad893fefdc135b50c8e034966c6",
-          "version": "1.0.4"
-        }
-      },
-      {
-        "package": "Beacon",
-        "repositoryURL": "https://github.com/grype/SwiftBeacon",
-        "state": {
-          "branch": null,
-          "revision": "2c4e85d8a8ef1a61e8442c67642bbede88e26782",
-          "version": "2.1.0"
-        }
+  "pins" : [
+    {
+      "identity" : "anycodable",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Flight-School/AnyCodable",
+      "state" : {
+        "revision" : "b1a7a8a6186f2fcb28f7bda67cfc545de48b3c80",
+        "version" : "0.6.2"
       }
-    ]
-  },
-  "version": 1
+    },
+    {
+      "identity" : "cuckoo",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Brightify/Cuckoo",
+      "state" : {
+        "revision" : "79b13331e5068f28c563a66eac9c38c45ed7fef4",
+        "version" : "1.5.2"
+      }
+    },
+    {
+      "identity" : "cwlcatchexception",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mattgallagher/CwlCatchException.git",
+      "state" : {
+        "revision" : "35f9e770f54ce62dd8526470f14c6e137cef3eea",
+        "version" : "2.1.1"
+      }
+    },
+    {
+      "identity" : "cwlpreconditiontesting",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mattgallagher/CwlPreconditionTesting.git",
+      "state" : {
+        "revision" : "c21f7bab5ca8eee0a9998bbd17ca1d0eb45d4688",
+        "version" : "2.1.0"
+      }
+    },
+    {
+      "identity" : "nimble",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/quick/nimble",
+      "state" : {
+        "revision" : "c93f16c25af5770f0d3e6af27c9634640946b068",
+        "version" : "9.2.1"
+      }
+    },
+    {
+      "identity" : "rwlock-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/grype/RWLock-Swift",
+      "state" : {
+        "revision" : "fc7781a5b696c9e26942d8175b7d2363cd2d3680",
+        "version" : "1.0.0"
+      }
+    },
+    {
+      "identity" : "swiftannouncements",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/grype/SwiftAnnouncements",
+      "state" : {
+        "revision" : "dedf28cd49da4ad893fefdc135b50c8e034966c6",
+        "version" : "1.0.4"
+      }
+    },
+    {
+      "identity" : "swiftbeacon",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/grype/SwiftBeacon",
+      "state" : {
+        "revision" : "2c4e85d8a8ef1a61e8442c67642bbede88e26782",
+        "version" : "2.1.0"
+      }
+    }
+  ],
+  "version" : 2
 }

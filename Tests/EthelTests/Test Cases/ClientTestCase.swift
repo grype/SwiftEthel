@@ -9,7 +9,6 @@
 import Cuckoo
 @testable import Ethel
 import Foundation
-import PromiseKit
 import XCTest
 
 class ClientTestCase: XCTestCase {

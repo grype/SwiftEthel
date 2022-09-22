@@ -8,7 +8,6 @@
 
 import Beacon
 import Foundation
-import PromiseKit
 
 /**
  I am specialized implementation of `EndpointIterator` that uses

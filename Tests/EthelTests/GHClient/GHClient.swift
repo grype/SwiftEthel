@@ -8,7 +8,6 @@
 
 @testable import Ethel
 import Foundation
-import PromiseKit
 
 /**
  I am an example implementation of GitHub API client with support for gists.

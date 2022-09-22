@@ -8,7 +8,6 @@
 
 @testable import Ethel
 import Foundation
-import PromiseKit
 
 class GHGistEndpoint: GHEndpoint {
     override var path: Path? { "/gists/\(id)" }
