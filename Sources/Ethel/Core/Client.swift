@@ -6,9 +6,8 @@
 //  Copyright © 2019 Pavel Skaldin. All rights reserved.
 //
 
-import Foundation
-import PromiseKit
 import Beacon
+import Foundation
 
 // MARK: - Types
 
@@ -69,7 +68,6 @@ public typealias TransportBlock = (Transport) -> Void
  
  */
 open class Client: NSObject, URLSessionDataDelegate, URLSessionDownloadDelegate {
-    
     open private(set) var baseUrl: URL
     
     open private(set) var session: URLSession!
@@ -146,40 +144,23 @@ open class Client: NSObject, URLSessionDataDelegate, URLSessionDownloadDelegate 
     
     // MARK: Executing
     
-    open func execute<T>(_ endpoint: Endpoint, @TransportBuilder with block: @escaping () -> TransportBuilding) -> Promise<T> {
-        return Promise<T> { seal in
-            let transport = createTransport()
-            let context = Context(endpoint: endpoint, transport: transport)
-            self.inContext(context) {
-                self.prepare().apply(to: transport)
-                endpoint.prepare().apply(to: transport)
-                block().apply(to: transport)
-                self.execute(transport: transport) {
-                    self.inContext(context) {
-                        self.resolve(seal, transport: transport)
-                    }
-                }
-            }
+    open func execute<T>(_ endpoint: Endpoint, @TransportBuilder with block: () -> TransportBuilding) async throws -> T {
+        let transport = createTransport()
+        let context = Context(endpoint: endpoint, transport: transport)
+        inContext(context) {
+            self.prepare().apply(to: transport)
+            endpoint.prepare().apply(to: transport)
+            block().apply(to: transport)
+            try await transport.execute()
         }
     }
     
-    func inContext(_ aContext: Context, do aBlock: @escaping () -> Void) {
-        let queue = self.queue
-        queue.async {
+    func inContext(_ aContext: Context, do aBlock: () -> Void) {
+        queue.sync {
             let oldValue = queue.getSpecific(key: CurrentContextKey)
             queue.setSpecific(key: CurrentContextKey, value: aContext, during: aBlock)
             queue.setSpecific(key: CurrentContextKey, value: oldValue)
         }
-    }
-    
-    func execute(transport: Transport, completion: @escaping () -> Void) {
-        let task = transport.execute { _, task in
-            if let task = task {
-                self.tasks.removeValue(forKey: task)
-            }
-            completion()
-        }
-        tasks[task] = transport
     }
     
     // MARK: URLSessionDelegate
@@ -229,6 +210,7 @@ open class Client: NSObject, URLSessionDataDelegate, URLSessionDownloadDelegate 
     }
     
     // MARK: - URLSessionDownloadDelegate
+
     open func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         guard let transport = tasks[downloadTask] else {
             emit("Could not find task in registry: \(downloadTask)")
@@ -250,4 +232,16 @@ open class Client: NSObject, URLSessionDataDelegate, URLSessionDownloadDelegate 
 
 public func / <T: Endpoint>(left: Client, right: T.Type) -> T {
     return right.init(on: left)
+}
+
+extension DispatchQueue {
+    static var currentQueueLabel: String? {
+        let name = __dispatch_queue_get_label(nil)
+        return String(cString: name, encoding: .utf8)
+    }
+    
+    static var current: DispatchQueue? {
+        guard let label = currentQueueLabel else { return nil }
+        return DispatchQueue(label: label)
+    }
 }

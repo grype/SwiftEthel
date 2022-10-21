@@ -40,8 +40,6 @@ open class Transport: NSObject {
         case data, download(URL), uploadData(Data), uploadFile(URL)
     }
     
-    public typealias Completion = (Transport, URLSessionTask?) -> Void
-    
     // MARK: - Properties
     
     public var contentWriter: ((Any) throws -> Data?)?
@@ -72,10 +70,6 @@ open class Transport: NSObject {
     
     public fileprivate(set) var responseDataURL: URL?
     
-    public fileprivate(set) var task: URLSessionTask?
-    
-    private var completion: Completion!
-    
     public private(set) var downloadProgress: Progress?
     
     public private(set) var uploadProgress: Progress?
@@ -92,39 +86,29 @@ open class Transport: NSObject {
     
     // MARK: - Executing
     
-    public func execute(completion aCompletionBlock: @escaping Completion) -> URLSessionTask {
+    public func execute() async throws {
         assert(request != nil, "Transport has no request object")
-        completion = aCompletionBlock
         cachedResponseContents = nil
         isComplete = false
         response = nil
         responseData = nil
-        task = createTask()
-        startTask()
-        announcer.announce(Announcement.taskStarted)
-        emit(self, on: Beacon.ethel)
-        return task!
-    }
-    
-    func createTask() -> URLSessionTask {
+        responseDataURL = nil
         switch requestType {
         case .download:
-            return session.downloadTask(with: request!)
+            (responseDataURL, response) = try await session.download(for: request!, delegate: self)
         case let .uploadData(data):
-            return session.uploadTask(with: request!, from: data)
+            (responseData, response) = try await session.upload(for: request!, from: data, delegate: self)
         case let .uploadFile(url):
-            return session.uploadTask(with: request!, fromFile: url)
+            (responseData, response) = try await session.upload(for: request!, fromFile: url, delegate: self)
         case .data:
-            return session.dataTask(with: request!)
+            (responseData, response) = try await session.data(for: request!, delegate: self)
         }
-    }
-    
-    func startTask() {
-        task?.resume()
+        announcer.announce(Announcement.taskStarted)
+        isComplete = true
+        emit(self, on: Beacon.ethel)
     }
     
     func completed(_ aTask: URLSessionTask?) {
-        completion(self, aTask)
         announcer.announce(Announcement.taskEnded)
     }
     
@@ -317,7 +301,6 @@ extension Transport: NSCopying {
         transport.isComplete = isComplete
         transport.responseData = responseData
         transport.responseError = responseError
-        transport.completion = completion
         return transport
     }
 }
