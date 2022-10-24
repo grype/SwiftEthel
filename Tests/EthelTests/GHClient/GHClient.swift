@@ -15,7 +15,7 @@ import Foundation
  I basically provide two things: 1) common Transport configuration and 2) access to the top tier endpoints (e.g. /gists)
  */
 public class GHClient: Client {
-    static var `default` = GHClient("https://api.github.com/")
+    public static var `default` = GHClient("https://api.github.com/")
 
     /// Configure all requests with common headers
     @TransportBuilder
