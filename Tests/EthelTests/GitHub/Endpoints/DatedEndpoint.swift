@@ -8,12 +8,12 @@
 
 import Foundation
 
-protocol GHDatedEndpoint: AnyObject {
+protocol DatedEndpoint: AnyObject {
     var since: Date? { get set }
     func since(_ date: Date) -> Self
 }
 
-extension GHDatedEndpoint {
+extension DatedEndpoint {
     func since(_ date: Date) -> Self {
         since = date
         return self

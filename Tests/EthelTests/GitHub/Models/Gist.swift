@@ -8,14 +8,14 @@
 
 import Foundation
 
-struct GHGist : Codable, CustomStringConvertible {
+struct Gist : Codable, CustomStringConvertible {
     var id: String?
     var url: URL?
     var isPublic: Bool?
     var created: Date?
     var updated: Date?
     var gistDescription: String?
-    var files: [String : GHGistFile]?
+    var files: [String : GistFile]?
     
     enum CodingKeys: String, CodingKey {
         case id, url
@@ -34,22 +34,10 @@ struct GHGist : Codable, CustomStringConvertible {
         created = ISO8601DateFormatter().date(from: try container.decode(String.self, forKey: .created))
         updated = ISO8601DateFormatter().date(from: try container.decode(String.self, forKey: .updated))
         gistDescription = try? container.decode(String.self, forKey: .gistDescription)
-        files = try? container.decode([String:GHGistFile].self, forKey: .files)
+        files = try? container.decode([String:GistFile].self, forKey: .files)
     }
     
     var description: String {
         return "GHGist <\(id!)>"
-    }
-}
-
-struct GHGistFile : Codable {
-    var filename: String?
-    var gistType: String?
-    var language: String?
-    var url: URL?
-    var gistSize: Int = 0
-    
-    enum CodingKeys : String, CodingKey {
-        case filename, gistType = "type", language, url = "raw_url", gistSize = "size"
     }
 }

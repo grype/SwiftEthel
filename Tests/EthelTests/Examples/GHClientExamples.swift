@@ -16,7 +16,7 @@ import XCTest
  */
 
 class GHClientExamples: XCTestCase {
-    var client = GHClient.default
+    var client = GitHub.default
     var queue: DispatchQueue!
     let logger: ConsoleLogger = .init(name: "Examples")
 
@@ -56,7 +56,7 @@ class GHClientExamples: XCTestCase {
 
     func testForEach() async throws {
         let limit = 5
-        let all: [GHGist] = try await client.gists.public.prefix(limit).reduce(into: []) { partialResult, gist in
+        let all: [Gist] = try await client.gists.public.prefix(limit).reduce(into: []) { partialResult, gist in
             partialResult.append(gist)
         }
         expect(all.count) == limit
@@ -64,14 +64,14 @@ class GHClientExamples: XCTestCase {
 
     func testFilter() async throws {
         let limit = 5
-        let all: [GHGist] = try await client.gists.public.filter { _ -> Bool in true }.reduce(into: []) { partialResult, gist in
+        let all: [Gist] = try await client.gists.public.filter { _ -> Bool in true }.reduce(into: []) { partialResult, gist in
             partialResult.append(gist)
         }
         expect(all.count) == limit
     }
 
     func testFirst() async throws {
-        let found: GHGist? = try await client.gists.public.first { gist -> Bool in
+        let found: Gist? = try await client.gists.public.first { gist -> Bool in
             gist.files?.contains(where: { each -> Bool in
                 each.value.language != nil
             }) ?? false
@@ -88,7 +88,7 @@ class GHClientExamples: XCTestCase {
     }
 
     func testSort() async throws {
-        let result: [GHGist] = try await client.gists.public
+        let result: [Gist] = try await client.gists.public
             .reduce(into: []) { $0.append($1) }
             .sorted { a, b -> Bool in
                 a.created! > b.created!
@@ -112,28 +112,28 @@ class GHClientExamples: XCTestCase {
 
     func testReduce() async throws {
         let limit = 3
-        let result: [GHGist] = try await client.gists.public.prefix(limit).reduce(into: []) { $0.append($1) }
+        let result: [Gist] = try await client.gists.public.prefix(limit).reduce(into: []) { $0.append($1) }
         expect(result).toNot(beNil())
         expect(result.count) == limit
     }
 
     func testPrefixPartialMaxLength() async throws {
         let limit = Int(client.gists.public.makeCursor().pageSize / 2)
-        let result: [GHGist] = try await client.gists.public.prefix(limit).reduce(into: []) { $0.append($1) }
+        let result: [Gist] = try await client.gists.public.prefix(limit).reduce(into: []) { $0.append($1) }
         expect(result).toNot(beNil())
         expect(result.count) == limit
     }
 
     func testPrefixMaxLengthMulitpleRequests() async throws {
         let limit = Int(Double(client.gists.public.makeCursor().pageSize) * 2.5)
-        let result: [GHGist] = try await client.gists.public.prefix(limit).reduce(into: []) { $0.append($1) }
+        let result: [Gist] = try await client.gists.public.prefix(limit).reduce(into: []) { $0.append($1) }
         expect(result).toNot(beNil())
         expect(result.count) == limit
     }
 
     func testListingRepositoryDirectory() async throws {
         let client = client
-        let result: OneOrMany<GHFileDescription> = try await client.repository("SwiftEthel", owner: "grype").contents["README.md"]
+        let result: OneOrMany<FileDescription> = try await client.repository("SwiftEthel", owner: "grype").contents["README.md"]
         expect(result).toNot(beNil())
         if case let .one(aFile) = result {
             expect(aFile.path).to(equal("README.md"))

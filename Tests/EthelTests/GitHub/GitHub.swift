@@ -14,8 +14,8 @@ import Foundation
 
  I basically provide two things: 1) common Transport configuration and 2) access to the top tier endpoints (e.g. /gists)
  */
-public class GHClient: Client {
-    public static var `default` = GHClient("https://api.github.com/")
+public class GitHub: Client {
+    public static var `default` = GitHub("https://api.github.com/")
 
     /// Configure all requests with common headers
     @TransportBuilder
@@ -26,21 +26,20 @@ public class GHClient: Client {
 
     // MARK: - Endpoints
 
-    /// Returns `GHGistsEndpoint` configured with this client
-    var gists: GHGistsEndpoint { self / GHGistsEndpoint.self }
+    var gists: GistsEndpoint { self / GistsEndpoint.self }
     
-    func gist(id: String) async throws -> GHGist {
-        let endpoint = self / GHGistEndpoint.self
+    func gist(id: String) async throws -> Gist {
+        let endpoint = self / GistEndpoint.self
         endpoint.id = id
         return try await endpoint.execute{
             Get()
-            DecodeJSON<GHGist>()
+            DecodeJSON<Gist>()
         }
     }
 
     /// Returns `GHGistEndpoint` endpoint configured with this client
-    func gist(id: String) -> GHGistEndpoint {
-        let endpoint = self / GHGistEndpoint.self
+    func gist(id: String) -> GistEndpoint {
+        let endpoint = self / GistEndpoint.self
         endpoint.id = id
         return endpoint
     }

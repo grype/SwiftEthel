@@ -9,7 +9,7 @@
 import Ethel
 import Foundation
 
-protocol GHRepositoryBasedEndpoint {
+protocol RepositoryBasedEndpoint {
     var owner: String? { get set }
     var repository: String? { get set }
 }

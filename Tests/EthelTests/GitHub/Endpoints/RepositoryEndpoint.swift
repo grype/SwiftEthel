@@ -9,13 +9,13 @@
 import Ethel
 import Foundation
 
-class GHRepositoryEndpoint: GHEndpoint, GHRepositoryBasedEndpoint {
+class RepositoryEndpoint: GitHubEndpoint, RepositoryBasedEndpoint {
     var owner: String?
     var repository: String?
     override var path: Path? { "/repos/\(owner!)/\(repository!)" }
 
     override func configureDerivedEndpoint(_ anEndpoint: Endpoint) {
-        guard var repoEndpoint = anEndpoint as? GHRepositoryBasedEndpoint else { return }
+        guard var repoEndpoint = anEndpoint as? RepositoryBasedEndpoint else { return }
         repoEndpoint.repository = repository
         repoEndpoint.owner = owner
     }
@@ -28,9 +28,9 @@ class GHRepositoryEndpoint: GHEndpoint, GHRepositoryBasedEndpoint {
     }
 }
 
-extension GHClient {
-    func repository(_ name: String, owner: String) -> GHRepositoryEndpoint {
-        let ep = self / GHRepositoryEndpoint.self
+extension GitHub {
+    func repository(_ name: String, owner: String) -> RepositoryEndpoint {
+        let ep = self / RepositoryEndpoint.self
         ep.owner = owner
         ep.repository = name
         return ep

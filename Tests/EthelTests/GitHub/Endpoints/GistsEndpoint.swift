@@ -9,12 +9,12 @@
 @testable import Ethel
 import Foundation
 
-class GHGistsEndpoint: GHPaginatedEndpoint<GHGist>, GHDatedEndpoint {
+class GistsEndpoint: PaginatedEndpoint<Gist>, DatedEndpoint {
     override var path: Path? { "/gists" }
 
     var since: Date?
 
-    var `public`: GHPublicGistsEndpoint { self / GHPublicGistsEndpoint.self }
+    var `public`: PublicGistsEndpoint { self / PublicGistsEndpoint.self }
 
     @TransportBuilder override func prepare() -> TransportBuilding {
         super.prepare()

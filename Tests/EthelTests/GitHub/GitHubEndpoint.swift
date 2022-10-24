@@ -11,14 +11,14 @@ import Foundation
 
 /**
  I am a base Endpoint on which all other endpoints build on.
-
+ 
  I store instance of the client on which I execute requests, default to root path, and provide common date formatter.
  */
-class GHEndpoint: Endpoint {
+class GitHubEndpoint: Ethel.Endpoint {
     var client: Client
     var path: Path? { "/" }
     var dateFormatter = ISO8601DateFormatter()
-
+    
     required init(on aClient: Client) {
         client = aClient
     }

@@ -9,23 +9,23 @@
 import Ethel
 import Foundation
 
-class GHRepositoryContentsEndpoint: GHEndpoint, GHRepositoryBasedEndpoint {
+class RepositoryContentsEndpoint: GitHubEndpoint, RepositoryBasedEndpoint {
     var owner: String?
     var repository: String?
     override var path: Path? { "/repos/\(owner!)/\(repository!)/contents" }
 
-    func get(at aPath: Path) async throws -> OneOrMany<GHFileDescription> {
+    func get(at aPath: Path) async throws -> OneOrMany<FileDescription> {
         try await execute {
             Get(aPath)
-            DecodeJSON<OneOrMany<GHFileDescription>>()
+            DecodeJSON<OneOrMany<FileDescription>>()
         }
     }
 
-    subscript(path: Path) -> OneOrMany<GHFileDescription> {
+    subscript(path: Path) -> OneOrMany<FileDescription> {
         get async throws { try await get(at: path) }
     }
 }
 
-extension GHRepositoryEndpoint {
-    var contents: GHRepositoryContentsEndpoint { self / GHRepositoryContentsEndpoint.self }
+extension RepositoryEndpoint {
+    var contents: RepositoryContentsEndpoint { self / RepositoryContentsEndpoint.self }
 }

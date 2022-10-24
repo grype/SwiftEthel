@@ -9,14 +9,14 @@
 @testable import Ethel
 import Foundation
 
-class GHPageCursor: Cursor {
+class PageCursor: Cursor {
     var hasMore: Bool = true
     var page: Int = 1
     var pageSize: Int = 5
 }
 
-extension GHPageCursor: CustomStringConvertible {
+extension PageCursor: CustomStringConvertible {
     var description: String {
-        return "<GHPageCursor: \(Unmanaged.passUnretained(self).toOpaque())> page: \(page); pageSize: \(pageSize)"
+        return "<PageCursor: \(Unmanaged.passUnretained(self).toOpaque())> page: \(page); pageSize: \(pageSize)"
     }
 }

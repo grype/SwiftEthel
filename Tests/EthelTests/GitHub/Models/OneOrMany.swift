@@ -8,9 +8,18 @@
 
 import Foundation
 
+/**
+ I capture a one-or-many association.
+ 
+ I can be either `one` or `many`. I exist primarily to capture variable API responses,
+ where the response may encode or or many values.
+ */
 enum OneOrMany<Wrapped: Codable>: Codable {
     case one(Wrapped)
     case many([Wrapped])
+
+    // MARK: - Initialization
+
     public init(_ one: Wrapped) {
         self = .one(one)
     }

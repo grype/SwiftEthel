@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct GHFileDescription: Codable {
+struct FileDescription: Codable {
     enum CodingKeys: String, CodingKey {
         case type, encoding, size, name, path, content, sha, url, gitUrl = "git_url", htmlUrl = "html_url", downloadUrl = "download_url"
     }

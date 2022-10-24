@@ -11,7 +11,7 @@ import Foundation
 /**
  Subscripting support...
  */
-extension GHPaginatedEndpoint {
+extension PaginatedEndpoint {
     subscript(index: Int) -> Element? {
         get async throws {
             let cursor = makeCursor()

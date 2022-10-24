@@ -9,7 +9,7 @@
 @testable import Ethel
 import Foundation
 
-class GHGistEndpoint: GHEndpoint {
+class GistEndpoint: GitHubEndpoint {
     override var path: Path? { "/gists/\(String(describing: id))" }
 
     var id: String?

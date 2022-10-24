@@ -9,17 +9,17 @@
 @testable import Ethel
 import Foundation
 
-extension GHPaginatedEndpoint: CursoredEndpoint {
-    typealias EndpointCursor = GHPageCursor
+extension PaginatedEndpoint: CursoredEndpoint {
+    typealias EndpointCursor = PageCursor
 
-    func makeCursor() -> GHPageCursor {
-        let cursor = GHPageCursor()
+    func makeCursor() -> PageCursor {
+        let cursor = PageCursor()
         cursor.page = page
         cursor.pageSize = pageSize
         return cursor
     }
 
-    func next(with aCursor: GHPageCursor) async throws -> [Element] {
+    func next(with aCursor: PageCursor) async throws -> [Element] {
         page = aCursor.page
         pageSize = aCursor.pageSize
         let gists = try await execute {

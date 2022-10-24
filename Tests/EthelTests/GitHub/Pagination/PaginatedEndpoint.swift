@@ -12,7 +12,7 @@ import Foundation
 /**
  I specialize the base `GHEndpoint` class with support for pagination.
  */
-class GHPaginatedEndpoint<T: Decodable>: GHEndpoint {
+class PaginatedEndpoint<T: Decodable>: GitHubEndpoint {
     typealias Element = T
     
     var page: Int = 1
