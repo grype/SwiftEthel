@@ -59,8 +59,8 @@ class GHGistsEndpoint : Endpoint {
     
     override class var path: Path { Path() / "gists" }
     
-    func gist(withId id: String) -> Promise<GHGist> {
-        return getJSON(decoder: nil) { (transport) in
+    func gist(withId id: String) async throws -> GHGist {
+        try await getJSON(decoder: nil) { (transport) in
             transport.request?.url?.appendPathComponent(id)
         }
     }
