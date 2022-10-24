@@ -1,5 +1,5 @@
 //
-//  GHPublicGistsEndpoint.swift
+//  PublicGistsEndpoint.swift
 //  Ethel
 //
 //  Created by Pavel Skaldin on 1/25/20.

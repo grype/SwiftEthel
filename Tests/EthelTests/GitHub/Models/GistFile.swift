@@ -1,8 +1,9 @@
 //
-//  File.swift
+//  GistFile.swift
 //  
 //
 //  Created by Pavel Skaldin on 10/23/22.
+//  Copyright © 2022 Pavel Skaldin. All rights reserved.
 //
 
 import Foundation

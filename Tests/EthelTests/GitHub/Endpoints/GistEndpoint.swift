@@ -1,5 +1,5 @@
 //
-//  GHGistEndpoint.swift
+//  GistEndpoint.swift
 //  Ethel
 //
 //  Created by Pavel Skaldin on 10/3/21.

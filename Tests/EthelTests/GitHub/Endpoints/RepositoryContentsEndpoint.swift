@@ -1,5 +1,5 @@
 //
-//  GHRepositoryContentsEndpoint.swift
+//  RepositoryContentsEndpoint.swift
 //  Ethel
 //
 //  Created by Pavel Skaldin on 1/4/22.

@@ -1,5 +1,5 @@
 //
-//  GHPaginatedEndpoint.swift
+//  PaginatedEndpoint.swift
 //  Ethel
 //
 //  Created by Pavel Skaldin on 2/10/20.

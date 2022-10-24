@@ -1,5 +1,5 @@
 //
-//  GHFileDescription.swift
+//  FileDescription.swift
 //  Ethel
 //
 //  Created by Pavel Skaldin on 1/4/22.

@@ -1,5 +1,5 @@
 //
-//  GHPaginatedEndpoint+Cursoring.swift
+//  PaginatedEndpoint+Cursoring.swift
 //  Ethel
 //
 //  Created by Pavel Skaldin on 10/2/21.

@@ -1,5 +1,5 @@
 //
-//  GHClientExamples.swift
+//  GitHubExamples.swift
 //  Ethel
 //
 //  Created by Pavel Skaldin on 1/8/20.
@@ -15,7 +15,7 @@ import XCTest
  These are examples that actually generate requests and are not meant to be run as a unit test, as the requsts are lilekly to timeout at some point.
  */
 
-class GHClientExamples: XCTestCase {
+class GitHubExamples: XCTestCase {
     var client = GitHub.default
     var queue: DispatchQueue!
     let logger: ConsoleLogger = .init(name: "Examples")
@@ -64,7 +64,7 @@ class GHClientExamples: XCTestCase {
 
     func testFilter() async throws {
         let limit = 5
-        let all: [Gist] = try await client.gists.public.filter { _ -> Bool in true }.reduce(into: []) { partialResult, gist in
+        let all: [Gist] = try await client.gists.public.prefix(limit).filter { _ -> Bool in true }.reduce(into: []) { partialResult, gist in
             partialResult.append(gist)
         }
         expect(all.count) == limit
@@ -88,7 +88,8 @@ class GHClientExamples: XCTestCase {
     }
 
     func testSort() async throws {
-        let result: [Gist] = try await client.gists.public
+        let limit = 5
+        let result: [Gist] = try await client.gists.public.prefix(limit)
             .reduce(into: []) { $0.append($1) }
             .sorted { a, b -> Bool in
                 a.created! > b.created!
@@ -144,7 +145,7 @@ class GHClientExamples: XCTestCase {
 
     func testDownloadingFile() async throws {
         let location = URL(fileURLWithPath: NSHomeDirectory().appending("/Downloads/SwiftEthel-archive.zip"))
-        _ = try await client.repository("SwiftEthel", owner: "grype").downloadArchive(to: location)
+        let result = try await client.repository("SwiftEthel", owner: "grype").downloadArchive(to: location)
         let fileManager = FileManager.default
         expect(fileManager.fileExists(atPath: location.path)).to(beTrue())
         try? fileManager.removeItem(at: location)

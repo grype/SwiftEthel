@@ -1,5 +1,5 @@
 //
-//  GHPaginatedEndpoint+Subscripting.swift
+//  PaginatedEndpoint+Subscripting.swift
 //  Ethel
 //
 //  Created by Pavel Skaldin on 10/2/21.

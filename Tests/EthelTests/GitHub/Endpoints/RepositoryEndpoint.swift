@@ -1,5 +1,5 @@
 //
-//  GHRepositoryEndpoint.swift
+//  RepositoryEndpoint.swift
 //  Ethel
 //
 //  Created by Pavel Skaldin on 1/5/22.
@@ -20,11 +20,11 @@ class RepositoryEndpoint: GitHubEndpoint, RepositoryBasedEndpoint {
         repoEndpoint.owner = owner
     }
 
-    func downloadArchive(to aUrl: URL) async throws {
+    func downloadArchive(to aUrl: URL) async throws -> Any? {
         try await execute {
             Get("zipball")
             Download(to: aUrl)
-        } as Void
+        }
     }
 }
 

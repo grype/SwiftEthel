@@ -1,5 +1,5 @@
 //
-//  GHDatedEndpoint.swift
+//  DatedEndpoint.swift
 //
 //
 //  Created by Pavel Skaldin on 10/22/22.
