@@ -9,7 +9,7 @@
 @testable import Ethel
 import Foundation
 
-class GHGistsEndpoint: GHPaginatedEndpoint<GHGist> {
+class GHGistsEndpoint: GHPaginatedEndpoint<GHGist>, GHDatedEndpoint {
     override var path: Path? { "/gists" }
 
     var since: Date?

@@ -78,6 +78,6 @@ class RequestTransportBuilderTests: ClientTestCase {
     func testContent() {
         let data = "My Content".data(using: .utf8)
         Content(data).apply(to: transport)
-        expect(self.transport.requestContents as! Data) == data
+        expect(self.transport.requestContents as? Data) == data
     }
 }

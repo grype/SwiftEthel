@@ -20,11 +20,11 @@ class GHRepositoryEndpoint: GHEndpoint, GHRepositoryBasedEndpoint {
         repoEndpoint.owner = owner
     }
 
-    func downloadArchive(to aUrl: URL) -> Promise<Void> {
-        execute {
+    func downloadArchive(to aUrl: URL) async throws {
+        try await execute {
             Get("zipball")
             Download(to: aUrl)
-        }
+        } as Void
     }
 }
 

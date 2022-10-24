@@ -36,7 +36,7 @@ public struct CurrentContext: TransportBuilding {
     }
 
     public func apply(to aTransport: Transport) {
-        guard let context = queue.getSpecific(key: CurrentContextKey) else { return }
+        guard let context = Context.current else { return }
         block(context)
     }
 }

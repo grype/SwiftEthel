@@ -44,10 +44,6 @@ class JSONCodingTests: XCTestCase {
         client = MockClient(urlString, sessionConfiguration: URLSessionConfiguration.background(withIdentifier: "test-session")).withEnabledSuperclassSpy()
         transport = MockTransport(client.session).withEnabledSuperclassSpy()
         
-        stub(transport) { stub in
-            when(stub.startTask()).thenDoNothing()
-        }
-        
         stub(client) { stub in
             when(stub.createTransport()).thenReturn(transport)
         }

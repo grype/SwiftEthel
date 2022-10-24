@@ -65,10 +65,10 @@ public struct Download: TransportBuilding {
         var subscription: Subscription<Transport.Announcement>!
         subscription = aTransport.announcer.when(Transport.Announcement.self, subscriber: nil) { announcement, _ in
             switch announcement {
-            case Transport.Announcement.downloadProgressed:
+            case Transport.Announcement.downloadDidProgress:
                 guard let progress = aTransport.downloadProgress else { return }
                 progressBlock(progress, aTransport)
-            case Transport.Announcement.taskEnded:
+            case Transport.Announcement.didEndTask:
                 aTransport.announcer.remove(subscription: subscription)
             default:
                 break
@@ -114,10 +114,10 @@ public struct Upload: TransportBuilding {
         var subscription: Subscription<Transport.Announcement>!
         subscription = aTransport.announcer.when(Transport.Announcement.self, subscriber: nil) { announcement, _ in
             switch announcement {
-            case Transport.Announcement.downloadProgressed:
+            case Transport.Announcement.downloadDidProgress:
                 guard let progress = aTransport.uploadProgress else { return }
                 progressBlock(progress, aTransport)
-            case Transport.Announcement.taskEnded:
+            case Transport.Announcement.didEndTask:
                 aTransport.announcer.remove(subscription: subscription)
             default:
                 break

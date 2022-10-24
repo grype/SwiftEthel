@@ -62,7 +62,7 @@ public class CursoredIterator<U: SequenceEndpoint, V: Cursor>: EndpointIterator 
     }
     
     open func fetch() async throws {
-        elements = try await endpoint.next(with: self as! U.Iterator)
+        elements = try await endpoint.next(with: self as! U.AsyncIterator)
     }
 }
 
@@ -79,11 +79,11 @@ public protocol CursoredEndpoint: SequenceEndpoint {
 }
 
 public extension CursoredEndpoint {
-    func makeIterator() -> CursoredIterator<Self, EndpointCursor> {
+    func makeAsyncIterator() -> CursoredIterator<Self, EndpointCursor> {
         return CursoredIterator(endpoint: self, cursor: makeCursor())
     }
     
-    func next(with anIterator: Iterator) async throws -> [Element] {
+    func next(with anIterator: AsyncIterator) async throws -> [Element] {
         let cursoredIterator = anIterator as! CursoredIterator<Self, EndpointCursor>
         return try await next(with: cursoredIterator.cursor)
     }

@@ -13,16 +13,16 @@ class GHRepositoryContentsEndpoint: GHEndpoint, GHRepositoryBasedEndpoint {
     var owner: String?
     var repository: String?
     override var path: Path? { "/repos/\(owner!)/\(repository!)/contents" }
-    
-    func get(at aPath: Path) -> Promise<OneOrMany<GHFileDescription>> {
-        execute {
+
+    func get(at aPath: Path) async throws -> OneOrMany<GHFileDescription> {
+        try await execute {
             Get(aPath)
             DecodeJSON<OneOrMany<GHFileDescription>>()
         }
     }
-    
-    subscript(path: Path) -> OneOrMany<GHFileDescription>? {
-        try? self.get(at: path).wait()
+
+    subscript(path: Path) -> OneOrMany<GHFileDescription> {
+        get async throws { try await get(at: path) }
     }
 }
 

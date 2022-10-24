@@ -24,18 +24,13 @@ class PluggableEndpointTests: ClientTestCase {
         expect(endpoint.path) == "hello/world"
     }
 
-    func testGet() {
+    func testGet() async throws {
         let endpoint = client / "hello"
         var transport: Transport?
-        pauseTasks()
-        resolveRequest(in: 0.2)
-        waitUntil { done in
-            let _: Promise<Any?> = endpoint.get {
-                Eval { aTransport in
-                    transport = aTransport
-                }
-            }.ensure {
-                done()
+        stubOutRequests()
+        let _: Any? = try await endpoint.get {
+            Eval { aTransport in
+                transport = aTransport
             }
         }
         expect(transport?.request?.url).toNot(beNil())

@@ -74,8 +74,6 @@ open class Client: NSObject, URLSessionDataDelegate, URLSessionDownloadDelegate 
     
     private(set) var tasks = [URLSessionTask: Transport]()
     
-    public private(set) var queue: DispatchQueue
-    
     // MARK: Init
     
     public convenience init(_ urlString: String, sessionConfiguration: URLSessionConfiguration? = nil) {
@@ -84,7 +82,6 @@ open class Client: NSObject, URLSessionDataDelegate, URLSessionDownloadDelegate 
     
     public init(_ anUrl: URL, sessionConfiguration: URLSessionConfiguration? = nil, queue aQueue: DispatchQueue? = nil) {
         baseUrl = anUrl
-        queue = aQueue ?? DispatchQueue(label: "Ethel.Client", qos: .background, attributes: [], autoreleaseFrequency: .inherit, target: nil)
         super.init()
         initializeURLSession(sessionConfiguration)
     }
@@ -92,7 +89,6 @@ open class Client: NSObject, URLSessionDataDelegate, URLSessionDownloadDelegate 
     private func initializeURLSession(_ sessionConfiguration: URLSessionConfiguration?) {
         let sessionConfig = sessionConfiguration ?? URLSessionConfiguration.default
         session = URLSession(configuration: sessionConfig, delegate: self, delegateQueue: nil)
-        session.delegateQueue.underlyingQueue = queue
     }
     
     // MARK: Configuring
@@ -101,8 +97,9 @@ open class Client: NSObject, URLSessionDataDelegate, URLSessionDownloadDelegate 
         return Transport(session)
     }
     
-    @TransportBuilder open func prepare() -> TransportBuilding {
-        if let path = queue.getSpecific(key: CurrentContextKey)?.endpoint.path {
+    @TransportBuilder
+    open func prepare() -> TransportBuilding {
+        if let path = Context.current?.endpoint.path {
             Request(baseUrl.resolving(path))
         }
         else {
@@ -110,30 +107,7 @@ open class Client: NSObject, URLSessionDataDelegate, URLSessionDownloadDelegate 
         }
     }
     
-    // MARK: Resolving
-    
-    func resolve<T>(_ resolver: Resolver<T>, transport: Transport) {
-        if let response = transport.response, let error = validate(response: response) {
-            resolver.reject(error)
-        }
-        else if let error = transport.responseError {
-            resolver.reject(error)
-        }
-        
-        do {
-            let contents = try transport.getResponseContents()
-            guard let typedContents = contents as? T else {
-                throw ResponseError.unexpectedResponseType(expected: T.self, actual: type(of: contents))
-            }
-            resolver.fulfill(typedContents)
-        }
-        catch {
-            resolver.reject(error)
-        }
-    }
-    
-    /// Returns an error if response is considered erroneous, that is
-    /// the Promise should be rejected
+    /// Returns an error if response is considered erroneous
     open func validate(response: URLResponse) -> Error? {
         guard let response = response as? HTTPURLResponse else { return nil }
         if response.statusCode >= 200, response.statusCode < 300 {
@@ -146,21 +120,17 @@ open class Client: NSObject, URLSessionDataDelegate, URLSessionDownloadDelegate 
     
     open func execute<T>(_ endpoint: Endpoint, @TransportBuilder with block: () -> TransportBuilding) async throws -> T {
         let transport = createTransport()
-        let context = Context(endpoint: endpoint, transport: transport)
-        inContext(context) {
-            self.prepare().apply(to: transport)
+        try await Context.with(.init(endpoint: endpoint, transport: transport)) {
+            prepare().apply(to: transport)
             endpoint.prepare().apply(to: transport)
             block().apply(to: transport)
             try await transport.execute()
         }
-    }
-    
-    func inContext(_ aContext: Context, do aBlock: () -> Void) {
-        queue.sync {
-            let oldValue = queue.getSpecific(key: CurrentContextKey)
-            queue.setSpecific(key: CurrentContextKey, value: aContext, during: aBlock)
-            queue.setSpecific(key: CurrentContextKey, value: oldValue)
+        let contents = try transport.getResponseContents()
+        guard let typedContents = contents as? T else {
+            throw ResponseError.unexpectedResponseType(expected: T.self, actual: type(of: contents))
         }
+        return typedContents
     }
     
     // MARK: URLSessionDelegate

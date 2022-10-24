@@ -33,7 +33,7 @@ open class Transport: NSObject {
     // MARK: - Types
     
     public enum Announcement: Announceable {
-        case taskStarted, taskEnded, uploadProgressed, downloadProgressed
+        case willStartTask, didEndTask, uploadDidProgress, downloadDidProgress
     }
     
     public enum RequestType {
@@ -93,6 +93,13 @@ open class Transport: NSObject {
         response = nil
         responseData = nil
         responseDataURL = nil
+        announcer.announce(Announcement.willStartTask)
+        try await performRequest()
+        isComplete = true
+        emit(self, on: Beacon.ethel)
+    }
+    
+    func performRequest() async throws {
         switch requestType {
         case .download:
             (responseDataURL, response) = try await session.download(for: request!, delegate: self)
@@ -103,13 +110,10 @@ open class Transport: NSObject {
         case .data:
             (responseData, response) = try await session.data(for: request!, delegate: self)
         }
-        announcer.announce(Announcement.taskStarted)
-        isComplete = true
-        emit(self, on: Beacon.ethel)
     }
     
     func completed(_ aTask: URLSessionTask?) {
-        announcer.announce(Announcement.taskEnded)
+        announcer.announce(Announcement.didEndTask)
     }
     
     // MARK: - Request
@@ -191,7 +195,6 @@ open class Transport: NSObject {
         \(super.description)
             Request: \(requestDescription)
             Response: \(responseDescription)
-            Task: (\(task?.state.rawValue.description ?? "")) \(task?.description ?? "<nil>")
         """
     }
 }
@@ -215,7 +218,7 @@ extension Transport: URLSessionDelegate {
             uploadProgress?.totalUnitCount = totalBytesExpectedToSend
         }
         uploadProgress?.completedUnitCount = totalBytesSent
-        announcer.announce(Announcement.uploadProgressed)
+        announcer.announce(Announcement.uploadDidProgress)
     }
 }
 
@@ -253,7 +256,7 @@ extension Transport: URLSessionDownloadDelegate {
             downloadProgress?.totalUnitCount = totalBytesExpectedToWrite
         }
         downloadProgress?.completedUnitCount = totalBytesWritten
-        announcer.announce(Announcement.downloadProgressed)
+        announcer.announce(Announcement.downloadDidProgress)
     }
 }
 
@@ -272,7 +275,7 @@ extension Transport: URLSessionTaskDelegate {
         else {
             emit(self, on: Beacon.ethel)
         }
-        completed(task)
+        completed(aTask)
     }
 }
 

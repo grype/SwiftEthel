@@ -27,26 +27,18 @@ class ClientTestCase: XCTestCase {
 
     // MARK: - Utilities
 
-    func pauseTasks() {
+    func stubOutRequests() {
         stub(transport) { stub in
-            when(stub.startTask()).thenDoNothing()
-        }
-    }
-
-    func resolveRequest(in timeout: TimeInterval) {
-        stub(client) { stub in
-            when(stub.execute(transport: any(), completion: any())).then { _, completion in
-                DispatchQueue.global().asyncAfter(deadline: .now() + timeout) {
-                    completion()
-                }
-            }
+            when(stub.performRequest()).thenDoNothing()
         }
     }
 
     @discardableResult
-    func execute(endpoint: Endpoint, with aBlock: @escaping (Transport) -> Void) -> Promise<Any?> {
-        return endpoint.execute {
-            Eval(aBlock)
+    func execute(endpoint: Endpoint, with aBlock: ((Transport) -> Void)? = nil) async throws -> Any? {
+        try await endpoint.execute {
+            if let aBlock = aBlock {
+                Eval(aBlock)
+            }
         }
     }
 }

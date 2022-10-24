@@ -10,21 +10,13 @@
 import Foundation
 
 class GHGistEndpoint: GHEndpoint {
-    override var path: Path? { "/gists/\(id)" }
-    
-    var id: String = ""
-    
-    func get() -> Promise<GHGist> {
-        execute {
-            Get()
-            DecodeJSON<GHGist>()
-        }
-    }
-    
-    func delete() -> Promise<Any?> {
-        execute {
+    override var path: Path? { "/gists/\(String(describing: id))" }
+
+    var id: String?
+
+    func delete() async throws -> Any? {
+        try await execute {
             Delete()
         }
     }
-    
 }

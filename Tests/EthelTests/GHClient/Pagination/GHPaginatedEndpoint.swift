@@ -19,15 +19,18 @@ class GHPaginatedEndpoint<T: Decodable>: GHEndpoint {
     
     var pageSize: Int = 5
     
-    @TransportBuilder func prepare() -> TransportBuilding {
+    @TransportBuilder
+    func prepare() -> TransportBuilding {
         AddQuery(name: "page", value: "\(page)")
         AddQuery(name: "per_page", value: "\(pageSize)")
     }
     
-    func fetch() -> Promise<[Element]> {
-        execute {
-            Get()
-            DecodeJSON<[Element]>()
+    var pageContents: [Element] {
+        get async throws {
+            try await execute {
+                Get()
+                DecodeJSON<[Element]>()
+            }
         }
     }
 }

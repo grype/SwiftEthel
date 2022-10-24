@@ -32,7 +32,7 @@ public extension Endpoint {
         if willLog(type: EndpointSignal.self, on: [Beacon.ethel]) {
             EndpointSignal(self).emit(on: [Beacon.ethel], userInfo: beaconUserInfo)
         }
-        return client.execute(self, with: block)
+        return try await client.execute(self, with: block)
     }
 
     var beaconUserInfo: [AnyHashable: Any] {

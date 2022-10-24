@@ -12,7 +12,7 @@ import Foundation
 var EthelBeacon = Beacon.shared
 
 extension Beacon {
-    open class var ethel: Beacon {
+    public class var ethel: Beacon {
         get { EthelBeacon }
         set { EthelBeacon = newValue }
     }

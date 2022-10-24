@@ -32,109 +32,71 @@ class ClientTests: ClientTestCase {
         expect(endpoint.client) === client
     }
     
-    func testDerivesAbsolutePath() {
+    func testDerivesAbsolutePath() async {
         let endpoint = client / AbsoluteEndpoint.self
-        pauseTasks()
-        waitUntil { done in
-            self.execute(endpoint: endpoint) { _ in
-                done()
-            }
-        }
+        stubOutRequests()
+        _ = try? await execute(endpoint: endpoint)
         expect(self.transport.request?.url) == client.baseUrl.rootURL?.resolving(endpoint.path!)
     }
     
-    func testDerivesRelativePath() {
+    func testDerivesRelativePath() async {
         let endpoint = client / RelativeEndpoint.self
-        pauseTasks()
-        waitUntil { done in
-            self.execute(endpoint: endpoint) { _ in
-                done()
-            }
-        }
+        stubOutRequests()
+        _ = try? await execute(endpoint: endpoint)
         expect(self.transport.request?.url) == client.baseUrl.resolving(endpoint.path!)
     }
     
-    func testDerivesAbsolutePluggedPath() {
+    func testDerivesAbsolutePluggedPath() async {
         let endpoint = client / "/absolute"
-        pauseTasks()
-        waitUntil { done in
-            self.execute(endpoint: endpoint) { _ in
-                done()
-            }
-        }
+        stubOutRequests()
+        _ = try? await execute(endpoint: endpoint)
         expect(self.transport.request?.url) == client.baseUrl.rootURL?.resolving("/absolute")
     }
     
-    func testDerivesRelativePluggedPath() {
+    func testDerivesRelativePluggedPath() async {
         let endpoint = client / "relative"
-        pauseTasks()
-        waitUntil { done in
-            self.execute(endpoint: endpoint) { _ in
-                done()
-            }
-        }
+        stubOutRequests()
+        _ = try? await execute(endpoint: endpoint)
         expect(self.transport.request?.url) == client.baseUrl.resolving("relative")
     }
     
     // MARK: - Execution
     
-    func testCreatesRequestContext() {
+    func testCreatesRequestContext() async {
         let endpoint = client / "somewhere1"
-        pauseTasks()
-        waitUntil { [self] done in
-            execute(endpoint: endpoint) { _ in
-                expect(self.client.queue.getSpecific(key: CurrentContextKey)).toNot(beNil())
-                done()
-            }
+        stubOutRequests()
+        _ = try? await execute(endpoint: endpoint) { _ in
+            let context = Context.current
+            expect(context).toNot(beNil())
         }
     }
     
-    func testContextHasTransport() {
+    func testContextHasTransport() async {
         let endpoint = client / "somewhere2"
-        pauseTasks()
-        waitUntil { [self] done in
-            execute(endpoint: endpoint) { [self] _ in
-                let context = client.queue.getSpecific(key: CurrentContextKey)
-                expect(context?.transport).toNot(beNil())
-                done()
-            }
+        stubOutRequests()
+        _ = try? await execute(endpoint: endpoint) { _ in
+            expect(Context.current?.transport).toNot(beNil())
         }
     }
     
-    func testContextExistsOnlyDuringExecution() {
+    func testContextExistsOnlyDuringExecution() async {
         let endpoint = client / "somewhere3"
-        expect(self.client.queue.getSpecific(key: CurrentContextKey)).to(beNil())
-        pauseTasks()
-        resolveRequest(in: 0.25)
-        waitUntil { [self] done in
-            _ = execute(endpoint: endpoint) { _ in
-                expect(self.client.queue.getSpecific(key: CurrentContextKey)).toNot(beNil())
-            }.ensure {
-                expect(self.client.queue.getSpecific(key: CurrentContextKey)).to(beNil())
-                done()
-            }
+        expect(Context.current).to(beNil())
+        stubOutRequests()
+        _ = try? await execute(endpoint: endpoint) { _ in
+            expect(Context.current).toNot(beNil())
         }
-        expect(self.client.queue.getSpecific(key: CurrentContextKey)).to(beNil())
+        expect(Context.current).to(beNil())
     }
     
-    func testUnexpectedResponseType() {
-        var error: Error?
-        let endpoint = client / "omg"
-        let result: Promise<Uncodable> = endpoint.get {
-            DecodeJSON<Uncodable>()
+    func testUnexpectedResponseType() async throws {
+        stubOutRequests()
+        do {
+            _ = try await execute(endpoint: client / "omg")
         }
-        result.catch { anError in
-            error = anError
+        catch {
+            expect(error).toNot(beNil())
         }
-        pauseTasks()
-        resolveRequest(in: 0.25)
-        waitUntil { [self] done in
-            _ = execute(endpoint: endpoint) { _ in
-            }.ensure {
-                done()
-            }
-        }
-        expect(error).toNot(beNil())
     }
 }
 

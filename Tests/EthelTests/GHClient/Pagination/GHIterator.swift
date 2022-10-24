@@ -11,6 +11,7 @@ import Foundation
 
 struct GHIterator<U: SequenceEndpoint>: EndpointIterator {
     // MARK: - Iterator
+
     typealias Element = U.Element
     
     var endpoint: U
@@ -40,10 +41,10 @@ struct GHIterator<U: SequenceEndpoint>: EndpointIterator {
         return elements == nil || currentOffset >= elements!.count
     }
     
-    mutating func next() -> Element? {
+    mutating func next() async throws -> Element? {
         guard hasMore else { return nil }
         if needsFetch {
-            fetch()
+            try await fetch()
         }
         
         guard let elements = elements, elements.count > currentOffset else {
@@ -54,14 +55,10 @@ struct GHIterator<U: SequenceEndpoint>: EndpointIterator {
         return result
     }
     
-    private mutating func fetch() {
+    private mutating func fetch() async throws {
         currentOffset = 0
-        do {
-            elements = try endpoint.next(with: self as! U.Iterator).wait()
-            hasMore = (elements?.count ?? 0) == pageSize
-            page += 1
-        } catch {
-            print("Error: \(error)")
-        }
+        elements = try await endpoint.next(with: self as! U.AsyncIterator)
+        hasMore = (elements?.count ?? 0) == pageSize
+        page += 1
     }
 }
