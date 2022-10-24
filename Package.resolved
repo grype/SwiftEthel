@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Flight-School/AnyCodable",
       "state" : {
-        "revision" : "b1a7a8a6186f2fcb28f7bda67cfc545de48b3c80",
-        "version" : "0.6.2"
+        "revision" : "862808b2070cd908cb04f9aafe7de83d35f81b05",
+        "version" : "0.6.7"
       }
     },
     {
@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Brightify/Cuckoo",
       "state" : {
-        "revision" : "79b13331e5068f28c563a66eac9c38c45ed7fef4",
-        "version" : "1.5.2"
+        "revision" : "64b1681e37444d998e9cff2df6537a75695ab638",
+        "version" : "1.9.1"
       }
     },
     {
@@ -68,8 +68,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/grype/SwiftBeacon",
       "state" : {
-        "revision" : "2c4e85d8a8ef1a61e8442c67642bbede88e26782",
-        "version" : "2.1.0"
+        "revision" : "5c213fc12611f87714852704c0ca26ff7d48704d",
+        "version" : "2.1.4"
       }
     }
   ],
