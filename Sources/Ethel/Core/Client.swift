@@ -80,7 +80,7 @@ open class Client: NSObject, URLSessionDataDelegate, URLSessionDownloadDelegate 
         self.init(URL(string: urlString)!, sessionConfiguration: sessionConfiguration)
     }
     
-    public init(_ anUrl: URL, sessionConfiguration: URLSessionConfiguration? = nil, queue aQueue: DispatchQueue? = nil) {
+    public init(_ anUrl: URL, sessionConfiguration: URLSessionConfiguration? = nil) {
         baseUrl = anUrl
         super.init()
         initializeURLSession(sessionConfiguration)
