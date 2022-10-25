@@ -27,11 +27,9 @@ public struct Eval: TransportBuilding {
  Evaluates a block, passing it current execution context.
  */
 public struct CurrentContext: TransportBuilding {
-    public private(set) var queue: DispatchQueue
     public private(set) var block: (Context)->Void
 
-    public init(queue aQueue: DispatchQueue, block aBlock: @escaping (Context)->Void) {
-        queue = aQueue
+    public init(block aBlock: @escaping (Context)->Void) {
         block = aBlock
     }
 
