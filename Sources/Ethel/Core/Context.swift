@@ -10,7 +10,7 @@ import Foundation
 
 public class Context {
     @TaskLocal
-    static var current: Context?
+    public static var current: Context?
 
     static func with(_ aContext: Context?, do aBlock: () async throws ->Void) async throws {
         try await $current.withValue(aContext, operation: aBlock)
