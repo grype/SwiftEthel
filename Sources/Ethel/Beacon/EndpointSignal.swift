@@ -11,7 +11,7 @@ import Foundation
 import AnyCodable
 
 public class EndpointSignal: WrapperSignal {
-    var endpoint: Endpoint {
+    public var endpoint: Endpoint {
         return value as! Endpoint
     }
 
@@ -31,7 +31,7 @@ public class EndpointSignal: WrapperSignal {
         return result
     }
 
-    init(_ anEndpoint: Endpoint) {
+    public init(_ anEndpoint: Endpoint) {
         super.init(anEndpoint)
         userInfo = endpoint.beaconUserInfo
     }
