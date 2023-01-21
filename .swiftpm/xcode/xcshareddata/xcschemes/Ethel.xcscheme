@@ -58,7 +58,13 @@
                   Identifier = "Examples">
                </Test>
                <Test
+                  Identifier = "FlickExamples">
+               </Test>
+               <Test
                   Identifier = "GHClientExamples">
+               </Test>
+               <Test
+                  Identifier = "GitHubExamples">
                </Test>
             </SkippedTests>
          </TestableReference>
