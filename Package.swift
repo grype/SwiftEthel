@@ -7,8 +7,8 @@ let package = Package(
     name: "Ethel",
     platforms: [
         .macOS(.v12),
-        .iOS(.v13),
-        .tvOS(.v10),
+        .iOS(.v15),
+        .tvOS(.v15),
         .watchOS(.v3)
     ],
     products: [
